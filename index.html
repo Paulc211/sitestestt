@@ -223,7 +223,7 @@
     text-shadow:2px 2px 0 rgba(0,0,0,.5);
   }
   .cover-masthead{
-    margin-top:14px;
+    margin-top:58px;
     color:var(--yellow);
     font-size:clamp(1.1rem,4vw,1.6rem);
     letter-spacing:4px;
@@ -241,7 +241,7 @@
   .letters-go .ltr{animation-play-state:running}
   @keyframes ltr-in{to{opacity:1;transform:none}}
   .issue-box{
-    position:absolute;top:56px;left:12px;
+    position:absolute;top:64px;left:12px;
     background:#fff;border:3px solid var(--ink);
     box-shadow:3px 3px 0 rgba(0,0,0,.4);
     font-family:'Bangers',Impact,'Arial Black',sans-serif;
@@ -424,6 +424,33 @@
   #next-btn.attention{animation:btn-nudge 1.6s ease-in-out infinite}
   @keyframes btn-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
 
+  /* ---------------- MUSIC TOGGLE ---------------- */
+  #music-btn{
+    position:fixed;top:14px;right:14px;z-index:1100;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--red);
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 rgba(0,0,0,.55);
+    color:#fff;font-size:1.5rem;line-height:1;
+    cursor:pointer;transition:.15s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #music-btn:hover{background:var(--yellow)}
+  #music-btn.playing{animation:music-bop 1s ease-in-out infinite}
+  @keyframes music-bop{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(6deg) scale(1.1)}}
+  #music-btn.off{opacity:.75;filter:grayscale(.6)}
+  #music-hint{
+    position:fixed;top:74px;right:10px;z-index:1100;
+    background:var(--yellow);border:2px solid var(--ink);
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:1px;font-size:.85rem;
+    padding:5px 10px;transform:rotate(-2deg);
+    pointer-events:none;
+    opacity:0;transition:opacity .4s;
+  }
+  #music-hint.show{opacity:1}
+
   .tap-zone{
     position:fixed;top:0;bottom:80px;width:13%;z-index:150;
     background:transparent;border:0;cursor:pointer;
@@ -602,6 +629,11 @@
   </div>
 
 </div>
+
+<!-- theme song -->
+<audio id="theme" src="assets/theme-song.mp3" loop preload="auto"></audio>
+<button id="music-btn" class="off" aria-label="Toggle music" title="Toggle music">🎵</button>
+<div id="music-hint">TAP 🎵 FOR MUSIC!</div>
 
 <!-- page navigation -->
 <button class="tap-zone" id="tap-prev" aria-label="Previous page"></button>
@@ -796,6 +828,34 @@
     timers.push(setTimeout(endIntro,3650));
   }
   $('skip-intro').addEventListener('click',endIntro);
+
+  /* ---------- theme song ---------- */
+  const music=$('theme'), musicBtn=$('music-btn'), musicHint=$('music-hint');
+  music.volume=0.55;
+  let musicWanted=true;
+  function musicUI(){
+    const on=!music.paused;
+    musicBtn.textContent=on?'🎵':'🔇';
+    musicBtn.classList.toggle('playing',on);
+    musicBtn.classList.toggle('off',!on);
+  }
+  function tryMusic(){
+    if(!musicWanted||!music.paused) return;
+    music.play().then(()=>{musicUI();musicHint.classList.remove('show');}).catch(()=>{});
+  }
+  musicBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(music.paused){ musicWanted=true; tryMusic(); }
+    else{ musicWanted=false; music.pause(); musicUI(); }
+    musicHint.classList.remove('show');
+  });
+  // browsers block autoplay with sound — start on the first tap/click/key instead
+  tryMusic();
+  ['pointerdown','keydown','touchstart'].forEach(ev=>
+    document.addEventListener(ev,tryMusic,{passive:true}));
+  // if autoplay was blocked, point at the music button after the intro
+  setTimeout(()=>{ if(music.paused&&musicWanted) musicHint.classList.add('show'); },reduced?500:4200);
+  setTimeout(()=>musicHint.classList.remove('show'),12000);
 
   /* ---------- countdown ---------- */
   const target=new Date(PARTY.countdownTo).getTime();
