@@ -64,7 +64,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400}
    opens in a circular wipe.
    ============================================================ */
 #intro{
-  position:fixed;inset:0;z-index:100;cursor:pointer;
+  position:fixed;inset:0;z-index:100;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
   background:
     radial-gradient(ellipse at 50% 42%,#2a1b14 0%,var(--noir) 62%,#0a0706 100%);
@@ -110,11 +110,31 @@ h1,h2,h3{font-family:var(--display);font-weight:400}
 .label .l-song{font-family:var(--serif);font-style:italic;font-size:.72rem;color:var(--gold-soft);margin-top:2px}
 .label .l-side{font-size:.5rem;letter-spacing:.35em;text-indent:.35em;color:rgba(240,226,192,.65);text-transform:uppercase;margin-top:4px}
 .label::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#0a0706;border:1px solid var(--gold)}
-/* tonearm */
+/* tonearm — grab it, swing it over the record, let it drop */
 .tonearm{
   position:absolute;top:-6%;right:-9%;width:11px;height:64%;
   transform-origin:top center;transform:rotate(-24deg);
-  transition:transform 1.1s cubic-bezier(.6,0,.3,1);z-index:3;pointer-events:none;
+  transition:transform 1.1s cubic-bezier(.6,0,.3,1);z-index:3;
+  cursor:grab;touch-action:none;
+}
+.tonearm.dragging{transition:none;cursor:grabbing}
+.tonearm.idle{animation:beckon 3.6s ease 2.2s infinite}
+@keyframes beckon{0%,100%{transform:rotate(-24deg)}12%{transform:rotate(-19deg)}24%{transform:rotate(-24deg)}}
+/* generous invisible hit zone + pulsing halo around the needle head */
+.tonearm .grab{
+  position:absolute;left:50%;bottom:-34px;transform:translateX(-50%);
+  width:86px;height:120px;border-radius:50%;
+}
+.tonearm .halo{
+  position:absolute;left:50%;bottom:-8px;transform:translate(-50%,50%);
+  width:52px;height:52px;border-radius:50%;border:1px solid var(--gold);
+  pointer-events:none;animation:haloPulse 2.2s ease infinite;
+}
+.tonearm.dragging .halo,#intro.playing .halo{display:none}
+@keyframes haloPulse{
+  0%{opacity:.7;transform:translate(-50%,50%) scale(.7)}
+  70%{opacity:0;transform:translate(-50%,50%) scale(1.5)}
+  100%{opacity:0;transform:translate(-50%,50%) scale(1.5)}
 }
 .tonearm .arm{position:absolute;left:50%;top:26px;transform:translateX(-50%);width:4px;height:calc(100% - 26px);background:linear-gradient(var(--gold-soft),var(--gold));border-radius:2px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
 .tonearm .pivot{position:absolute;left:50%;top:0;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--gold-soft),#8a6c31);box-shadow:0 4px 12px rgba(0,0,0,.7)}
@@ -526,7 +546,7 @@ footer .fnote{font-family:var(--serif);font-style:italic;margin-top:34px;font-si
 <audio id="song" src="is-it-a-crime.mp3" loop preload="auto"></audio>
 
 <!-- ══════════════ INTRO — drop the needle ══════════════ -->
-<div id="intro" role="button" aria-label="Drop the needle and enter">
+<div id="intro" role="button" tabindex="0" aria-label="Drag the needle onto the record to enter, or press Enter">
   <p class="intro-kicker">Now spinning &middot; Sade</p>
   <div class="turntable">
     <div class="vinyl"></div>
@@ -536,10 +556,13 @@ footer .fnote{font-family:var(--serif);font-style:italic;margin-top:34px;font-si
       <div class="l-side">Side A &middot; 33&#8531; rpm</div>
     </div>
     <span class="ripple r1"></span><span class="ripple r2"></span><span class="ripple r3"></span>
-    <div class="tonearm"><span class="pivot"></span><span class="arm"></span><span class="head"></span></div>
+    <div class="tonearm idle" id="tonearm" aria-label="Drag the needle onto the record">
+      <span class="pivot"></span><span class="arm"></span><span class="head"></span>
+      <span class="grab"></span><span class="halo"></span>
+    </div>
   </div>
   <div class="intro-names">Amelia <em>&amp;</em> James</div>
-  <div class="intro-hint">Drop the needle</div>
+  <div class="intro-hint">Grab the needle &middot; lay it on the record</div>
 </div>
 
 <!-- ══════════════ NAV ══════════════ -->
@@ -855,8 +878,52 @@ function enterSite(withMusic){
     setTimeout(()=>intro.classList.add("gone"), 1500);
   }, 1400);
 }
-intro.addEventListener("click", ()=>enterSite(true));
-setTimeout(()=>enterSite(false), 10000);   // auto-enter silently if the guest just waits
+/* the needle is a real thing: grab it, swing it over the platter, and let
+   it drop. Release it over the record and the song starts; let go too
+   early and it springs back to its rest. */
+const tonearm = document.getElementById("tonearm");
+const REST = -24, MAX = 14, DROP_AT = 0;   // degrees; >= DROP_AT means the stylus is over the record
+let dragging = false, dragRot = REST;
+let autoTimer = setTimeout(()=>enterSite(false), 16000);   // auto-enter silently if the guest just waits
+
+function pivotPoint(){
+  const r = tonearm.querySelector(".pivot").getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
+}
+tonearm.addEventListener("pointerdown", e=>{
+  if(opened) return;
+  e.preventDefault();
+  dragging = true; clearTimeout(autoTimer);
+  tonearm.classList.remove("idle");
+  tonearm.classList.add("dragging");
+  tonearm.setPointerCapture(e.pointerId);
+});
+tonearm.addEventListener("pointermove", e=>{
+  if(!dragging) return;
+  const p = pivotPoint();
+  // the arm hangs straight down at 0deg; positive rotation swings it onto the platter
+  const deg = -Math.atan2(e.clientX - p.x, e.clientY - p.y) * 180/Math.PI;
+  dragRot = Math.max(REST - 2, Math.min(MAX, deg));
+  tonearm.style.transform = `rotate(${dragRot}deg)`;
+});
+function releaseArm(){
+  if(!dragging) return;
+  dragging = false;
+  tonearm.classList.remove("dragging");
+  tonearm.style.transform = "";          // hand control back to the CSS transition
+  if(dragRot >= DROP_AT){
+    enterSite(true);                     // the needle lands, the song begins
+  } else {
+    tonearm.classList.add("idle");       // sprang back — beckon again
+    dragRot = REST;
+    autoTimer = setTimeout(()=>enterSite(false), 16000);
+  }
+}
+tonearm.addEventListener("pointerup", releaseArm);
+tonearm.addEventListener("pointercancel", releaseArm);
+intro.addEventListener("keydown", e=>{
+  if(e.key === "Enter" || e.key === " "){ e.preventDefault(); enterSite(true); }
+});
 
 /* ── Smoke wisps + petals ──────────────────────────────── */
 function addWisps(host, n){
