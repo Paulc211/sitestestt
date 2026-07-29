@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amelia &amp; James — September 12, 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Italiana&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PALETTE — ivory / sage / champagne / dusty rose
+   ============================================================ */
+:root{
+  --ivory:#faf7f1;
+  --ivory-deep:#f3eee4;
+  --sage:#7d8b6f;
+  --sage-deep:#4b5741;
+  --sage-mist:#e6eadf;
+  --champagne:#c2a878;
+  --champagne-soft:#e9dcc3;
+  --rose:#d4a49c;
+  --ink:#33382c;
+  --ink-soft:#6a6f60;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --display:'Italiana',var(--serif);
+  --sans:'Jost','Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--ivory);
+  color:var(--ink);
+  overflow-x:hidden;
+  line-height:1.7;
+}
+::selection{background:var(--sage-mist);color:var(--sage-deep)}
+
+h1,h2,h3{font-family:var(--serif);font-weight:400}
+
+/* ============================================================
+   FIXED FLORAL CORNERS (page frame)
+   ============================================================ */
+.page-frame{position:fixed;inset:14px;border:1px solid rgba(125,139,111,.35);pointer-events:none;z-index:60}
+.corner-flower{position:fixed;width:150px;height:150px;pointer-events:none;z-index:61;opacity:.9}
+.corner-flower svg{width:100%;height:100%}
+.corner-flower.tl{top:0;left:0}
+.corner-flower.tr{top:0;right:0;transform:scaleX(-1)}
+.corner-flower.bl{bottom:0;left:0;transform:scaleY(-1)}
+.corner-flower.br{bottom:0;right:0;transform:scale(-1,-1)}
+@media(max-width:640px){
+  .corner-flower{width:90px;height:90px}
+  .page-frame{inset:9px}
+}
+
+/* ============================================================
+   INTRO — "The Blooming Veil"
+   A line-art peony draws itself, the monogram breathes in,
+   then the veil parts upward like sheer curtains lifting.
+   ============================================================ */
+#intro{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+#intro .veil{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#f6f1e7 0%,var(--ivory) 45%,#eef0e6 100%);
+  transition:transform 1.6s cubic-bezier(.77,0,.18,1);
+}
+#intro .veil.left{clip-path:polygon(0 0,50.5% 0,50.5% 100%,0 100%)}
+#intro .veil.right{clip-path:polygon(49.5% 0,100% 0,100% 100%,49.5% 100%)}
+#intro.open .veil.left{transform:translateX(-102%)}
+#intro.open .veil.right{transform:translateX(102%)}
+#intro.gone{display:none}
+#intro .intro-content{
+  position:relative;text-align:center;z-index:2;
+  transition:opacity .8s ease,transform .8s ease;
+}
+#intro.open .intro-content{opacity:0;transform:scale(1.05)}
+#intro .bloom{width:min(46vw,230px);margin:0 auto 8px}
+#intro .bloom path,#intro .bloom circle{
+  fill:none;stroke:var(--sage);stroke-width:1.4;stroke-linecap:round;
+  stroke-dasharray:600;stroke-dashoffset:600;
+  animation:draw 3.2s ease forwards;
+}
+#intro .bloom .p2{animation-delay:.5s}
+#intro .bloom .p3{animation-delay:1s;stroke:var(--rose)}
+#intro .bloom .p4{animation-delay:1.4s;stroke:var(--champagne)}
+@keyframes draw{to{stroke-dashoffset:0}}
+#intro .mono{
+  font-family:var(--display);font-size:clamp(3rem,9vw,5.2rem);color:var(--sage-deep);
+  letter-spacing:.4em;text-indent:.4em;
+  opacity:0;animation:breatheIn 2s ease 1.6s forwards;
+}
+#intro .mono .amp{color:var(--champagne);font-style:italic;font-family:var(--serif)}
+#intro .intro-sub{
+  font-size:.8rem;letter-spacing:.55em;text-indent:.55em;text-transform:uppercase;color:var(--ink-soft);
+  opacity:0;animation:breatheIn 1.8s ease 2.4s forwards;
+}
+#intro .enter-hint{
+  margin-top:42px;font-size:.68rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;color:var(--champagne);
+  opacity:0;animation:pulseHint 2.4s ease 3.2s infinite;
+}
+@keyframes breatheIn{from{opacity:0;letter-spacing:.7em;filter:blur(6px)}to{opacity:1;filter:blur(0)}}
+@keyframes pulseHint{0%,100%{opacity:.25}50%{opacity:.9}}
+
+/* drifting petals inside intro + hero */
+.petal{position:absolute;top:-40px;pointer-events:none;animation:fall linear infinite;opacity:.7}
+.petal svg{width:100%;height:100%}
+@keyframes fall{
+  0%{transform:translateY(-5vh) rotate(0deg) translateX(0)}
+  50%{transform:translateY(50vh) rotate(190deg) translateX(4vw)}
+  100%{transform:translateY(110vh) rotate(380deg) translateX(-3vw)}
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;position:relative;padding:90px 24px 60px;
+  background:
+    radial-gradient(ellipse at 20% 15%,rgba(212,164,156,.14),transparent 55%),
+    radial-gradient(ellipse at 80% 85%,rgba(125,139,111,.16),transparent 55%),
+    var(--ivory);
+  overflow:hidden;
+}
+.hero .eyebrow{font-size:.75rem;letter-spacing:.6em;text-indent:.6em;text-transform:uppercase;color:var(--sage)}
+.hero h1{
+  font-family:var(--display);font-size:clamp(3.4rem,11vw,7.5rem);
+  color:var(--ink);line-height:1.08;margin:18px 0 8px;
+}
+.hero h1 .amp{
+  display:block;font-family:var(--serif);font-style:italic;font-size:.32em;color:var(--champagne);
+  letter-spacing:.5em;text-indent:.5em;margin:10px 0;
+}
+.hero .date-line{
+  display:flex;align-items:center;gap:20px;margin:26px 0 10px;color:var(--sage-deep);
+  font-family:var(--serif);font-size:clamp(1.05rem,2.6vw,1.4rem);letter-spacing:.25em;text-transform:uppercase;
+}
+.hero .date-line::before,.hero .date-line::after{content:"";height:1px;width:70px;background:var(--champagne)}
+.hero .venue-line{color:var(--ink-soft);font-weight:300;letter-spacing:.18em;font-size:.9rem}
+
+.countdown{display:flex;gap:clamp(14px,4vw,40px);margin-top:46px}
+.count-cell{min-width:74px}
+.count-cell .num{
+  font-family:var(--serif);font-size:clamp(1.9rem,5vw,3rem);color:var(--sage-deep);line-height:1;
+}
+.count-cell .lbl{font-size:.62rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--champagne);margin-top:8px}
+.count-cell+.count-cell{border-left:1px solid var(--champagne-soft);padding-left:clamp(14px,4vw,40px)}
+
+.hero-cta{display:flex;gap:16px;margin-top:52px;flex-wrap:wrap;justify-content:center}
+
+.scroll-cue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);color:var(--sage);font-size:.62rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;animation:cueFloat 2.6s ease infinite}
+@keyframes cueFloat{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:15px 34px;border:1px solid var(--sage-deep);color:var(--sage-deep);
+  background:transparent;text-decoration:none;cursor:pointer;
+  font-family:var(--sans);font-size:.74rem;letter-spacing:.32em;text-indent:.1em;text-transform:uppercase;
+  position:relative;overflow:hidden;transition:color .45s ease;
+}
+.btn::before{
+  content:"";position:absolute;inset:0;background:var(--sage-deep);
+  transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.77,0,.18,1);z-index:-1;
+}
+.btn:hover{color:var(--ivory)}
+.btn:hover::before{transform:scaleX(1)}
+.btn.gold{border-color:var(--champagne);color:var(--champagne)}
+.btn.gold::before{background:var(--champagne)}
+.btn.gold:hover{color:#fff}
+.btn.solid{background:var(--sage-deep);color:var(--ivory)}
+.btn.solid::before{background:var(--champagne)}
+.btn svg{width:15px;height:15px;flex:none}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{padding:110px 24px;position:relative}
+.wrap{max-width:1060px;margin:0 auto}
+.sec-head{text-align:center;margin-bottom:64px}
+.sec-head .kicker{font-size:.7rem;letter-spacing:.55em;text-indent:.55em;text-transform:uppercase;color:var(--champagne)}
+.sec-head h2{font-size:clamp(2.2rem,6vw,3.4rem);color:var(--ink);margin-top:12px;font-weight:500}
+.sec-head .divider{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:20px;color:var(--sage)}
+.sec-head .divider::before,.sec-head .divider::after{content:"";height:1px;width:60px;background:var(--champagne-soft)}
+.sec-head .divider svg{width:26px;height:26px}
+
+/* scroll reveal */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity 1s ease,transform 1s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ============================================================
+   OUR STORY — timeline
+   ============================================================ */
+#story{background:linear-gradient(180deg,var(--ivory) 0%,var(--sage-mist) 120%)}
+.timeline{position:relative;max-width:720px;margin:0 auto}
+.timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(var(--champagne-soft),var(--sage),var(--champagne-soft))}
+.moment{position:relative;width:50%;padding:0 46px 70px}
+.moment:nth-child(odd){left:0;text-align:right}
+.moment:nth-child(even){left:50%;text-align:left}
+.moment .dot{
+  position:absolute;top:6px;width:13px;height:13px;border-radius:50%;
+  background:var(--ivory);border:2px solid var(--champagne);
+}
+.moment:nth-child(odd) .dot{right:-7px}
+.moment:nth-child(even) .dot{left:-7px}
+.moment .yr{font-family:var(--serif);font-style:italic;color:var(--champagne);font-size:1.3rem}
+.moment h3{font-size:1.45rem;color:var(--sage-deep);margin:4px 0 8px}
+.moment p{color:var(--ink-soft);font-weight:300;font-size:.93rem}
+@media(max-width:640px){
+  .timeline::before{left:10px}
+  .moment{width:100%;left:0!important;text-align:left!important;padding:0 0 56px 42px}
+  .moment .dot{left:4px!important;right:auto!important}
+}
+
+/* ============================================================
+   DETAILS — day schedule cards
+   ============================================================ */
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px}
+.detail-card{
+  background:#fffdf8;border:1px solid var(--champagne-soft);
+  padding:52px 32px 44px;text-align:center;position:relative;
+  transition:transform .5s ease,box-shadow .5s ease;
+}
+.detail-card:hover{transform:translateY(-8px);box-shadow:0 24px 50px -28px rgba(75,87,65,.35)}
+.detail-card .card-corner{position:absolute;width:34px;height:34px;opacity:.8}
+.detail-card .card-corner.a{top:8px;left:8px}
+.detail-card .card-corner.b{top:8px;right:8px;transform:scaleX(-1)}
+.detail-card .card-corner.c{bottom:8px;left:8px;transform:scaleY(-1)}
+.detail-card .card-corner.d{bottom:8px;right:8px;transform:scale(-1,-1)}
+.detail-card .icon{width:44px;height:44px;margin:0 auto 18px;color:var(--sage)}
+.detail-card .icon svg{width:100%;height:100%}
+.detail-card h3{font-size:1.5rem;color:var(--sage-deep)}
+.detail-card .time{font-family:var(--serif);font-style:italic;color:var(--champagne);font-size:1.15rem;margin:6px 0 12px}
+.detail-card p{font-size:.88rem;color:var(--ink-soft);font-weight:300}
+
+/* ============================================================
+   VENUE
+   ============================================================ */
+#venue{background:var(--sage-deep);color:var(--ivory)}
+#venue .sec-head h2{color:var(--ivory)}
+#venue .sec-head .kicker{color:var(--champagne)}
+.venue-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center}
+@media(max-width:820px){.venue-inner{grid-template-columns:1fr}}
+.venue-map-ph{
+  aspect-ratio:4/3;border:1px dashed rgba(233,220,195,.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  color:var(--champagne-soft);background:rgba(255,255,255,.04);
+}
+/* picture here: replace this placeholder with a venue photo or an embedded map iframe */
+.venue-map-ph svg{width:46px;height:46px;opacity:.8}
+.venue-map-ph span{font-size:.72rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase}
+.venue-copy h3{font-family:var(--display);font-size:2.1rem;letter-spacing:.06em}
+.venue-copy .addr{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--champagne-soft);margin:14px 0 8px;line-height:1.6}
+.venue-copy p{font-weight:300;color:#d9ddd0;font-size:.92rem}
+.venue-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px}
+#venue .btn{border-color:var(--champagne-soft);color:var(--champagne-soft)}
+#venue .btn::before{background:var(--champagne)}
+#venue .btn:hover{color:var(--sage-deep)}
+
+/* ============================================================
+   GALLERY — auto-scrolling marquee
+   ============================================================ */
+#gallery{padding-left:0;padding-right:0;overflow:hidden}
+.marquee{display:flex;gap:22px;width:max-content;animation:slide 42s linear infinite;padding:6px 0}
+.marquee:hover{animation-play-state:paused}
+.marquee.rev{animation-direction:reverse;animation-duration:52s;margin-top:22px}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ph{
+  width:clamp(220px,26vw,320px);aspect-ratio:3/4;flex:none;
+  border:1px dashed var(--champagne);background:linear-gradient(150deg,#fffdf8,var(--ivory-deep));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--champagne);
+}
+.marquee.rev .ph{aspect-ratio:4/3;width:clamp(240px,28vw,360px)}
+.ph svg{width:38px;height:38px;opacity:.75}
+.ph span{font-size:.68rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--ink-soft)}
+.gallery-note{text-align:center;color:var(--ink-soft);font-weight:300;font-size:.85rem;margin-top:34px;font-style:italic;font-family:var(--serif)}
+
+/* ============================================================
+   RSVP
+   ============================================================ */
+#rsvp{background:linear-gradient(180deg,var(--ivory) 0%,#f2ede1 100%)}
+.rsvp-card{
+  max-width:560px;margin:0 auto;background:#fffdf8;border:1px solid var(--champagne-soft);
+  padding:64px 48px;position:relative;box-shadow:0 40px 80px -50px rgba(75,87,65,.4);
+}
+@media(max-width:520px){.rsvp-card{padding:48px 26px}}
+.seat-meter{text-align:center;margin-bottom:38px}
+.seat-meter .big{font-family:var(--serif);font-size:2.6rem;color:var(--sage-deep);line-height:1}
+.seat-meter .big em{font-style:italic;color:var(--champagne)}
+.seat-meter .cap{font-size:.68rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;color:var(--ink-soft);margin-top:8px}
+.seat-bar{height:3px;background:var(--champagne-soft);margin-top:18px;position:relative;overflow:hidden}
+.seat-bar i{position:absolute;inset:0;transform-origin:left;background:linear-gradient(90deg,var(--sage),var(--champagne));transition:transform 1s cubic-bezier(.77,0,.18,1)}
+.field{margin-bottom:26px}
+.field label{display:block;font-size:.66rem;letter-spacing:.35em;text-indent:.1em;text-transform:uppercase;color:var(--sage-deep);margin-bottom:9px}
+.field input,.field select{
+  width:100%;border:none;border-bottom:1px solid var(--champagne);background:transparent;
+  padding:10px 2px;font-family:var(--serif);font-size:1.2rem;color:var(--ink);outline:none;
+  transition:border-color .3s;border-radius:0;
+}
+.field input:focus{border-color:var(--sage-deep)}
+.stepper{display:flex;align-items:center;gap:22px}
+.stepper button{
+  width:44px;height:44px;border:1px solid var(--champagne);background:transparent;color:var(--sage-deep);
+  font-family:var(--serif);font-size:1.5rem;cursor:pointer;transition:.3s;line-height:1;
+}
+.stepper button:hover{background:var(--sage-deep);border-color:var(--sage-deep);color:var(--ivory)}
+.stepper .count{font-family:var(--serif);font-size:2.2rem;min-width:52px;text-align:center;color:var(--ink)}
+.avail-msg{margin-top:14px;font-family:var(--serif);font-style:italic;font-size:1.02rem;color:var(--sage-deep);min-height:1.6em;transition:color .3s}
+.avail-msg.warn{color:#b1584e}
+#rsvpForm .btn{width:100%;justify-content:center;margin-top:10px}
+.rsvp-done{display:none;text-align:center}
+.rsvp-done.show{display:block;animation:doneIn .9s ease}
+@keyframes doneIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.rsvp-done .ring{width:74px;height:74px;margin:0 auto 24px;color:var(--sage)}
+.rsvp-done .ring svg{width:100%;height:100%}
+.rsvp-done h3{font-size:1.9rem;color:var(--sage-deep)}
+.rsvp-done p{color:var(--ink-soft);font-weight:300;margin-top:10px;font-size:.95rem}
+.rsvp-done .mail-note{
+  margin-top:22px;display:inline-flex;align-items:center;gap:10px;
+  padding:12px 22px;border:1px solid var(--champagne-soft);color:var(--champagne);
+  font-size:.7rem;letter-spacing:.28em;text-indent:.05em;text-transform:uppercase;
+}
+.rsvp-done .mail-note svg{width:16px;height:16px}
+.demo-note{text-align:center;font-size:.68rem;letter-spacing:.15em;color:#b6b0a2;margin-top:26px}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq{max-width:680px;margin:0 auto}
+.faq details{border-bottom:1px solid var(--champagne-soft);padding:22px 4px}
+.faq summary{
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--serif);font-size:1.25rem;color:var(--sage-deep);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--serif);color:var(--champagne);font-size:1.5rem;transition:transform .3s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding-top:12px;color:var(--ink-soft);font-weight:300;font-size:.92rem}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  text-align:center;padding:90px 24px 70px;
+  background:var(--sage-deep);color:var(--champagne-soft);
+}
+footer .mono{font-family:var(--display);font-size:2.6rem;letter-spacing:.3em;text-indent:.3em;color:var(--ivory)}
+footer .mono .amp{color:var(--champagne);font-family:var(--serif);font-style:italic}
+footer .fdate{font-size:.72rem;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;margin-top:16px}
+footer .fnote{font-family:var(--serif);font-style:italic;margin-top:34px;font-size:1.05rem;color:#cfd5c4}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:70;
+  display:flex;justify-content:center;gap:clamp(14px,3.5vw,38px);
+  padding:22px 60px;
+  background:linear-gradient(rgba(250,247,241,.92),rgba(250,247,241,0));
+  backdrop-filter:blur(2px);
+  opacity:0;transform:translateY(-14px);transition:opacity .8s ease .2s,transform .8s ease .2s;
+}
+nav.on{opacity:1;transform:none}
+nav a{
+  text-decoration:none;color:var(--sage-deep);font-size:.66rem;letter-spacing:.3em;text-indent:.1em;
+  text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid transparent;transition:.3s;
+}
+nav a:hover{color:var(--champagne);border-color:var(--champagne)}
+@media(max-width:560px){nav{flex-wrap:wrap;gap:10px 16px;padding:16px 40px}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SVG library ══════════════ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- hand-drawn corner rose branch -->
+    <g id="cornerRose">
+      <path d="M8,8 C40,14 70,34 88,70" fill="none" stroke="#7d8b6f" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M8,8 C30,40 44,72 52,108" fill="none" stroke="#7d8b6f" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M30,15 q10,-9 20,-2 q-2,12 -14,12 q-8,-2 -6,-10z" fill="#d4a49c" opacity=".85"/>
+      <path d="M33,18 q6,-5 12,-1" fill="none" stroke="#b1584e" stroke-width=".9" opacity=".5"/>
+      <path d="M58,34 q12,-7 20,2 q-4,12 -16,9 q-8,-4 -4,-11z" fill="#c2a878" opacity=".8"/>
+      <path d="M40,58 q11,-6 18,2 q-3,11 -14,9 q-8,-4 -4,-11z" fill="#d4a49c" opacity=".7"/>
+      <path d="M76,58 q4,-10 14,-9 q4,10 -4,15 q-9,2 -10,-6z" fill="#e9dcc3"/>
+      <circle cx="24" cy="30" r="3" fill="#c2a878"/>
+      <circle cx="52" cy="46" r="2.4" fill="#7d8b6f"/>
+      <circle cx="44" cy="90" r="2.6" fill="#d4a49c"/>
+      <path d="M20,48 q-8,2 -10,10 q8,2 12,-4z" fill="#7d8b6f" opacity=".65"/>
+      <path d="M64,80 q-9,0 -12,8 q8,4 13,-2z" fill="#7d8b6f" opacity=".65"/>
+      <path d="M84,92 q-2,-9 -10,-11 q-3,8 3,13z" fill="#a8b399" opacity=".8"/>
+    </g>
+    <!-- small card corner sprig -->
+    <g id="sprig">
+      <path d="M4,4 C14,8 22,16 27,28" fill="none" stroke="#c2a878" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M10,7 q4,-4 9,-1 q-1,5 -6,5 q-4,-1 -3,-4z" fill="#d4a49c" opacity=".8"/>
+      <circle cx="19" cy="16" r="1.7" fill="#7d8b6f"/>
+      <path d="M22,24 q-4,0 -6,4 q4,2 7,-1z" fill="#7d8b6f" opacity=".6"/>
+    </g>
+    <!-- petal -->
+    <g id="petalShape"><path d="M8,0 C14,4 15,12 8,18 C1,12 2,4 8,0z" fill="#d4a49c" opacity=".55"/></g>
+    <!-- section divider flower -->
+    <g id="divFlower">
+      <circle cx="13" cy="13" r="3" fill="#c2a878"/>
+      <path d="M13,3 q4,4 0,7 q-4,-3 0,-7z M23,13 q-4,4 -7,0 q3,-4 7,0z M13,23 q-4,-4 0,-7 q4,3 0,7z M3,13 q4,-4 7,0 q-3,4 -7,0z" fill="#d4a49c" opacity=".8"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- ══════════════ page frame + floral corners ══════════════ -->
+<div class="page-frame" aria-hidden="true"></div>
+<div class="corner-flower tl" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRose"/></svg></div>
+<div class="corner-flower tr" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRose"/></svg></div>
+<div class="corner-flower bl" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRose"/></svg></div>
+<div class="corner-flower br" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRose"/></svg></div>
+
+<!-- ══════════════ INTRO — the blooming veil ══════════════ -->
+<div id="intro" role="button" aria-label="Enter site">
+  <div class="veil left"></div>
+  <div class="veil right"></div>
+  <div class="intro-content">
+    <svg class="bloom" viewBox="0 0 200 140">
+      <path class="p1" d="M100,120 C100,90 100,70 100,50"/>
+      <path class="p2" d="M100,55 C80,50 65,35 68,15 C90,18 100,35 100,55 C110,35 120,18 132,15 C135,35 120,50 100,55"/>
+      <path class="p3" d="M100,55 C88,42 88,25 100,14 C112,25 112,42 100,55"/>
+      <path class="p4" d="M100,85 C85,84 74,76 70,64 M100,95 C115,94 126,86 130,74"/>
+      <circle class="p3" cx="100" cy="34" r="5"/>
+    </svg>
+    <div class="mono">A<span class="amp">&amp;</span>J</div>
+    <div class="intro-sub">Two hearts &middot; one garden</div>
+    <div class="enter-hint">Tap to lift the veil</div>
+  </div>
+</div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav id="nav">
+  <a href="#story">Our Story</a>
+  <a href="#details">The Day</a>
+  <a href="#venue">Venue</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#rsvp">RSVP</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero" id="top">
+  <p class="eyebrow">Together with their families</p>
+  <h1>Amelia<span class="amp">&amp;</span>James</h1>
+  <div class="date-line">September 12, 2026</div>
+  <p class="venue-line">The Rosewood Estate &middot; Napa Valley, California</p>
+
+  <div class="countdown" id="countdown" aria-label="Countdown to the wedding">
+    <div class="count-cell"><div class="num" id="cd-d">—</div><div class="lbl">Days</div></div>
+    <div class="count-cell"><div class="num" id="cd-h">—</div><div class="lbl">Hours</div></div>
+    <div class="count-cell"><div class="num" id="cd-m">—</div><div class="lbl">Minutes</div></div>
+    <div class="count-cell"><div class="num" id="cd-s">—</div><div class="lbl">Seconds</div></div>
+  </div>
+
+  <div class="hero-cta">
+    <a class="btn solid" href="#rsvp">RSVP</a>
+    <button class="btn gold" id="calBtnHero" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+      Save to Calendar
+    </button>
+  </div>
+  <div class="scroll-cue">Scroll</div>
+</header>
+
+<!-- ══════════════ OUR STORY ══════════════ -->
+<section id="story">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">How we got here</p>
+      <h2>Our Story</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divFlower"/></svg></div>
+    </div>
+    <div class="timeline">
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2019</div><h3>The First Hello</h3>
+        <p>A borrowed pen at a coffee shop, a conversation that outlasted three refills, and a napkin with a phone number we still keep.</p>
+      </div>
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2021</div><h3>The Adventure Years</h3>
+        <p>Road trips, burnt pancakes, a very stubborn houseplant named Fernando, and the slow realization that home is a person.</p>
+      </div>
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2025</div><h3>The Question</h3>
+        <p>On a quiet hillside at golden hour, one of us knelt. The other cried. The ring almost rolled away. She still said yes.</p>
+      </div>
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2026</div><h3>The Beginning</h3>
+        <p>And now — the best chapter yet. We would be honored to have you there when we write it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ THE DAY ══════════════ -->
+<section id="details">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Order of celebration</p>
+      <h2>The Day</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divFlower"/></svg></div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 21c-4-3.5-7-6.5-7-10a7 7 0 0 1 14 0c0 3.5-3 6.5-7 10z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+        <h3>The Ceremony</h3>
+        <p class="time">4:00 in the afternoon</p>
+        <p>Vows beneath the old oak in the rose garden. Please arrive by 3:30 so we can begin as the light turns gold.</p>
+      </div>
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M8 3h8l-3 8v7M9 21h6M6 3l6 8 6-8"/></svg></div>
+        <h3>Cocktail Hour</h3>
+        <p class="time">5:00 in the evening</p>
+        <p>Champagne and garden hors d'oeuvres on the terrace while we steal away for a few photographs.</p>
+      </div>
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 20h16M6 20V10a6 6 0 0 1 12 0v10M12 4V2"/></svg></div>
+        <h3>Dinner &amp; Toasts</h3>
+        <p class="time">6:30 in the evening</p>
+        <p>A long-table dinner under string lights, with toasts from the people who knew us before we knew each other.</p>
+      </div>
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprig"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></div>
+        <h3>Dancing</h3>
+        <p class="time">8:00 until late</p>
+        <p>Kick off your shoes. The band plays until midnight, and the last dance belongs to everyone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ VENUE ══════════════ -->
+<section id="venue">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Where to find us</p>
+      <h2>The Venue</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divFlower"/></svg></div>
+    </div>
+    <div class="venue-inner">
+      <div class="venue-map-ph reveal">
+        <!-- picture here: venue photo or embedded map -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="9" cy="8" r="1.6"/></svg>
+        <span>Picture here</span>
+      </div>
+      <div class="venue-copy reveal">
+        <h3>The Rosewood Estate</h3>
+        <p class="addr">1250 Vineyard Crest Lane<br>Napa, California 94558</p>
+        <p>A restored 1900s stone winery wrapped in climbing roses, with gardens that roll down to the vines. On-site parking is complimentary, and a shuttle will run from the recommended hotels starting at 3:00 pm.</p>
+        <div class="venue-btns">
+          <a class="btn" id="mapsBtn"
+             href="https://www.google.com/maps/search/?api=1&query=The+Rosewood+Estate%2C+1250+Vineyard+Crest+Lane%2C+Napa%2C+CA+94558"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21c-4-3.5-7-6.5-7-10a7 7 0 0 1 14 0c0 3.5-3 6.5-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+            Open in Maps
+          </a>
+          <button class="btn" id="calBtnVenue" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+            Save to Calendar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ GALLERY ══════════════ -->
+<section id="gallery">
+  <div class="sec-head reveal">
+    <p class="kicker">A few of our favorite frames</p>
+    <h2>Gallery</h2>
+    <div class="divider"><svg viewBox="0 0 26 26"><use href="#divFlower"/></svg></div>
+  </div>
+
+  <!-- picture here: replace each .ph placeholder below with <img src="your-photo.jpg" alt="..."> -->
+  <div class="marquee" id="marqueeA"></div>
+  <div class="marquee rev" id="marqueeB"></div>
+  <p class="gallery-note">Photos coming soon — hover to pause the reel.</p>
+</section>
+
+<!-- ══════════════ RSVP ══════════════ -->
+<section id="rsvp">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Kindly respond by August 1, 2026</p>
+      <h2>RSVP</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divFlower"/></svg></div>
+    </div>
+
+    <div class="rsvp-card reveal">
+      <div class="seat-meter">
+        <div class="big"><em id="seatsLeft">120</em> seats remain</div>
+        <div class="cap">of 120 in the garden</div>
+        <div class="seat-bar"><i id="seatBarFill"></i></div>
+      </div>
+
+      <form id="rsvpForm" novalidate>
+        <div class="field">
+          <label for="rName">Full name</label>
+          <input id="rName" type="text" placeholder="Your name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="rEmail">Email</label>
+          <input id="rEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label>Seats in your party</label>
+          <div class="stepper">
+            <button type="button" id="stepDown" aria-label="Fewer seats">&minus;</button>
+            <div class="count" id="partyCount">1</div>
+            <button type="button" id="stepUp" aria-label="More seats">+</button>
+          </div>
+          <p class="avail-msg" id="availMsg"></p>
+        </div>
+        <button class="btn solid" type="submit">Reserve our seats</button>
+      </form>
+
+      <div class="rsvp-done" id="rsvpDone">
+        <div class="ring">
+          <svg viewBox="0 0 74 74" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="37" cy="37" r="33" stroke="#c2a878"/>
+            <path d="M22 38l10 10 20-22" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3 id="doneTitle">Thank you!</h3>
+        <p id="doneMsg">Your seats are saved in the garden.</p>
+        <div class="mail-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          Confirmation email sent
+        </div>
+      </div>
+
+      <p class="demo-note">Demo only — seat counts are stored in your browser, no data is sent anywhere.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Good things to know</p>
+      <h2>Questions</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divFlower"/></svg></div>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>What should I wear?</summary>
+        <p>Garden formal — think flowing dresses, linen suits, soft colors. The ceremony is on grass, so consider block heels or flats.</p>
+      </details>
+      <details>
+        <summary>Can I bring a plus one?</summary>
+        <p>If your invitation says "and guest," absolutely! Just include them in your seat count when you RSVP.</p>
+      </details>
+      <details>
+        <summary>Are children welcome?</summary>
+        <p>We adore your little ones, but this will be an adults-only evening — with the exception of family in the wedding party.</p>
+      </details>
+      <details>
+        <summary>Where should we stay?</summary>
+        <p>We've reserved room blocks at the Vineyard Inn and Hotel Solaine, both ten minutes away. Mention "A &amp; J wedding" when booking.</p>
+      </details>
+      <details>
+        <summary>What about gifts?</summary>
+        <p>Your presence is truly the present. If you'd like to give something, a registry link will live right here soon.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="mono">A<span class="amp">&amp;</span>J</div>
+  <div class="fdate">09 &middot; 12 &middot; 2026</div>
+  <p class="fnote">"And suddenly, all the love songs were about you."</p>
+</footer>
+
+<script>
+/* ── Wedding facts (edit these!) ───────────────────────── */
+const WEDDING = {
+  title: "Amelia & James — Wedding",
+  start: new Date("2026-09-12T16:00:00"),
+  end:   new Date("2026-09-13T00:00:00"),
+  location: "The Rosewood Estate, 1250 Vineyard Crest Lane, Napa, CA 94558",
+  details: "Ceremony at 4:00 pm beneath the oak, dinner and dancing to follow. Garden formal attire.",
+  totalSeats: 120
+};
+
+/* ── Intro: the blooming veil ──────────────────────────── */
+const intro = document.getElementById("intro");
+const nav = document.getElementById("nav");
+let opened = false;
+function openVeil(){
+  if(opened) return; opened = true;
+  intro.classList.add("open");
+  nav.classList.add("on");
+  setTimeout(()=>intro.classList.add("gone"), 1700);
+}
+intro.addEventListener("click", openVeil);
+setTimeout(openVeil, 6500);            // auto-lift if the guest just waits
+document.body.style.overflow = "hidden";
+const unlock = new MutationObserver(()=>{
+  if(intro.classList.contains("open")) { document.body.style.overflow = ""; unlock.disconnect(); }
+});
+unlock.observe(intro,{attributes:true});
+
+/* ── Drifting petals (intro + hero) ────────────────────── */
+function sprinklePetals(host, n){
+  for(let i=0;i<n;i++){
+    const p = document.createElement("div");
+    p.className = "petal";
+    const s = 10 + Math.random()*14;
+    p.style.cssText = `left:${Math.random()*100}%;width:${s}px;height:${s}px;`+
+      `animation-duration:${9+Math.random()*10}s;animation-delay:${-Math.random()*14}s;`;
+    p.innerHTML = '<svg viewBox="0 0 16 18"><use href="#petalShape"/></svg>';
+    host.appendChild(p);
+  }
+}
+sprinklePetals(intro, 14);
+sprinklePetals(document.querySelector(".hero"), 10);
+
+/* ── Countdown ─────────────────────────────────────────── */
+const pad = n => String(Math.max(0,n)).padStart(2,"0");
+function tick(){
+  const diff = WEDDING.start - new Date();
+  const d = Math.floor(diff/864e5), h = Math.floor(diff/36e5)%24,
+        m = Math.floor(diff/6e4)%60, s = Math.floor(diff/1e3)%60;
+  cdD.textContent = Math.max(0,d); cdH.textContent = pad(h);
+  cdM.textContent = pad(m); cdS.textContent = pad(s);
+}
+const cdD=document.getElementById("cd-d"), cdH=document.getElementById("cd-h"),
+      cdM=document.getElementById("cd-m"), cdS=document.getElementById("cd-s");
+tick(); setInterval(tick,1000);
+
+/* ── Save to Calendar (.ics download) ──────────────────── */
+function icsDate(d){ return d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,""); }
+function saveToCalendar(){
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//AJ Wedding//EN","BEGIN:VEVENT",
+    "UID:aj-wedding-2026@example.com",
+    "DTSTAMP:" + icsDate(new Date()),
+    "DTSTART:" + icsDate(WEDDING.start),
+    "DTEND:"   + icsDate(WEDDING.end),
+    "SUMMARY:" + WEDDING.title,
+    "LOCATION:" + WEDDING.location.replace(/,/g,"\\,"),
+    "DESCRIPTION:" + WEDDING.details.replace(/,/g,"\\,"),
+    "END:VEVENT","END:VCALENDAR"
+  ].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));
+  a.download = "amelia-and-james-wedding.ics";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+document.getElementById("calBtnHero").addEventListener("click", saveToCalendar);
+document.getElementById("calBtnVenue").addEventListener("click", saveToCalendar);
+
+/* ── Gallery marquee (blank placeholders for now) ──────── */
+/* picture here: swap each placeholder for
+   <img src="photos/your-photo.jpg" alt="Amelia and James" style="width:100%;height:100%;object-fit:cover"> */
+function buildMarquee(el, count){
+  let cards = "";
+  for(let i=0;i<count;i++){
+    cards += `<div class="ph">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="9" cy="8" r="1.6"/>
+      </svg>
+      <span>Picture here</span>
+    </div>`;
+  }
+  el.innerHTML = cards + cards;   // duplicated so the loop is seamless
+}
+buildMarquee(document.getElementById("marqueeA"), 6);
+buildMarquee(document.getElementById("marqueeB"), 6);
+
+/* ── RSVP with live seat availability (demo, localStorage) ── */
+const seatKey = "aj-wedding-seats-taken";
+let taken = parseInt(localStorage.getItem(seatKey) || "0", 10);
+if(isNaN(taken) || taken < 0 || taken > WEDDING.totalSeats) taken = 0;
+let party = 1;
+
+const seatsLeftEl = document.getElementById("seatsLeft"),
+      seatBarFill = document.getElementById("seatBarFill"),
+      partyEl = document.getElementById("partyCount"),
+      availMsg = document.getElementById("availMsg"),
+      form = document.getElementById("rsvpForm"),
+      done = document.getElementById("rsvpDone");
+
+function seatsLeft(){ return WEDDING.totalSeats - taken; }
+function renderSeats(){
+  seatsLeftEl.textContent = seatsLeft();
+  seatBarFill.style.transform = `scaleX(${taken / WEDDING.totalSeats})`;
+  partyEl.textContent = party;
+  const left = seatsLeft();
+  if(left === 0){
+    availMsg.textContent = "The garden is full — please reach out to us directly.";
+    availMsg.classList.add("warn");
+  } else if(party > left){
+    availMsg.textContent = `Only ${left} seat${left===1?"":"s"} remain — not quite enough for a party of ${party}.`;
+    availMsg.classList.add("warn");
+  } else {
+    availMsg.textContent = `Lovely — ${party} seat${party===1?"":"s"} for your party, ${left - party} will remain after you.`;
+    availMsg.classList.remove("warn");
+  }
+}
+document.getElementById("stepUp").addEventListener("click", ()=>{ if(party<12) party++; renderSeats(); });
+document.getElementById("stepDown").addEventListener("click", ()=>{ if(party>1) party--; renderSeats(); });
+renderSeats();
+
+form.addEventListener("submit", e=>{
+  e.preventDefault();
+  const name = document.getElementById("rName").value.trim();
+  const email = document.getElementById("rEmail").value.trim();
+  if(!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    availMsg.textContent = "Please add your name and a valid email so we can confirm.";
+    availMsg.classList.add("warn");
+    return;
+  }
+  if(party > seatsLeft()){ renderSeats(); return; }
+  taken += party;
+  localStorage.setItem(seatKey, String(taken));
+  form.style.display = "none";
+  document.getElementById("doneTitle").textContent = `Thank you, ${name.split(" ")[0]}!`;
+  document.getElementById("doneMsg").textContent =
+    `${party} seat${party===1?"":"s"} reserved · a confirmation has been sent to ${email}.`;
+  done.classList.add("show");
+  renderSeats();
+});
+
+/* ── Scroll reveal ─────────────────────────────────────── */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+},{threshold:.15});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
