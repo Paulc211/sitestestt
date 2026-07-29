@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Invited! 🕷️ A Spider-Man Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#e62429;
+    --dark-red:#a3161b;
+    --blue:#2a52be;
+    --dark-blue:#16255c;
+    --navy:#0a0e1f;
+    --yellow:#ffd400;
+    --ink:#0d0d0d;
+    --paper:#f6f1e5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html.locked,html.locked body{overflow:hidden;height:100%}
+  body{
+    font-family:'Comic Neue','Comic Sans MS','Chalkboard SE',cursive;
+    background:var(--navy);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.bangers{font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;font-weight:400}
+
+  /* ============================================================ */
+  /* INTRO — Spidey lowers on his web, then THWIP! at the screen  */
+  /* ============================================================ */
+  #intro{
+    position:fixed;inset:0;z-index:1000;
+    background:#000;
+    overflow:hidden;
+    transition:opacity .9s ease;
+  }
+  #intro.fade{opacity:0;pointer-events:none}
+  #intro .stars span{
+    position:absolute;width:2px;height:2px;border-radius:50%;
+    background:#fff;opacity:.5;
+    animation:twinkle 2.4s ease-in-out infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.12}50%{opacity:.7}}
+
+  .drop{
+    position:absolute;left:50%;top:0;width:0;height:0;
+    animation:lower 2.5s cubic-bezier(.34,1.3,.42,1) forwards;
+  }
+  @keyframes lower{
+    0%{height:0}
+    100%{height:34vh}
+  }
+  .sway{
+    position:absolute;left:0;top:0;width:0;height:100%;
+    transform-origin:top center;
+    animation:sway 3.2s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{transform:rotate(2.4deg)}
+    50%{transform:rotate(-2.4deg)}
+  }
+  .thread{
+    position:absolute;left:-1px;top:0;width:2px;height:100%;
+    background:linear-gradient(to bottom,rgba(255,255,255,.9),rgba(255,255,255,.55));
+    box-shadow:0 0 6px rgba(255,255,255,.35);
+  }
+  .spidey-sprite{
+    position:absolute;top:100%;left:0;
+    width:min(180px,38vw);
+    margin-top:-4px;
+    transform:translateX(-46.4%);
+    filter:drop-shadow(0 0 22px rgba(230,36,41,.35));
+  }
+
+  .thwip-burst{
+    position:absolute;left:50%;top:calc(34vh + 40px);
+    transform:translate(30%,-50%) scale(0) rotate(-8deg);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    font-size:clamp(2rem,8vw,4rem);
+    color:var(--yellow);
+    -webkit-text-stroke:2px #000;
+    text-shadow:4px 4px 0 var(--red);
+    z-index:5;white-space:nowrap;
+  }
+  .thwip-burst.go{animation:burst-pop .45s cubic-bezier(.3,1.6,.5,1) forwards}
+  @keyframes burst-pop{
+    0%{transform:translate(30%,-50%) scale(0) rotate(-8deg)}
+    100%{transform:translate(30%,-50%) scale(1) rotate(-8deg)}
+  }
+
+  #web-splat{
+    position:absolute;left:50%;top:calc(34vh + 180px);
+    width:220px;height:220px;
+    transform:translate(-50%,-50%) scale(0);
+    z-index:4;
+    opacity:0;
+  }
+  #web-splat.shoot{
+    animation:splat-out .65s cubic-bezier(.5,0,.9,.6) forwards;
+  }
+  @keyframes splat-out{
+    0%{transform:translate(-50%,-50%) scale(.05) rotate(0deg);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(16) rotate(18deg);opacity:1}
+  }
+  #flash{
+    position:absolute;inset:0;background:#fff;opacity:0;z-index:6;pointer-events:none;
+  }
+  #flash.go{animation:flash-fade .8s ease forwards}
+  @keyframes flash-fade{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+
+  #skip-intro{
+    position:absolute;right:16px;bottom:16px;z-index:10;
+    background:transparent;border:2px solid rgba(255,255,255,.4);
+    color:rgba(255,255,255,.7);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;
+    font-size:1rem;padding:8px 18px;border-radius:999px;cursor:pointer;
+    transition:.2s;
+  }
+  #skip-intro:hover{border-color:#fff;color:#fff}
+
+  /* ============================================================ */
+  /* SHARED COMIC STYLING                                          */
+  /* ============================================================ */
+  section{position:relative;padding:90px 20px;overflow:hidden}
+  .halftone{
+    background-image:radial-gradient(circle,rgba(0,0,0,.14) 1.5px,transparent 1.7px);
+    background-size:16px 16px;
+  }
+  .wrap{max-width:900px;margin:0 auto;position:relative;z-index:2}
+
+  .comic-panel{
+    background:var(--paper);
+    border:4px solid var(--ink);
+    border-radius:10px;
+    box-shadow:8px 8px 0 rgba(0,0,0,.55);
+    padding:28px 24px;
+  }
+  .sticker{
+    position:absolute;
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    color:var(--yellow);
+    -webkit-text-stroke:1.5px #000;
+    text-shadow:3px 3px 0 var(--red);
+    transform:rotate(-10deg);
+    z-index:3;
+    pointer-events:none;
+  }
+
+  /* scroll-in animations */
+  [data-anim]{opacity:0;transition:transform .8s cubic-bezier(.2,1.2,.4,1),opacity .8s ease}
+  [data-anim="pop"]{transform:scale(.5)}
+  [data-anim="rise"]{transform:translateY(70px)}
+  [data-anim="slide-left"]{transform:translateX(-90px) rotate(-3deg)}
+  [data-anim="slide-right"]{transform:translateX(90px) rotate(3deg)}
+  [data-anim="spin"]{transform:rotate(-15deg) scale(.4)}
+  [data-anim].in{opacity:1;transform:none}
+
+  /* ============================================================ */
+  /* HERO                                                          */
+  /* ============================================================ */
+  #hero{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    background:
+      radial-gradient(ellipse at 50% 120%,rgba(230,36,41,.35),transparent 60%),
+      linear-gradient(180deg,#05060f 0%,var(--dark-blue) 70%,var(--blue) 130%);
+    padding-top:60px;
+  }
+  #hero .skyline{
+    position:absolute;bottom:0;left:0;right:0;height:130px;z-index:1;opacity:.9;
+  }
+  .calling{
+    color:var(--yellow);
+    font-size:clamp(1.2rem,4vw,1.8rem);
+    letter-spacing:4px;
+    text-shadow:2px 2px 0 #000;
+    margin-bottom:10px;
+  }
+  .hero-name{
+    font-size:clamp(3.2rem,14vw,7.5rem);
+    color:#fff;
+    -webkit-text-stroke:2px #000;
+    text-shadow:5px 5px 0 var(--red),9px 9px 0 rgba(0,0,0,.4);
+    line-height:1;
+    margin:6px 0;
+  }
+  .hero-name .ltr{display:inline-block;opacity:0;transform:translateY(-60px) rotate(-12deg);animation:ltr-in .55s cubic-bezier(.3,1.5,.5,1) forwards;animation-play-state:paused}
+  .letters-go .ltr{animation-play-state:running}
+  @keyframes ltr-in{to{opacity:1;transform:none}}
+  .turning{
+    color:#fff;font-size:clamp(1.6rem,6vw,2.6rem);
+    text-shadow:2px 2px 0 #000;letter-spacing:3px;
+  }
+  .turning .age{
+    display:inline-block;
+    color:var(--yellow);
+    font-size:1.6em;
+    -webkit-text-stroke:1.5px #000;
+    text-shadow:3px 3px 0 var(--red);
+    animation:age-bounce 1.6s ease-in-out infinite;
+  }
+  @keyframes age-bounce{0%,100%{transform:translateY(0) rotate(4deg)}50%{transform:translateY(-10px) rotate(-4deg)}}
+  .hero-sub{
+    color:rgba(255,255,255,.85);font-size:clamp(1rem,3vw,1.25rem);
+    margin-top:18px;font-weight:700;
+  }
+  .scroll-cue{
+    position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+    color:#fff;font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;
+    font-size:1.05rem;text-shadow:2px 2px 0 #000;z-index:2;
+    animation:cue 1.6s ease-in-out infinite;white-space:nowrap;
+  }
+  @keyframes cue{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
+  .corner-web{position:absolute;width:150px;height:150px;opacity:.5;z-index:1;pointer-events:none}
+  .corner-web.tl{top:0;left:0}
+  .corner-web.tr{top:0;right:0;transform:scaleX(-1)}
+
+  /* dangling spider that rides the scroll */
+  #dangler{
+    position:fixed;top:0;right:8vw;z-index:50;pointer-events:none;
+    display:flex;flex-direction:column;align-items:center;
+    transition:transform .1s linear;
+  }
+  #dangler .line{width:2px;height:110px;background:rgba(255,255,255,.65)}
+  #dangler .spider{font-size:2rem;margin-top:-6px;animation:spider-spin 5s ease-in-out infinite;filter:drop-shadow(2px 3px 2px rgba(0,0,0,.5))}
+  @keyframes spider-spin{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-8deg)}}
+
+  /* ============================================================ */
+  /* DETAILS ("The Mission")                                       */
+  /* ============================================================ */
+  #details{background:var(--red)}
+  #details.halftone{background-image:radial-gradient(circle,rgba(0,0,0,.18) 1.5px,transparent 1.7px);background-size:16px 16px}
+  .section-title{
+    text-align:center;
+    font-size:clamp(2.2rem,8vw,4rem);
+    color:#fff;
+    -webkit-text-stroke:1.5px #000;
+    text-shadow:4px 4px 0 rgba(0,0,0,.5);
+    margin-bottom:50px;
+  }
+  .cards{display:grid;gap:34px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .card{
+    text-align:center;
+    transition:transform .25s ease;
+  }
+  .card:hover{transform:scale(1.04) rotate(0deg)!important}
+  .card:nth-child(1){transform:rotate(-2deg)}
+  .card:nth-child(2){transform:rotate(1.5deg)}
+  .card:nth-child(3){transform:rotate(-1.5deg)}
+  .card .emoji{font-size:3rem;display:block;margin-bottom:8px}
+  .card h3{font-size:2rem;color:var(--red);letter-spacing:3px;margin-bottom:8px}
+  .card p{font-weight:700;font-size:1.1rem;line-height:1.5}
+  .card small{display:block;margin-top:6px;color:#555;font-weight:700}
+
+  /* ============================================================ */
+  /* COUNTDOWN                                                     */
+  /* ============================================================ */
+  #countdown{background:linear-gradient(180deg,var(--dark-blue),var(--blue))}
+  .count-grid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+  .count-box{
+    background:var(--paper);
+    border:4px solid var(--ink);
+    border-radius:12px;
+    box-shadow:6px 6px 0 rgba(0,0,0,.5);
+    min-width:86px;padding:14px 10px;text-align:center;
+    transform:rotate(-1deg);
+  }
+  .count-box:nth-child(even){transform:rotate(1.5deg)}
+  .count-box b{font-family:'Bangers',Impact,'Arial Black',sans-serif;font-size:2.6rem;color:var(--red);display:block;line-height:1}
+  .count-box span{font-weight:700;letter-spacing:1px;font-size:.85rem;color:var(--dark-blue);text-transform:uppercase}
+
+  /* ============================================================ */
+  /* AGENDA                                                        */
+  /* ============================================================ */
+  #agenda{background:var(--paper)}
+  #agenda .section-title{color:var(--blue);-webkit-text-stroke:1.5px #000;text-shadow:4px 4px 0 rgba(0,0,0,.25)}
+  .agenda-list{list-style:none;max-width:620px;margin:0 auto;display:grid;gap:20px}
+  .agenda-list li{
+    display:flex;align-items:center;gap:16px;
+    background:#fff;
+    border:3px solid var(--ink);
+    border-radius:60px;
+    padding:14px 24px;
+    box-shadow:5px 5px 0 rgba(0,0,0,.35);
+    font-weight:700;font-size:1.15rem;
+  }
+  .agenda-list li .em{font-size:1.9rem}
+  .agenda-list li:nth-child(odd){transform:rotate(-.8deg)}
+  .agenda-list li:nth-child(even){transform:rotate(.8deg)}
+
+  /* ============================================================ */
+  /* RSVP                                                          */
+  /* ============================================================ */
+  #rsvp{
+    background:
+      radial-gradient(ellipse at 50% -20%,rgba(42,82,190,.5),transparent 60%),
+      linear-gradient(180deg,#05060f,var(--dark-red));
+    text-align:center;
+    padding-top:0;
+  }
+  #rsvp-spidey{
+    width:min(120px,26vw);
+    transform-origin:top center;
+    animation:sway 3.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px rgba(230,36,41,.4));
+    margin-bottom:8px;
+  }
+  #rsvp .section-title{margin-bottom:16px}
+  #rsvp p{color:#fff;font-weight:700;font-size:1.15rem;max-width:520px;margin:0 auto 30px}
+  .rsvp-btn{
+    display:inline-block;
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    font-size:clamp(1.6rem,5vw,2.2rem);
+    letter-spacing:3px;
+    color:#fff;
+    background:var(--red);
+    border:4px solid var(--ink);
+    border-radius:16px;
+    padding:16px 42px;
+    text-decoration:none;
+    box-shadow:7px 7px 0 rgba(0,0,0,.6);
+    transition:.15s;
+    animation:btn-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes btn-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  .rsvp-btn:hover{background:var(--yellow);color:var(--ink);animation-play-state:paused;transform:scale(1.07)}
+  .rsvp-by{margin-top:22px;color:var(--yellow);font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;font-size:1.2rem;text-shadow:2px 2px 0 #000}
+
+  footer{
+    background:#000;color:rgba(255,255,255,.85);
+    text-align:center;padding:44px 20px 120px;
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;
+    font-size:clamp(1.2rem,4vw,1.7rem);
+    position:relative;overflow:hidden;
+  }
+  footer .small{display:block;margin-top:10px;font-size:.95rem;letter-spacing:1px;color:rgba(255,255,255,.45);font-family:'Comic Neue','Comic Sans MS',cursive}
+  footer .web-bottom{position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);width:280px;opacity:.35}
+
+  .zig{display:block;width:100%;height:26px;margin-bottom:-1px}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     👇👇👇  EDIT YOUR PARTY DETAILS HERE  👇👇👇
+     Change these values and everything on the page updates.
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+  const PARTY = {
+    name:      "ALEX",                          // birthday hero's name
+    age:       "6",                             // the big number!
+    date:      "Saturday, August 15",           // party date (display)
+    time:      "2:00 PM – 5:00 PM",             // party time
+    venue:     "Webster Park Pavilion",         // where
+    address:   "123 Web Lane, Queens, NY",      // address line
+    rsvpName:  "Paulo",                         // who to RSVP to
+    rsvpPhone: "555-123-4567",                  // RSVP phone number
+    rsvpBy:    "August 8",                      // RSVP deadline
+    countdownTo: "2026-08-15T14:00:00"          // ISO date+time for countdown
+  };
+</script>
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- ================= INTRO ANIMATION ================= -->
+<div id="intro">
+  <div class="stars" id="stars"></div>
+  <div class="drop">
+    <div class="sway">
+      <div class="thread"></div>
+      <img class="spidey-sprite" src="assets/spidey.png" alt="Spider-Man lowering on a web">
+    </div>
+  </div>
+  <div class="thwip-burst" id="thwip">THWIP!</div>
+  <svg id="web-splat" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
+  <div id="flash"></div>
+  <button id="skip-intro">Skip intro ➜</button>
+</div>
+
+<!-- dangling spider that follows your scroll -->
+<div id="dangler" aria-hidden="true">
+  <div class="line"></div>
+  <div class="spider">🕷️</div>
+</div>
+
+<!-- ================= HERO ================= -->
+<section id="hero">
+  <svg class="corner-web tl" viewBox="0 0 100 100" aria-hidden="true"></svg>
+  <svg class="corner-web tr" viewBox="0 0 100 100" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="calling bangers">🕷️ CALLING ALL SUPERHEROES 🕷️</div>
+    <h1 class="hero-name" id="hero-name">ALEX</h1>
+    <div class="turning bangers">IS TURNING <span class="age" id="hero-age">6</span>!</div>
+    <div class="hero-sub">Your friendly neighborhood birthday party is coming —<br>and the web-slinger himself needs YOU on the team!</div>
+  </div>
+  <svg class="skyline" viewBox="0 0 1200 130" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#04050c" d="M0,130 L0,70 40,70 40,40 90,40 90,80 130,80 130,25 170,25 170,60 230,60 230,85 270,85 270,45 330,45 330,15 360,15 360,70 420,70 420,50 470,50 470,90 520,90 520,30 560,30 560,65 620,65 620,10 660,10 660,55 720,55 720,80 770,80 770,35 820,35 820,70 880,70 880,20 920,20 920,60 980,60 980,90 1030,90 1030,40 1080,40 1080,75 1140,75 1140,50 1200,50 1200,130 Z"/>
+  </svg>
+  <div class="scroll-cue">▼ SCROLL DOWN, TRUE BELIEVER ▼</div>
+</section>
+
+<!-- ================= DETAILS ================= -->
+<section id="details" class="halftone">
+  <div class="sticker" style="top:30px;left:6%;font-size:2.4rem" data-anim="spin">POW!</div>
+  <div class="sticker" style="bottom:30px;right:6%;font-size:2.4rem;transform:rotate(8deg)" data-anim="spin">BAM!</div>
+  <div class="wrap">
+    <h2 class="section-title" data-anim="pop">🕸️ THE MISSION BRIEFING 🕸️</h2>
+    <div class="cards">
+      <div class="card comic-panel" data-anim="slide-left">
+        <span class="emoji">📅</span>
+        <h3>WHEN</h3>
+        <p id="d-date">Saturday, August 15</p>
+        <small id="d-time">2:00 PM – 5:00 PM</small>
+      </div>
+      <div class="card comic-panel" data-anim="pop" style="transition-delay:.15s">
+        <span class="emoji">📍</span>
+        <h3>WHERE</h3>
+        <p id="d-venue">Webster Park Pavilion</p>
+        <small id="d-address">123 Web Lane, Queens, NY</small>
+      </div>
+      <div class="card comic-panel" data-anim="slide-right" style="transition-delay:.3s">
+        <span class="emoji">🦸</span>
+        <h3>WHO</h3>
+        <p>You + every hero in the neighborhood!</p>
+        <small>Capes &amp; costumes highly encouraged 🕷️</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COUNTDOWN ================= -->
+<section id="countdown">
+  <div class="wrap">
+    <h2 class="section-title" data-anim="pop">SPIDEY-SENSE SAYS...</h2>
+    <div class="count-grid" data-anim="rise">
+      <div class="count-box"><b id="c-days">0</b><span>days</span></div>
+      <div class="count-box"><b id="c-hours">0</b><span>hours</span></div>
+      <div class="count-box"><b id="c-mins">0</b><span>mins</span></div>
+      <div class="count-box"><b id="c-secs">0</b><span>secs</span></div>
+    </div>
+    <p style="text-align:center;color:#fff;font-weight:700;margin-top:26px;font-size:1.15rem" data-anim="rise">...until the party swings into action! 🕸️</p>
+  </div>
+</section>
+
+<!-- ================= AGENDA ================= -->
+<section id="agenda" class="halftone">
+  <div class="sticker" style="top:24px;right:8%;font-size:2.2rem;transform:rotate(10deg)" data-anim="spin">ZAP!</div>
+  <div class="wrap">
+    <h2 class="section-title" data-anim="pop">ON THE AGENDA</h2>
+    <ul class="agenda-list">
+      <li data-anim="slide-left"><span class="em">🕸️</span> Web-slinging games &amp; obstacle course</li>
+      <li data-anim="slide-right" style="transition-delay:.1s"><span class="em">🍕</span> Pizza worthy of a super-appetite</li>
+      <li data-anim="slide-left" style="transition-delay:.2s"><span class="em">🎂</span> Spidey cake (with great frosting comes great responsibility)</li>
+      <li data-anim="slide-right" style="transition-delay:.3s"><span class="em">🎁</span> Goody bags for every hero</li>
+      <li data-anim="slide-left" style="transition-delay:.4s"><span class="em">📸</span> Photo ops with the birthday web-slinger</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= RSVP ================= -->
+<section id="rsvp">
+  <div class="wrap">
+    <img id="rsvp-spidey" src="assets/spidey.png" alt="" data-anim="rise">
+    <h2 class="section-title" data-anim="pop">THWIP US YOUR RSVP!</h2>
+    <p data-anim="rise">Every hero counts! Let <span id="r-name">Paulo</span> know if your super-kid can make it.</p>
+    <a class="rsvp-btn" id="r-btn" href="sms:5551234567" data-anim="pop">📱 TEXT YOUR RSVP</a>
+    <div class="rsvp-by" id="r-by" data-anim="rise">☎ Please RSVP by August 8 ☎</div>
+  </div>
+</section>
+
+<footer>
+  "WITH GREAT BIRTHDAYS COMES GREAT FUN!"
+  <span class="small">Can't wait to see you there, true believer! 🕷️🎈</span>
+  <svg class="web-bottom" viewBox="0 0 100 100" aria-hidden="true" id="footer-web"></svg>
+</footer>
+
+<script>
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- fill in party details from PARTY config ---------- */
+  const $ = id => document.getElementById(id);
+  const nameEl = $('hero-name');
+  nameEl.innerHTML = [...PARTY.name].map((ch,i)=>
+    ch===' ' ? ' ' : `<span class="ltr" style="animation-delay:${i*0.08}s">${ch}</span>`).join('');
+  $('hero-age').textContent = PARTY.age;
+  $('d-date').textContent = PARTY.date;
+  $('d-time').textContent = PARTY.time;
+  $('d-venue').textContent = PARTY.venue;
+  $('d-address').textContent = PARTY.address;
+  $('r-name').textContent = PARTY.rsvpName;
+  $('r-by').textContent = '☎ Please RSVP by ' + PARTY.rsvpBy + ' ☎';
+  $('r-btn').href = 'sms:' + PARTY.rsvpPhone.replace(/[^0-9+]/g,'');
+  document.title = "You're Invited! 🕷️ " + PARTY.name + "'s Spider-Man Birthday";
+
+  /* ---------- build web SVGs (splat + corner webs) ---------- */
+  function buildWeb(svg, spokes, rings, radius, stroke, width, full){
+    const NS='http://www.w3.org/2000/svg';
+    const startA = full ? 0 : 0, endA = full ? Math.PI*2 : Math.PI/2;
+    const n = full ? spokes : Math.ceil(spokes/4)+1;
+    const angles=[];
+    for(let i=0;i<n;i++) angles.push(startA + (endA-startA)*(full ? i/spokes*spokes/n*(n/(n)) : i/(n-1)));
+    if(full){ angles.length=0; for(let i=0;i<spokes;i++) angles.push(i/spokes*Math.PI*2); }
+    // spokes
+    angles.forEach(a=>{
+      const l=document.createElementNS(NS,'line');
+      l.setAttribute('x1',0);l.setAttribute('y1',0);
+      l.setAttribute('x2',Math.cos(a)*radius);l.setAttribute('y2',Math.sin(a)*radius);
+      l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',width);
+      svg.appendChild(l);
+    });
+    // rings (sagging quadratic segments between spokes)
+    for(let r=1;r<=rings;r++){
+      const rad = radius*r/rings;
+      for(let i=0;i<angles.length-(full?0:1);i++){
+        const a1=angles[i], a2=angles[(i+1)%angles.length];
+        const x1=Math.cos(a1)*rad, y1=Math.sin(a1)*rad;
+        const x2=Math.cos(a2)*rad, y2=Math.sin(a2)*rad;
+        const am=(a1+((a2-a1+Math.PI*2)%(Math.PI*2))/2);
+        const sag=rad*0.82;
+        const cx=Math.cos(am)*sag, cy=Math.sin(am)*sag;
+        const p=document.createElementNS(NS,'path');
+        p.setAttribute('d',`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
+        p.setAttribute('fill','none');p.setAttribute('stroke',stroke);p.setAttribute('stroke-width',width);
+        svg.appendChild(p);
+      }
+    }
+  }
+  const splat = $('web-splat');
+  splat.setAttribute('viewBox','-100 -100 200 200');
+  buildWeb(splat, 14, 6, 98, '#ffffff', 2.2, true);
+
+  document.querySelectorAll('.corner-web').forEach(svg=>{
+    svg.setAttribute('viewBox','0 0 100 100');
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    svg.appendChild(g);
+    buildWeb(g, 16, 5, 96, 'rgba(255,255,255,.55)', 1.4, false);
+  });
+  const fw=$('footer-web');
+  fw.setAttribute('viewBox','-100 -100 200 200');
+  buildWeb(fw, 12, 5, 96, 'rgba(255,255,255,.8)', 1.6, true);
+
+  /* ---------- intro stars ---------- */
+  const stars=$('stars');
+  for(let i=0;i<40;i++){
+    const s=document.createElement('span');
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*2.4)+'s';
+    stars.appendChild(s);
+  }
+
+  /* ---------- intro timeline ---------- */
+  const intro=$('intro');
+  document.documentElement.classList.add('locked');
+  let ended=false;
+  const timers=[];
+
+  function endIntro(){
+    if(ended) return; ended=true;
+    timers.forEach(clearTimeout);
+    intro.classList.add('fade');
+    document.documentElement.classList.remove('locked');
+    document.body.classList.add('letters-go');
+    setTimeout(()=>intro.remove(),1000);
+  }
+
+  if(reduced){
+    endIntro();
+  }else{
+    timers.push(setTimeout(()=>{ $('thwip').classList.add('go'); },2650));
+    timers.push(setTimeout(()=>{ splat.classList.add('shoot'); },2850));
+    timers.push(setTimeout(()=>{ $('flash').classList.add('go'); },3350));
+    timers.push(setTimeout(endIntro,3650));
+  }
+  $('skip-intro').addEventListener('click',endIntro);
+
+  /* ---------- scroll-in animations ---------- */
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.15});
+  document.querySelectorAll('[data-anim]').forEach(el=>io.observe(el));
+
+  /* ---------- dangling spider rides the scroll ---------- */
+  const dangler=$('dangler');
+  let ticking=false;
+  window.addEventListener('scroll',()=>{
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{
+      const max=document.documentElement.scrollHeight-innerHeight;
+      const p=max>0? scrollY/max : 0;
+      dangler.style.transform=`translateY(${Math.sin(p*12)*18}px) rotate(${Math.sin(p*20)*5}deg)`;
+      ticking=false;
+    });
+  },{passive:true});
+
+  /* ---------- countdown ---------- */
+  const target=new Date(PARTY.countdownTo).getTime();
+  function tick(){
+    let d=Math.max(0,target-Date.now());
+    const days=Math.floor(d/864e5); d-=days*864e5;
+    const hrs=Math.floor(d/36e5); d-=hrs*36e5;
+    const mins=Math.floor(d/6e4); d-=mins*6e4;
+    const secs=Math.floor(d/1e3);
+    $('c-days').textContent=days;
+    $('c-hours').textContent=hrs;
+    $('c-mins').textContent=mins;
+    $('c-secs').textContent=secs;
+  }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
