@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amelia &amp; James — Is It a Crime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Italiana&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PALETTE — midnight lounge for Sade's "Is It a Crime"
+   smoke black · burgundy velvet · antique gold · candle ivory
+   ============================================================ */
+:root{
+  --noir:#120d0c;
+  --noir-2:#1b1310;
+  --noir-3:#241813;
+  --wine:#6e1f2c;
+  --wine-deep:#3d1219;
+  --wine-glow:#93313f;
+  --gold:#c9a253;
+  --gold-soft:#e2c98d;
+  --champagne:#f0e2c0;
+  --ivory:#f6edd9;
+  --smoke:#9c8b78;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --display:'Playfair Display',Georgia,serif;
+  --mono-font:'Italiana',var(--serif);
+  --sans:'Jost','Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--noir);
+  color:var(--ivory);
+  overflow-x:hidden;
+  line-height:1.7;
+}
+::selection{background:var(--wine);color:var(--champagne)}
+h1,h2,h3{font-family:var(--display);font-weight:400}
+
+/* ============================================================
+   GOLD PAGE FRAME + ROSE CORNERS
+   ============================================================ */
+.page-frame{position:fixed;inset:14px;border:1px solid rgba(201,162,83,.35);pointer-events:none;z-index:60}
+.page-frame::after{content:"";position:absolute;inset:5px;border:1px solid rgba(201,162,83,.14)}
+.corner-flower{position:fixed;width:150px;height:150px;pointer-events:none;z-index:61;opacity:.95}
+.corner-flower svg{width:100%;height:100%}
+.corner-flower.tl{top:0;left:0}
+.corner-flower.tr{top:0;right:0;transform:scaleX(-1)}
+.corner-flower.bl{bottom:0;left:0;transform:scaleY(-1)}
+.corner-flower.br{bottom:0;right:0;transform:scale(-1,-1)}
+@media(max-width:640px){
+  .corner-flower{width:92px;height:92px}
+  .page-frame{inset:9px}
+}
+
+/* ============================================================
+   INTRO — "DROP THE NEEDLE"
+   A gold-rimmed vinyl spins in the dark. Drop the needle and
+   the song begins, ripples of sound roll out, and the room
+   opens in a circular wipe.
+   ============================================================ */
+#intro{
+  position:fixed;inset:0;z-index:100;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:
+    radial-gradient(ellipse at 50% 42%,#2a1b14 0%,var(--noir) 62%,#0a0706 100%);
+}
+#intro.wipe{animation:circleWipe 1.5s cubic-bezier(.77,0,.18,1) forwards}
+@keyframes circleWipe{
+  from{clip-path:circle(150% at 50% 45%)}
+  to{clip-path:circle(0% at 50% 45%)}
+}
+#intro.gone{display:none}
+.intro-kicker{
+  font-size:.68rem;letter-spacing:.6em;text-indent:.6em;text-transform:uppercase;color:var(--gold);
+  margin-bottom:34px;opacity:0;animation:fadeUp 1.4s ease .3s forwards;
+}
+.turntable{position:relative;width:min(74vw,360px);height:min(74vw,360px)}
+.vinyl{
+  position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle,#241a14 0 18%,transparent 18.5%),
+    repeating-radial-gradient(circle,#171010 0 2px,#0d0908 2px 4px);
+  box-shadow:
+    0 0 0 3px #0a0706,
+    0 0 0 5px var(--gold),
+    0 30px 70px -20px rgba(0,0,0,.9),
+    0 0 90px -20px rgba(201,162,83,.45);
+  animation:spin 6s linear infinite;
+}
+.vinyl::before{ /* light sheen sweeping the grooves */
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 20deg,transparent 0 40deg,rgba(240,226,192,.10) 60deg,transparent 90deg,transparent 200deg,rgba(240,226,192,.07) 225deg,transparent 260deg);
+}
+#intro.playing .vinyl{animation-duration:1.8s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.label{
+  position:absolute;inset:31%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--wine-glow),var(--wine) 45%,var(--wine-deep));
+  border:2px solid var(--gold);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  animation:spin 6s linear infinite;
+}
+#intro.playing .label{animation-duration:1.8s}
+.label .l-mono{font-family:var(--mono-font);font-size:1.5rem;color:var(--champagne);letter-spacing:.18em;text-indent:.18em}
+.label .l-song{font-family:var(--serif);font-style:italic;font-size:.72rem;color:var(--gold-soft);margin-top:2px}
+.label .l-side{font-size:.5rem;letter-spacing:.35em;text-indent:.35em;color:rgba(240,226,192,.65);text-transform:uppercase;margin-top:4px}
+.label::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#0a0706;border:1px solid var(--gold)}
+/* tonearm */
+.tonearm{
+  position:absolute;top:-6%;right:-9%;width:11px;height:64%;
+  transform-origin:top center;transform:rotate(-24deg);
+  transition:transform 1.1s cubic-bezier(.6,0,.3,1);z-index:3;pointer-events:none;
+}
+.tonearm .arm{position:absolute;left:50%;top:26px;transform:translateX(-50%);width:4px;height:calc(100% - 26px);background:linear-gradient(var(--gold-soft),var(--gold));border-radius:2px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+.tonearm .pivot{position:absolute;left:50%;top:0;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--gold-soft),#8a6c31);box-shadow:0 4px 12px rgba(0,0,0,.7)}
+.tonearm .head{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:14px;height:26px;border-radius:4px;background:linear-gradient(#e2c98d,#9c7a38)}
+#intro.playing .tonearm{transform:rotate(9deg)}
+/* sound ripples on needle drop */
+.ripple{
+  position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;
+  border:1px solid var(--gold);opacity:0;pointer-events:none;
+}
+#intro.playing .ripple{animation:rip 1.6s ease-out forwards}
+#intro.playing .ripple.r2{animation-delay:.25s}
+#intro.playing .ripple.r3{animation-delay:.5s}
+@keyframes rip{
+  0%{opacity:.9;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(90)}
+}
+.intro-names{
+  margin-top:40px;font-family:var(--display);font-size:clamp(1.4rem,4.5vw,2.1rem);color:var(--ivory);
+  letter-spacing:.24em;text-indent:.24em;text-transform:uppercase;
+  opacity:0;animation:fadeUp 1.4s ease .8s forwards;
+}
+.intro-names em{font-style:italic;color:var(--gold);text-transform:none;letter-spacing:.1em}
+.intro-hint{
+  margin-top:16px;font-size:.66rem;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;color:var(--gold);
+  animation:hintPulse 2.4s ease 1.6s infinite;opacity:0;
+}
+@keyframes hintPulse{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* smoke wisps (intro + hero) */
+.wisp{position:absolute;bottom:-10%;width:220px;height:60vh;pointer-events:none;opacity:0;filter:blur(14px);animation:rise 14s ease-in infinite}
+.wisp svg{width:100%;height:100%}
+.wisp path{fill:none;stroke:rgba(156,139,120,.5);stroke-width:26;stroke-linecap:round}
+@keyframes rise{
+  0%{transform:translateY(12%) scale(1);opacity:0}
+  25%{opacity:.35}
+  70%{opacity:.15}
+  100%{transform:translateY(-70%) scale(1.4);opacity:0}
+}
+
+/* ============================================================
+   MUSIC DOCK — spinning mini-vinyl toggle
+   ============================================================ */
+.music-dock{
+  position:fixed;right:26px;bottom:26px;z-index:80;
+  display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;
+  background:rgba(18,13,12,.8);border:1px solid rgba(201,162,83,.5);
+  padding:9px 16px 9px 9px;border-radius:999px;backdrop-filter:blur(6px);
+  transition:border-color .3s;
+}
+.music-dock:hover{border-color:var(--gold)}
+.mini-vinyl{
+  width:38px;height:38px;border-radius:50%;position:relative;flex:none;
+  background:repeating-radial-gradient(circle,#171010 0 1.5px,#0d0908 1.5px 3px);
+  border:1.5px solid var(--gold);
+  animation:spin 3s linear infinite paused;
+}
+.music-dock.on .mini-vinyl{animation-play-state:running}
+.mini-vinyl::after{content:"";position:absolute;inset:34%;border-radius:50%;background:var(--wine);border:1px solid var(--gold)}
+.eq{display:flex;align-items:flex-end;gap:3px;height:16px}
+.eq i{width:3px;background:var(--gold);height:4px;border-radius:2px}
+.music-dock.on .eq i{animation:eq 0.9s ease-in-out infinite}
+.music-dock.on .eq i:nth-child(2){animation-delay:.15s}
+.music-dock.on .eq i:nth-child(3){animation-delay:.3s}
+.music-dock.on .eq i:nth-child(4){animation-delay:.45s}
+@keyframes eq{0%,100%{height:4px}50%{height:16px}}
+.music-dock .m-label{font-size:.6rem;letter-spacing:.3em;text-indent:.1em;text-transform:uppercase;color:var(--gold-soft)}
+@media(max-width:640px){.music-dock .m-label{display:none}}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:70;
+  display:flex;justify-content:center;gap:clamp(14px,3.5vw,38px);
+  padding:24px 60px;
+  background:linear-gradient(rgba(18,13,12,.94),rgba(18,13,12,0));
+  opacity:0;transform:translateY(-14px);transition:opacity .8s ease .2s,transform .8s ease .2s;
+}
+nav.on{opacity:1;transform:none}
+nav a{
+  text-decoration:none;color:var(--gold-soft);font-size:.66rem;letter-spacing:.3em;text-indent:.1em;
+  text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid transparent;transition:.3s;
+}
+nav a:hover{color:var(--champagne);border-color:var(--gold)}
+@media(max-width:560px){nav{flex-wrap:wrap;gap:10px 16px;padding:16px 40px}}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:15px 34px;border:1px solid var(--gold);color:var(--gold-soft);
+  background:transparent;text-decoration:none;cursor:pointer;
+  font-family:var(--sans);font-size:.72rem;letter-spacing:.32em;text-indent:.1em;text-transform:uppercase;
+  position:relative;overflow:hidden;transition:color .45s ease;
+}
+.btn::before{
+  content:"";position:absolute;inset:0;background:linear-gradient(100deg,var(--gold),#a37f36);
+  transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.77,0,.18,1);z-index:-1;
+}
+.btn:hover{color:var(--noir)}
+.btn:hover::before{transform:scaleX(1)}
+.btn.wine{border-color:var(--wine-glow);color:#e7b6ba}
+.btn.wine::before{background:linear-gradient(100deg,var(--wine-glow),var(--wine))}
+.btn.wine:hover{color:var(--champagne)}
+.btn.solid{background:linear-gradient(100deg,var(--gold),#a37f36);color:var(--noir);border-color:transparent}
+.btn.solid::before{background:var(--wine)}
+.btn.solid:hover{color:var(--champagne)}
+.btn svg{width:15px;height:15px;flex:none}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;position:relative;padding:110px 24px 70px;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(110,31,44,.35),transparent 55%),
+    radial-gradient(ellipse at 15% 85%,rgba(201,162,83,.10),transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(110,31,44,.18),transparent 55%),
+    var(--noir);
+}
+.hero .eyebrow{font-size:.72rem;letter-spacing:.6em;text-indent:.6em;text-transform:uppercase;color:var(--gold)}
+.hero h1{
+  font-size:clamp(3.2rem,10.5vw,7rem);line-height:1.06;margin:22px 0 6px;color:var(--ivory);
+  background:linear-gradient(160deg,var(--champagne) 20%,var(--gold) 55%,#8f6d2e 90%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero h1 .amp{
+  display:block;font-family:var(--serif);font-style:italic;font-size:.3em;
+  letter-spacing:.5em;text-indent:.5em;margin:12px 0;
+  -webkit-text-fill-color:var(--wine-glow);
+}
+.hero .lyric{
+  font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,2.8vw,1.4rem);color:var(--smoke);
+  margin-top:10px;
+}
+.hero .lyric b{color:var(--gold-soft);font-weight:400}
+.hero .date-line{
+  display:flex;align-items:center;gap:20px;margin:30px 0 10px;color:var(--champagne);
+  font-family:var(--serif);font-size:clamp(1.02rem,2.6vw,1.35rem);letter-spacing:.25em;text-transform:uppercase;
+}
+.hero .date-line::before,.hero .date-line::after{content:"";height:1px;width:70px;background:linear-gradient(90deg,transparent,var(--gold));}
+.hero .date-line::after{background:linear-gradient(90deg,var(--gold),transparent)}
+.hero .venue-line{color:var(--smoke);font-weight:300;letter-spacing:.18em;font-size:.88rem}
+.countdown{display:flex;gap:clamp(14px,4vw,40px);margin-top:46px}
+.count-cell{min-width:74px}
+.count-cell .num{font-family:var(--display);font-size:clamp(1.9rem,5vw,3rem);color:var(--gold-soft);line-height:1}
+.count-cell .lbl{font-size:.6rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--wine-glow);margin-top:8px}
+.count-cell+.count-cell{border-left:1px solid rgba(201,162,83,.3);padding-left:clamp(14px,4vw,40px)}
+.hero-cta{display:flex;gap:16px;margin-top:52px;flex-wrap:wrap;justify-content:center}
+.scroll-cue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);color:var(--gold);font-size:.6rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;animation:cueFloat 2.6s ease infinite}
+@keyframes cueFloat{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+/* falling rose petals, wine-dark */
+.petal{position:absolute;top:-40px;pointer-events:none;animation:fall linear infinite;opacity:.6}
+.petal svg{width:100%;height:100%}
+@keyframes fall{
+  0%{transform:translateY(-5vh) rotate(0) translateX(0)}
+  50%{transform:translateY(50vh) rotate(190deg) translateX(4vw)}
+  100%{transform:translateY(110vh) rotate(380deg) translateX(-3vw)}
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{padding:110px 24px;position:relative}
+.wrap{max-width:1060px;margin:0 auto}
+.sec-head{text-align:center;margin-bottom:64px}
+.sec-head .kicker{font-size:.68rem;letter-spacing:.55em;text-indent:.55em;text-transform:uppercase;color:var(--wine-glow)}
+.sec-head h2{font-size:clamp(2.2rem,6vw,3.4rem);color:var(--champagne);margin-top:12px}
+.sec-head .divider{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:20px}
+.sec-head .divider::before,.sec-head .divider::after{content:"";height:1px;width:60px;background:rgba(201,162,83,.4)}
+.sec-head .divider svg{width:26px;height:26px}
+.reveal{opacity:0;transform:translateY(34px);transition:opacity 1s ease,transform 1s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ============================================================
+   OUR STORY
+   ============================================================ */
+#story{background:linear-gradient(180deg,var(--noir) 0%,var(--noir-2) 100%)}
+.timeline{position:relative;max-width:720px;margin:0 auto}
+.timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,var(--gold),var(--wine-glow),transparent)}
+.moment{position:relative;width:50%;padding:0 46px 70px}
+.moment:nth-child(odd){left:0;text-align:right}
+.moment:nth-child(even){left:50%;text-align:left}
+.moment .dot{position:absolute;top:6px;width:13px;height:13px;border-radius:50%;background:var(--noir);border:2px solid var(--gold)}
+.moment:nth-child(odd) .dot{right:-7px}
+.moment:nth-child(even) .dot{left:-7px}
+.moment .yr{font-family:var(--serif);font-style:italic;color:var(--gold);font-size:1.3rem}
+.moment h3{font-size:1.4rem;color:var(--champagne);margin:4px 0 8px}
+.moment p{color:var(--smoke);font-weight:300;font-size:.93rem}
+@media(max-width:640px){
+  .timeline::before{left:10px}
+  .moment{width:100%;left:0!important;text-align:left!important;padding:0 0 56px 42px}
+  .moment .dot{left:4px!important;right:auto!important}
+}
+
+/* ============================================================
+   THE EVENING — schedule cards
+   ============================================================ */
+#details{background:var(--noir-2)}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px}
+.detail-card{
+  background:linear-gradient(170deg,var(--noir-3),var(--noir-2));
+  border:1px solid rgba(201,162,83,.35);
+  padding:52px 32px 44px;text-align:center;position:relative;
+  transition:transform .5s ease,box-shadow .5s ease,border-color .5s;
+}
+.detail-card:hover{transform:translateY(-8px);border-color:var(--gold);box-shadow:0 24px 60px -30px rgba(201,162,83,.35)}
+.detail-card .card-corner{position:absolute;width:34px;height:34px;opacity:.9}
+.detail-card .card-corner.a{top:8px;left:8px}
+.detail-card .card-corner.b{top:8px;right:8px;transform:scaleX(-1)}
+.detail-card .card-corner.c{bottom:8px;left:8px;transform:scaleY(-1)}
+.detail-card .card-corner.d{bottom:8px;right:8px;transform:scale(-1,-1)}
+.detail-card .icon{width:44px;height:44px;margin:0 auto 18px;color:var(--gold)}
+.detail-card .icon svg{width:100%;height:100%}
+.detail-card h3{font-size:1.45rem;color:var(--champagne)}
+.detail-card .time{font-family:var(--serif);font-style:italic;color:var(--wine-glow);font-size:1.12rem;margin:6px 0 12px}
+.detail-card p{font-size:.87rem;color:var(--smoke);font-weight:300}
+
+/* ============================================================
+   VENUE
+   ============================================================ */
+#venue{background:linear-gradient(180deg,var(--noir-2),var(--wine-deep) 160%)}
+.venue-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center}
+@media(max-width:820px){.venue-inner{grid-template-columns:1fr}}
+.venue-map-ph{
+  aspect-ratio:4/3;border:1px dashed rgba(201,162,83,.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  color:var(--gold);background:rgba(201,162,83,.04);
+}
+/* picture here: replace this placeholder with a venue photo or an embedded map iframe */
+.venue-map-ph svg{width:46px;height:46px;opacity:.8}
+.venue-map-ph span{font-size:.7rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--smoke)}
+.venue-copy h3{font-family:var(--mono-font);font-size:2.1rem;letter-spacing:.06em;color:var(--champagne)}
+.venue-copy .addr{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--gold-soft);margin:14px 0 8px;line-height:1.6}
+.venue-copy p{font-weight:300;color:var(--smoke);font-size:.92rem}
+.venue-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px}
+
+/* ============================================================
+   GALLERY — auto-scrolling marquee
+   ============================================================ */
+#gallery{padding-left:0;padding-right:0;overflow:hidden;background:var(--noir)}
+.marquee{display:flex;gap:22px;width:max-content;animation:slide 42s linear infinite;padding:6px 0}
+.marquee:hover{animation-play-state:paused}
+.marquee.rev{animation-direction:reverse;animation-duration:52s;margin-top:22px}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ph{
+  width:clamp(220px,26vw,320px);aspect-ratio:3/4;flex:none;
+  border:1px dashed rgba(201,162,83,.5);background:linear-gradient(150deg,var(--noir-3),var(--noir-2));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--gold);
+}
+.marquee.rev .ph{aspect-ratio:4/3;width:clamp(240px,28vw,360px)}
+.ph svg{width:38px;height:38px;opacity:.75}
+.ph span{font-size:.66rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--smoke)}
+.gallery-note{text-align:center;color:var(--smoke);font-weight:300;font-size:.85rem;margin-top:34px;font-style:italic;font-family:var(--serif)}
+
+/* ============================================================
+   RSVP — "YOUR INVITATION"
+   type name + phone → the house reveals how many seats your
+   invitation is valid for
+   ============================================================ */
+#rsvp{background:linear-gradient(180deg,var(--noir) 0%,var(--noir-2) 100%)}
+.rsvp-card{
+  max-width:580px;margin:0 auto;background:linear-gradient(170deg,var(--noir-3),var(--noir-2));
+  border:1px solid rgba(201,162,83,.45);
+  padding:64px 48px;position:relative;box-shadow:0 50px 100px -60px rgba(0,0,0,.9);
+}
+@media(max-width:520px){.rsvp-card{padding:48px 26px}}
+.seat-meter{text-align:center;margin-bottom:38px}
+.seat-meter .big{font-family:var(--display);font-size:2.4rem;color:var(--champagne);line-height:1}
+.seat-meter .big em{font-style:italic;color:var(--gold)}
+.seat-meter .cap{font-size:.66rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;color:var(--smoke);margin-top:8px}
+.seat-bar{height:3px;background:rgba(201,162,83,.2);margin-top:18px;position:relative;overflow:hidden}
+.seat-bar i{position:absolute;inset:0;transform-origin:left;background:linear-gradient(90deg,var(--wine-glow),var(--gold));transition:transform 1s cubic-bezier(.77,0,.18,1)}
+.field{margin-bottom:26px}
+.field label{display:block;font-size:.64rem;letter-spacing:.35em;text-indent:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}
+.field input{
+  width:100%;border:none;border-bottom:1px solid rgba(201,162,83,.5);background:transparent;
+  padding:10px 2px;font-family:var(--serif);font-size:1.2rem;color:var(--ivory);outline:none;
+  transition:border-color .3s;border-radius:0;
+}
+.field input:focus{border-color:var(--gold)}
+.field input::placeholder{color:#5b5045}
+/* the invitation ticket that flips open */
+.invite-ticket{
+  margin:34px 0 6px;border:1px solid rgba(201,162,83,.5);position:relative;
+  padding:28px 24px;text-align:center;overflow:hidden;
+  max-height:0;opacity:0;padding-top:0;padding-bottom:0;margin-top:0;border-width:0;
+  transition:max-height .9s cubic-bezier(.77,0,.18,1),opacity .7s ease,padding .7s ease,margin .7s ease;
+  background:
+    radial-gradient(circle at 0 50%,var(--noir) 9px,transparent 10px),
+    radial-gradient(circle at 100% 50%,var(--noir) 9px,transparent 10px),
+    linear-gradient(150deg,rgba(110,31,44,.3),rgba(201,162,83,.08));
+}
+.invite-ticket.show{max-height:300px;opacity:1;padding:28px 24px;margin:34px 0 6px;border-width:1px}
+.invite-ticket .t-kicker{font-size:.6rem;letter-spacing:.45em;text-indent:.45em;text-transform:uppercase;color:var(--gold)}
+.invite-ticket .t-line{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--ivory);margin-top:10px}
+.invite-ticket .t-seats{font-family:var(--display);font-size:2.6rem;color:var(--gold-soft);line-height:1.15}
+.invite-ticket .t-seats small{font-size:.95rem;font-family:var(--serif);font-style:italic;color:var(--smoke)}
+.stepper-row{display:none;align-items:center;justify-content:center;gap:22px;margin-top:16px}
+.stepper-row.show{display:flex}
+.stepper-row button{
+  width:40px;height:40px;border:1px solid var(--gold);background:transparent;color:var(--gold-soft);
+  font-family:var(--serif);font-size:1.4rem;cursor:pointer;transition:.3s;line-height:1;
+}
+.stepper-row button:hover{background:var(--gold);color:var(--noir)}
+.stepper-row .count{font-family:var(--display);font-size:1.9rem;min-width:46px;text-align:center;color:var(--ivory)}
+.stepper-row .of{font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--smoke)}
+.avail-msg{margin-top:14px;font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--gold-soft);min-height:1.6em;text-align:center}
+.avail-msg.warn{color:#e0766b}
+#rsvpForm .btn{width:100%;justify-content:center;margin-top:22px}
+#rsvpForm .btn[disabled]{opacity:.35;pointer-events:none}
+.rsvp-done{display:none;text-align:center}
+.rsvp-done.show{display:block;animation:doneIn .9s ease}
+@keyframes doneIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.rsvp-done .ring{width:74px;height:74px;margin:0 auto 24px;color:var(--gold)}
+.rsvp-done .ring svg{width:100%;height:100%}
+.rsvp-done h3{font-size:1.9rem;color:var(--champagne)}
+.rsvp-done p{color:var(--smoke);font-weight:300;margin-top:10px;font-size:.95rem}
+.rsvp-done .mail-note{
+  margin-top:22px;display:inline-flex;align-items:center;gap:10px;
+  padding:12px 22px;border:1px solid rgba(201,162,83,.5);color:var(--gold);
+  font-size:.68rem;letter-spacing:.28em;text-indent:.05em;text-transform:uppercase;
+}
+.rsvp-done .mail-note svg{width:16px;height:16px}
+.demo-note{text-align:center;font-size:.66rem;letter-spacing:.15em;color:#5b5045;margin-top:26px}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+#faq{background:var(--noir-2)}
+.faq{max-width:680px;margin:0 auto}
+.faq details{border-bottom:1px solid rgba(201,162,83,.25);padding:22px 4px}
+.faq summary{
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--serif);font-size:1.25rem;color:var(--champagne);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--serif);color:var(--gold);font-size:1.5rem;transition:transform .3s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding-top:12px;color:var(--smoke);font-weight:300;font-size:.92rem}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  text-align:center;padding:90px 24px 70px;
+  background:linear-gradient(180deg,var(--noir-2),var(--wine-deep));color:var(--gold-soft);
+}
+footer .mono{font-family:var(--mono-font);font-size:2.6rem;letter-spacing:.3em;text-indent:.3em;color:var(--champagne)}
+footer .mono .amp{color:var(--gold);font-family:var(--serif);font-style:italic}
+footer .fdate{font-size:.7rem;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;margin-top:16px;color:var(--gold)}
+footer .fnote{font-family:var(--serif);font-style:italic;margin-top:34px;font-size:1.08rem;color:var(--smoke)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SVG library ══════════════ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- gold-line rose branch for page corners -->
+    <g id="cornerRoseNoir">
+      <path d="M8,8 C40,14 70,34 88,70" fill="none" stroke="#c9a253" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M8,8 C30,40 44,72 52,108" fill="none" stroke="#c9a253" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>
+      <path d="M30,15 q10,-9 20,-2 q-2,12 -14,12 q-8,-2 -6,-10z" fill="#6e1f2c"/>
+      <path d="M33,18 q6,-5 12,-1" fill="none" stroke="#c9a253" stroke-width=".9" opacity=".7"/>
+      <path d="M58,34 q12,-7 20,2 q-4,12 -16,9 q-8,-4 -4,-11z" fill="#93313f" opacity=".9"/>
+      <path d="M40,58 q11,-6 18,2 q-3,11 -14,9 q-8,-4 -4,-11z" fill="#6e1f2c" opacity=".9"/>
+      <path d="M76,58 q4,-10 14,-9 q4,10 -4,15 q-9,2 -10,-6z" fill="#e2c98d" opacity=".55"/>
+      <circle cx="24" cy="30" r="3" fill="#c9a253"/>
+      <circle cx="52" cy="46" r="2.4" fill="#93313f"/>
+      <circle cx="44" cy="90" r="2.6" fill="#c9a253" opacity=".8"/>
+      <path d="M20,48 q-8,2 -10,10 q8,2 12,-4z" fill="#c9a253" opacity=".5"/>
+      <path d="M64,80 q-9,0 -12,8 q8,4 13,-2z" fill="#c9a253" opacity=".5"/>
+      <path d="M84,92 q-2,-9 -10,-11 q-3,8 3,13z" fill="#93313f" opacity=".7"/>
+    </g>
+    <!-- small card corner sprig -->
+    <g id="sprigNoir">
+      <path d="M4,4 C14,8 22,16 27,28" fill="none" stroke="#c9a253" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M10,7 q4,-4 9,-1 q-1,5 -6,5 q-4,-1 -3,-4z" fill="#6e1f2c"/>
+      <circle cx="19" cy="16" r="1.7" fill="#c9a253"/>
+      <path d="M22,24 q-4,0 -6,4 q4,2 7,-1z" fill="#c9a253" opacity=".55"/>
+    </g>
+    <!-- wine petal -->
+    <g id="petalNoir"><path d="M8,0 C14,4 15,12 8,18 C1,12 2,4 8,0z" fill="#6e1f2c" opacity=".75"/></g>
+    <!-- divider: little vinyl note -->
+    <g id="divNote">
+      <circle cx="13" cy="13" r="9" fill="none" stroke="#c9a253" stroke-width="1"/>
+      <circle cx="13" cy="13" r="5" fill="none" stroke="#c9a253" stroke-width=".7" opacity=".6"/>
+      <circle cx="13" cy="13" r="2" fill="#93313f"/>
+    </g>
+    <!-- smoke wisp path -->
+    <g id="wispPath"><path d="M110,560 C60,440 170,380 110,270 C60,180 160,120 120,20"/></g>
+  </defs>
+</svg>
+
+<!-- ══════════════ page frame + rose corners ══════════════ -->
+<div class="page-frame" aria-hidden="true"></div>
+<div class="corner-flower tl" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRoseNoir"/></svg></div>
+<div class="corner-flower tr" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRoseNoir"/></svg></div>
+<div class="corner-flower bl" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRoseNoir"/></svg></div>
+<div class="corner-flower br" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#cornerRoseNoir"/></svg></div>
+
+<!-- ══════════════ the song ══════════════ -->
+<audio id="song" src="is-it-a-crime.mp3" loop preload="auto"></audio>
+
+<!-- ══════════════ INTRO — drop the needle ══════════════ -->
+<div id="intro" role="button" aria-label="Drop the needle and enter">
+  <p class="intro-kicker">Now spinning &middot; Sade</p>
+  <div class="turntable">
+    <div class="vinyl"></div>
+    <div class="label">
+      <div class="l-mono">A &hearts; J</div>
+      <div class="l-song">"Is It a Crime"</div>
+      <div class="l-side">Side A &middot; 33&#8531; rpm</div>
+    </div>
+    <span class="ripple r1"></span><span class="ripple r2"></span><span class="ripple r3"></span>
+    <div class="tonearm"><span class="pivot"></span><span class="arm"></span><span class="head"></span></div>
+  </div>
+  <div class="intro-names">Amelia <em>&amp;</em> James</div>
+  <div class="intro-hint">Drop the needle</div>
+</div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav id="nav">
+  <a href="#story">Our Story</a>
+  <a href="#details">The Evening</a>
+  <a href="#venue">Venue</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#rsvp">RSVP</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<!-- ══════════════ music dock ══════════════ -->
+<div class="music-dock" id="musicDock" role="button" aria-label="Toggle music">
+  <div class="mini-vinyl"></div>
+  <div class="eq"><i></i><i></i><i></i><i></i></div>
+  <span class="m-label">Is It a Crime</span>
+</div>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero" id="top">
+  <p class="eyebrow">Together with their families</p>
+  <h1>Amelia<span class="amp">&amp;</span>James</h1>
+  <p class="lyric">Is it a crime&hellip; <b>to love you this much?</b></p>
+  <div class="date-line">September 12, 2026</div>
+  <p class="venue-line">The Velvet Room &middot; Downtown Los Angeles, California</p>
+
+  <div class="countdown" id="countdown" aria-label="Countdown to the wedding">
+    <div class="count-cell"><div class="num" id="cd-d">—</div><div class="lbl">Days</div></div>
+    <div class="count-cell"><div class="num" id="cd-h">—</div><div class="lbl">Hours</div></div>
+    <div class="count-cell"><div class="num" id="cd-m">—</div><div class="lbl">Minutes</div></div>
+    <div class="count-cell"><div class="num" id="cd-s">—</div><div class="lbl">Seconds</div></div>
+  </div>
+
+  <div class="hero-cta">
+    <a class="btn solid" href="#rsvp">RSVP</a>
+    <button class="btn" id="calBtnHero" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+      Save to Calendar
+    </button>
+  </div>
+  <div class="scroll-cue">Scroll</div>
+</header>
+
+<!-- ══════════════ OUR STORY ══════════════ -->
+<section id="story">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Every love has a soundtrack</p>
+      <h2>Our Story</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divNote"/></svg></div>
+    </div>
+    <div class="timeline">
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2019</div><h3>Track 1 · The Meeting</h3>
+        <p>A crowded record shop, two hands reaching for the same copy of "Diamond Life." He let her have it. She let him walk her home.</p>
+      </div>
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2021</div><h3>Track 2 · The Slow Years</h3>
+        <p>Late dinners, later dances in the kitchen, a record player that never cooled down, and a love that never rushed.</p>
+      </div>
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2025</div><h3>Track 3 · The Question</h3>
+        <p>At the jazz bar where they had their first date, the band slid into "Is It a Crime." He was already on one knee before the first chorus.</p>
+      </div>
+      <div class="moment reveal"><span class="dot"></span>
+        <div class="yr">2026</div><h3>Track 4 · The Beginning</h3>
+        <p>Now the needle drops on the best side yet — and you're on the guest list.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ THE EVENING ══════════════ -->
+<section id="details">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Set list for the night</p>
+      <h2>The Evening</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divNote"/></svg></div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2c1.5 2.5 1.5 5-0 7-1.5-2-1.5-4.5 0-7zM12 9v7"/><path d="M8 21c0-2.5 1.8-5 4-5s4 2.5 4 5z"/></svg></div>
+        <h3>The Ceremony</h3>
+        <p class="time">6:00 in the evening</p>
+        <p>Vows by candlelight beneath the chandeliers. Doors open at 5:30 — come early, the quartet will be warming up.</p>
+      </div>
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M8 3h8l-3 8v7M9 21h6M6 3l6 8 6-8"/></svg></div>
+        <h3>Golden Hour</h3>
+        <p class="time">7:00 in the evening</p>
+        <p>Champagne coupes and smoky old fashioneds on the mezzanine while the skyline turns amber behind the glass.</p>
+      </div>
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 20h16M6 20V10a6 6 0 0 1 12 0v10M12 4V2"/></svg></div>
+        <h3>Dinner &amp; Toasts</h3>
+        <p class="time">8:00 in the evening</p>
+        <p>A candlelit supper in the velvet booths, with toasts between courses from the people who saw it coming first.</p>
+      </div>
+      <div class="detail-card reveal">
+        <svg class="card-corner a" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner b" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner c" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <svg class="card-corner d" viewBox="0 0 32 32"><use href="#sprigNoir"/></svg>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></div>
+        <h3>The Slow Dances</h3>
+        <p class="time">9:30 until late</p>
+        <p>First dance: you already know the song. Then the live band takes it from smooth to sweat — stay for the last note.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ VENUE ══════════════ -->
+<section id="venue">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Where the night lives</p>
+      <h2>The Venue</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divNote"/></svg></div>
+    </div>
+    <div class="venue-inner">
+      <div class="venue-map-ph reveal">
+        <!-- picture here: venue photo or embedded map -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="9" cy="8" r="1.6"/></svg>
+        <span>Picture here</span>
+      </div>
+      <div class="venue-copy reveal">
+        <h3>The Velvet Room</h3>
+        <p class="addr">448 South Broadway<br>Los Angeles, California 90013</p>
+        <p>A 1920s supper club restored to its candlelit glory — velvet booths, a sunken dance floor, and a stage that has held horns since Prohibition. Valet on Broadway; the coat check keeps secrets.</p>
+        <div class="venue-btns">
+          <a class="btn" id="mapsBtn"
+             href="https://www.google.com/maps/search/?api=1&query=The+Velvet+Room%2C+448+South+Broadway%2C+Los+Angeles%2C+CA+90013"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21c-4-3.5-7-6.5-7-10a7 7 0 0 1 14 0c0 3.5-3 6.5-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+            Open in Maps
+          </a>
+          <button class="btn" id="calBtnVenue" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+            Save to Calendar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ GALLERY ══════════════ -->
+<section id="gallery">
+  <div class="sec-head reveal">
+    <p class="kicker">Stills from the B-side</p>
+    <h2>Gallery</h2>
+    <div class="divider"><svg viewBox="0 0 26 26"><use href="#divNote"/></svg></div>
+  </div>
+
+  <!-- picture here: replace each .ph placeholder below with <img src="your-photo.jpg" alt="..."> -->
+  <div class="marquee" id="marqueeA"></div>
+  <div class="marquee rev" id="marqueeB"></div>
+  <p class="gallery-note">Photos coming soon — hover to pause the reel.</p>
+</section>
+
+<!-- ══════════════ RSVP ══════════════ -->
+<section id="rsvp">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Kindly respond by August 1, 2026</p>
+      <h2>RSVP</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divNote"/></svg></div>
+    </div>
+
+    <div class="rsvp-card reveal">
+      <div class="seat-meter">
+        <div class="big"><em id="seatsLeft">150</em> seats remain</div>
+        <div class="cap">of 150 in the lounge</div>
+        <div class="seat-bar"><i id="seatBarFill"></i></div>
+      </div>
+
+      <form id="rsvpForm" novalidate>
+        <div class="field">
+          <label for="rName">Full name</label>
+          <input id="rName" type="text" placeholder="As it appears on your invitation" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="rPhone">Phone number</label>
+          <input id="rPhone" type="tel" placeholder="(555) 555-5555" autocomplete="tel" required>
+        </div>
+
+        <div class="invite-ticket" id="inviteTicket">
+          <p class="t-kicker">Invitation found</p>
+          <p class="t-line" id="ticketLine">Good evening.</p>
+          <div class="t-seats"><span id="ticketSeats">2</span> <small id="ticketSeatsWord">seats</small></div>
+          <div class="stepper-row" id="stepperRow">
+            <button type="button" id="stepDown" aria-label="Fewer guests">&minus;</button>
+            <div class="count" id="partyCount">1</div>
+            <button type="button" id="stepUp" aria-label="More guests">+</button>
+            <span class="of" id="ofMax">of 2</span>
+          </div>
+          <p class="avail-msg" id="availMsg"></p>
+        </div>
+
+        <button class="btn solid" type="submit" id="reserveBtn" disabled>Reserve our table</button>
+      </form>
+
+      <div class="rsvp-done" id="rsvpDone">
+        <div class="ring">
+          <svg viewBox="0 0 74 74" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="37" cy="37" r="33" stroke="#93313f"/>
+            <path d="M22 38l10 10 20-22" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3 id="doneTitle">Thank you!</h3>
+        <p id="doneMsg">Your seats are saved in the lounge.</p>
+        <div class="mail-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/></svg>
+          Confirmation text sent
+        </div>
+      </div>
+
+      <p class="demo-note">Demo only — invitations and seats are simulated in your browser, no data is sent anywhere.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Good things to know</p>
+      <h2>Questions</h2>
+      <div class="divider"><svg viewBox="0 0 26 26"><use href="#divNote"/></svg></div>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>What should I wear?</summary>
+        <p>Cocktail noir — velvet, silk, jewel tones, black tie welcome. Dress like you're stepping into a Sade record, because you are.</p>
+      </details>
+      <details>
+        <summary>Can I bring a plus one?</summary>
+        <p>Your invitation's seat count (revealed when you RSVP) already includes any guests we've reserved for you — the number you see is yours to fill.</p>
+      </details>
+      <details>
+        <summary>Are children welcome?</summary>
+        <p>This one's an evening for the grown folks — dim lights, late hours, and slow songs. Little ones sit this record out.</p>
+      </details>
+      <details>
+        <summary>Where should we stay?</summary>
+        <p>Room blocks are held at the Ace and the Hoxton, both a short walk down Broadway. Mention "A &amp; J wedding" when booking.</p>
+      </details>
+      <details>
+        <summary>What about gifts?</summary>
+        <p>Your presence on the dance floor is the gift. If you insist, a registry link will appear right here soon.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="mono">A<span class="amp">&amp;</span>J</div>
+  <div class="fdate">09 &middot; 12 &middot; 2026 &middot; Los Angeles</div>
+  <p class="fnote">"Is it a crime, that I still want you — and I want you to want me too."</p>
+</footer>
+
+<script>
+/* ── Wedding facts (edit these!) ───────────────────────── */
+const WEDDING = {
+  title: "Amelia & James — Wedding",
+  start: new Date("2026-09-12T18:00:00"),
+  end:   new Date("2026-09-13T01:00:00"),
+  location: "The Velvet Room, 448 South Broadway, Los Angeles, CA 90013",
+  details: "Candlelit ceremony at 6:00 pm, supper and slow dances to follow. Cocktail noir attire.",
+  totalSeats: 150
+};
+
+/* ── The song + music dock ─────────────────────────────── */
+const song = document.getElementById("song");
+const dock = document.getElementById("musicDock");
+song.volume = 0.85;
+function setDock(on){ dock.classList.toggle("on", on); }
+dock.addEventListener("click", ()=>{
+  if(song.paused){ song.play().then(()=>setDock(true)).catch(()=>{}); }
+  else { song.pause(); setDock(false); }
+});
+
+/* ── Intro: drop the needle ────────────────────────────── */
+const intro = document.getElementById("intro");
+const nav = document.getElementById("nav");
+let opened = false;
+document.body.style.overflow = "hidden";
+function enterSite(withMusic){
+  if(opened) return; opened = true;
+  if(withMusic){ song.play().then(()=>setDock(true)).catch(()=>{}); }
+  intro.classList.add("playing");
+  // let the needle land and the record spin up before the room opens
+  setTimeout(()=>{
+    intro.classList.add("wipe");
+    nav.classList.add("on");
+    document.body.style.overflow = "";
+    setTimeout(()=>intro.classList.add("gone"), 1500);
+  }, 1400);
+}
+intro.addEventListener("click", ()=>enterSite(true));
+setTimeout(()=>enterSite(false), 10000);   // auto-enter silently if the guest just waits
+
+/* ── Smoke wisps + petals ──────────────────────────────── */
+function addWisps(host, n){
+  for(let i=0;i<n;i++){
+    const w = document.createElement("div");
+    w.className = "wisp";
+    w.style.cssText = `left:${8+Math.random()*84}%;animation-delay:${-Math.random()*14}s;animation-duration:${12+Math.random()*8}s;`;
+    w.innerHTML = '<svg viewBox="0 0 220 580"><use href="#wispPath"/></svg>';
+    host.appendChild(w);
+  }
+}
+function addPetals(host, n){
+  for(let i=0;i<n;i++){
+    const p = document.createElement("div");
+    p.className = "petal";
+    const s = 10 + Math.random()*14;
+    p.style.cssText = `left:${Math.random()*100}%;width:${s}px;height:${s}px;`+
+      `animation-duration:${9+Math.random()*10}s;animation-delay:${-Math.random()*14}s;`;
+    p.innerHTML = '<svg viewBox="0 0 16 18"><use href="#petalNoir"/></svg>';
+    host.appendChild(p);
+  }
+}
+addWisps(intro, 4);
+addWisps(document.querySelector(".hero"), 3);
+addPetals(document.querySelector(".hero"), 10);
+
+/* ── Countdown ─────────────────────────────────────────── */
+const pad = n => String(Math.max(0,n)).padStart(2,"0");
+const cdD=document.getElementById("cd-d"), cdH=document.getElementById("cd-h"),
+      cdM=document.getElementById("cd-m"), cdS=document.getElementById("cd-s");
+function tick(){
+  const diff = WEDDING.start - new Date();
+  cdD.textContent = Math.max(0, Math.floor(diff/864e5));
+  cdH.textContent = pad(Math.floor(diff/36e5)%24);
+  cdM.textContent = pad(Math.floor(diff/6e4)%60);
+  cdS.textContent = pad(Math.floor(diff/1e3)%60);
+}
+tick(); setInterval(tick,1000);
+
+/* ── Save to Calendar (.ics download) ──────────────────── */
+function icsDate(d){ return d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,""); }
+function saveToCalendar(){
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//AJ Wedding//EN","BEGIN:VEVENT",
+    "UID:aj-wedding-noir-2026@example.com",
+    "DTSTAMP:" + icsDate(new Date()),
+    "DTSTART:" + icsDate(WEDDING.start),
+    "DTEND:"   + icsDate(WEDDING.end),
+    "SUMMARY:" + WEDDING.title,
+    "LOCATION:" + WEDDING.location.replace(/,/g,"\\,"),
+    "DESCRIPTION:" + WEDDING.details.replace(/,/g,"\\,"),
+    "END:VEVENT","END:VCALENDAR"
+  ].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));
+  a.download = "amelia-and-james-wedding.ics";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+document.getElementById("calBtnHero").addEventListener("click", saveToCalendar);
+document.getElementById("calBtnVenue").addEventListener("click", saveToCalendar);
+
+/* ── Gallery marquee (blank placeholders for now) ──────── */
+/* picture here: swap each placeholder for
+   <img src="photos/your-photo.jpg" alt="Amelia and James" style="width:100%;height:100%;object-fit:cover"> */
+function buildMarquee(el, count){
+  let cards = "";
+  for(let i=0;i<count;i++){
+    cards += `<div class="ph">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="9" cy="8" r="1.6"/>
+      </svg>
+      <span>Picture here</span>
+    </div>`;
+  }
+  el.innerHTML = cards + cards;   // duplicated so the loop is seamless
+}
+buildMarquee(document.getElementById("marqueeA"), 6);
+buildMarquee(document.getElementById("marqueeB"), 6);
+
+/* ── RSVP: name + phone reveals YOUR invitation's seats ──
+   Demo logic: the seat allotment is derived deterministically
+   from the name + phone digits (2–6 seats), so the same guest
+   always sees the same invitation. A real site would look this
+   up on a server instead. */
+const seatKey = "aj-noir-seats-taken";
+let taken = parseInt(localStorage.getItem(seatKey) || "0", 10);
+if(isNaN(taken) || taken < 0 || taken > WEDDING.totalSeats) taken = 0;
+
+const nameIn = document.getElementById("rName"),
+      phoneIn = document.getElementById("rPhone"),
+      ticket = document.getElementById("inviteTicket"),
+      ticketLine = document.getElementById("ticketLine"),
+      ticketSeats = document.getElementById("ticketSeats"),
+      ticketSeatsWord = document.getElementById("ticketSeatsWord"),
+      stepperRow = document.getElementById("stepperRow"),
+      partyEl = document.getElementById("partyCount"),
+      ofMax = document.getElementById("ofMax"),
+      availMsg = document.getElementById("availMsg"),
+      reserveBtn = document.getElementById("reserveBtn"),
+      seatsLeftEl = document.getElementById("seatsLeft"),
+      seatBarFill = document.getElementById("seatBarFill"),
+      form = document.getElementById("rsvpForm"),
+      done = document.getElementById("rsvpDone");
+
+let allotted = 0, party = 1;
+
+function seatsLeft(){ return WEDDING.totalSeats - taken; }
+function renderPool(){
+  seatsLeftEl.textContent = seatsLeft();
+  seatBarFill.style.transform = `scaleX(${taken / WEDDING.totalSeats})`;
+}
+renderPool();
+
+function inviteSeatsFor(name, digits){
+  let h = 0;
+  const s = (name.toLowerCase().replace(/\s+/g,"") + digits);
+  for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; }
+  return 2 + (h % 5);   // every invitation admits 2–6
+}
+
+function checkInvite(){
+  const name = nameIn.value.trim();
+  const digits = phoneIn.value.replace(/\D/g,"");
+  if(name.length >= 2 && digits.length >= 7){
+    allotted = Math.min(inviteSeatsFor(name, digits), Math.max(seatsLeft(),0));
+    party = Math.min(party, Math.max(allotted,1));
+    const first = name.split(" ")[0];
+    ticketLine.textContent = `Good evening, ${first.charAt(0).toUpperCase()+first.slice(1)} — your invitation is valid for`;
+    ticketSeats.textContent = allotted;
+    ticketSeatsWord.textContent = allotted === 1 ? "seat" : "seats";
+    ofMax.textContent = `of ${allotted}`;
+    ticket.classList.add("show");
+    stepperRow.classList.add("show");
+    reserveBtn.disabled = allotted === 0;
+    renderParty();
+  } else {
+    ticket.classList.remove("show");
+    reserveBtn.disabled = true;
+  }
+}
+function renderParty(){
+  partyEl.textContent = party;
+  if(allotted === 0){
+    availMsg.textContent = "The lounge is fully seated — please reach out to us directly.";
+    availMsg.classList.add("warn");
+    return;
+  }
+  availMsg.classList.remove("warn");
+  availMsg.textContent = party === allotted
+    ? "Bringing the whole table — we love to see it."
+    : `Reserving ${party} of your ${allotted} seats.`;
+}
+nameIn.addEventListener("input", checkInvite);
+phoneIn.addEventListener("input", checkInvite);
+document.getElementById("stepUp").addEventListener("click", ()=>{ if(party<allotted) party++; renderParty(); });
+document.getElementById("stepDown").addEventListener("click", ()=>{ if(party>1) party--; renderParty(); });
+
+form.addEventListener("submit", e=>{
+  e.preventDefault();
+  const name = nameIn.value.trim();
+  const digits = phoneIn.value.replace(/\D/g,"");
+  if(name.length < 2 || digits.length < 7){
+    availMsg.textContent = "Please add your name and phone number so we can find your invitation.";
+    availMsg.classList.add("warn");
+    return;
+  }
+  if(allotted === 0 || party > seatsLeft()) { renderParty(); return; }
+  taken += party;
+  localStorage.setItem(seatKey, String(taken));
+  form.style.display = "none";
+  const first = name.split(" ")[0];
+  document.getElementById("doneTitle").textContent = `Thank you, ${first.charAt(0).toUpperCase()+first.slice(1)}!`;
+  document.getElementById("doneMsg").textContent =
+    `${party} of your ${allotted} seats are reserved — a confirmation has been sent to ${phoneIn.value.trim()}.`;
+  done.classList.add("show");
+  renderPool();
+});
+
+/* ── Scroll reveal ─────────────────────────────────────── */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+},{threshold:.15});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
