@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isabella: XV — A Quinceañera Original</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PALETTE — streaming-service dark + quince rosa & gold
+   ============================================================ */
+:root{
+  --black:#0b0b0f;
+  --black-2:#141419;
+  --black-3:#1d1d24;
+  --card:#22222b;
+  --rosa:#e5397f;
+  --rosa-deep:#b3215d;
+  --rosa-glow:rgba(229,57,127,.45);
+  --gold:#d9b25a;
+  --gold-soft:#f0d9a3;
+  --white:#f5f5f4;
+  --grey:#a7a7b0;
+  --grey-dim:#6d6d78;
+  --display:'Bebas Neue',Impact,sans-serif;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Jost','Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--black);
+  color:var(--white);
+  overflow-x:hidden;
+  line-height:1.7;
+}
+::selection{background:var(--rosa);color:#fff}
+h1,h2,h3{font-weight:400}
+
+/* ============================================================
+   INTRO — the "ta-dum" title sting: XV zooms in with a glow,
+   then the whole card cuts to the show page.
+   ============================================================ */
+#intro{
+  position:fixed;inset:0;z-index:100;background:#000;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:opacity .7s ease;
+}
+#intro.fade{opacity:0;pointer-events:none}
+#intro.gone{display:none}
+#intro .sting{
+  font-family:var(--display);
+  font-size:clamp(6rem,30vw,17rem);
+  color:var(--rosa);line-height:1;
+  text-shadow:0 0 60px var(--rosa-glow),0 0 120px var(--rosa-glow);
+  transform:scale(2.4);opacity:0;
+  animation:tadum 2.2s cubic-bezier(.2,.8,.25,1) forwards;
+}
+@keyframes tadum{
+  0%{transform:scale(2.4);opacity:0}
+  30%{opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+#intro .sting-sub{
+  position:absolute;bottom:16vh;left:0;right:0;text-align:center;
+  font-size:.72rem;letter-spacing:.55em;text-indent:.55em;text-transform:uppercase;color:var(--grey);
+  opacity:0;animation:stingSub 1.2s ease 1.6s forwards;
+}
+@keyframes stingSub{to{opacity:1}}
+#intro .skip-hint{
+  position:absolute;bottom:8vh;left:0;right:0;text-align:center;
+  font-size:.62rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;color:var(--grey-dim);
+  opacity:0;animation:hintPulse 2.2s ease 2.2s infinite;
+}
+@keyframes hintPulse{0%,100%{opacity:.2}50%{opacity:.85}}
+
+/* ============================================================
+   NAV — streaming top bar
+   ============================================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:70;
+  display:flex;align-items:center;gap:clamp(14px,3vw,34px);
+  padding:16px clamp(18px,4vw,48px);
+  background:linear-gradient(rgba(11,11,15,.92),rgba(11,11,15,0));
+  transition:background .4s ease,opacity .8s ease .2s,transform .8s ease .2s;
+  opacity:0;transform:translateY(-14px);
+}
+nav.on{opacity:1;transform:none}
+nav.scrolled{background:rgba(11,11,15,.96)}
+nav .brand{
+  font-family:var(--display);font-size:1.5rem;letter-spacing:.14em;
+  color:var(--rosa);text-decoration:none;line-height:1;
+  text-shadow:0 0 18px var(--rosa-glow);
+}
+nav .links{display:flex;gap:clamp(12px,2.6vw,28px);margin-left:auto;flex-wrap:wrap}
+nav a.lnk{
+  text-decoration:none;color:var(--grey);font-size:.7rem;letter-spacing:.24em;text-indent:.06em;
+  text-transform:uppercase;transition:color .3s;
+}
+nav a.lnk:hover{color:var(--white)}
+@media(max-width:640px){nav .links{gap:10px 14px}nav a.lnk{font-size:.62rem}}
+
+/* ============================================================
+   HERO — the show page / title card
+   ============================================================ */
+.hero{
+  min-height:100vh;position:relative;overflow:hidden;
+  display:flex;align-items:center;
+  padding:120px clamp(18px,4vw,48px) 80px;
+  background:
+    radial-gradient(ellipse at 85% 20%,rgba(229,57,127,.16),transparent 55%),
+    radial-gradient(ellipse at 10% 90%,rgba(217,178,90,.10),transparent 50%),
+    linear-gradient(160deg,#131318 0%,var(--black) 70%);
+}
+.hero::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:180px;
+  background:linear-gradient(transparent,var(--black));pointer-events:none;
+}
+.hero-inner{
+  max-width:1160px;margin:0 auto;width:100%;
+  display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(30px,5vw,70px);align-items:center;
+  position:relative;z-index:2;
+}
+@media(max-width:880px){.hero-inner{grid-template-columns:1fr}}
+
+.hero .origin{
+  display:flex;align-items:center;gap:10px;
+  font-size:.72rem;letter-spacing:.5em;text-indent:.06em;text-transform:uppercase;color:var(--grey);
+}
+.hero .origin b{
+  font-family:var(--display);font-size:1.35rem;letter-spacing:.1em;color:var(--rosa);
+  font-weight:400;text-shadow:0 0 16px var(--rosa-glow);
+}
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(3.6rem,10vw,7.4rem);
+  line-height:.94;letter-spacing:.02em;margin:16px 0 6px;
+  text-shadow:0 4px 30px rgba(0,0,0,.6);
+}
+.hero h1 .xv{color:var(--gold);text-shadow:0 0 30px rgba(217,178,90,.45)}
+.hero .tagline{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:var(--gold-soft);margin-bottom:18px}
+
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--grey)}
+.meta-row .match{color:#46d369;font-weight:600}
+.meta-row .badge{
+  border:1px solid var(--grey-dim);padding:1px 8px;font-size:.68rem;letter-spacing:.14em;
+  color:var(--grey);text-transform:uppercase;
+}
+.meta-row .badge.gold{border-color:var(--gold);color:var(--gold)}
+
+.hero .synopsis{margin-top:18px;color:#cfcfd6;font-weight:300;font-size:.98rem;max-width:52ch}
+
+.hero-btns{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:11px;
+  padding:14px 30px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;
+  font-family:var(--sans);font-size:.82rem;letter-spacing:.2em;text-indent:.06em;text-transform:uppercase;
+  font-weight:500;transition:transform .25s ease,background .25s ease,color .25s ease,box-shadow .25s ease;
+}
+.btn svg{width:16px;height:16px;flex:none}
+.btn.play{
+  background:var(--white);color:#111;
+  box-shadow:0 8px 30px -10px rgba(255,255,255,.35);
+}
+.btn.play:hover{transform:scale(1.04);background:#fff}
+.btn.ghost{
+  background:rgba(109,109,120,.32);color:var(--white);
+  backdrop-filter:blur(3px);
+}
+.btn.ghost:hover{background:rgba(109,109,120,.5)}
+.btn.rosa{background:var(--rosa);color:#fff;box-shadow:0 10px 34px -12px var(--rosa-glow)}
+.btn.rosa:hover{background:var(--rosa-deep);transform:scale(1.03)}
+
+/* credits — "Starring" cast-style list */
+.credits{margin-top:30px;font-size:.86rem;font-weight:300;max-width:56ch}
+.credits .row{margin-bottom:6px;color:#cfcfd6}
+.credits .lbl{color:var(--grey-dim);margin-right:8px}
+.credits .row b{font-weight:500;color:var(--white)}
+.credits .row .as{font-family:var(--serif);font-style:italic;color:var(--gold-soft)}
+
+/* premiere countdown */
+.premiere{margin-top:30px}
+.premiere .plbl{font-size:.66rem;letter-spacing:.45em;text-indent:.06em;text-transform:uppercase;color:var(--rosa);margin-bottom:12px}
+.countdown{display:flex;gap:clamp(12px,3vw,28px)}
+.count-cell{min-width:64px;text-align:center}
+.count-cell .num{font-family:var(--display);font-size:clamp(1.9rem,5vw,2.9rem);line-height:1;color:var(--white)}
+.count-cell .lbl{font-size:.58rem;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;color:var(--grey-dim);margin-top:7px}
+.count-cell+.count-cell{border-left:1px solid #2c2c36;padding-left:clamp(12px,3vw,28px)}
+
+/* the poster */
+.poster-wrap{position:relative;justify-self:center;width:min(100%,380px)}
+.poster{
+  aspect-ratio:2/3;width:100%;border-radius:8px;
+  border:1px dashed var(--rosa);
+  background:linear-gradient(160deg,var(--black-3),var(--black-2));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  color:var(--rosa);position:relative;overflow:hidden;
+  box-shadow:0 40px 90px -40px rgba(229,57,127,.35),0 30px 60px -30px rgba(0,0,0,.8);
+}
+/* picture here: replace this placeholder with the quinceañera's portrait */
+.poster svg{width:52px;height:52px;opacity:.8}
+.poster span{font-size:.72rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--grey)}
+.poster .poster-title{
+  position:absolute;bottom:20px;left:0;right:0;text-align:center;
+  font-family:var(--display);font-size:2rem;color:rgba(245,245,244,.25);letter-spacing:.1em;
+}
+.poster-wrap .top-ten{
+  position:absolute;top:-12px;right:-12px;width:74px;height:74px;
+  background:var(--gold);color:#1a1206;border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
+  font-family:var(--display);transform:rotate(6deg);
+  box-shadow:0 14px 30px -12px rgba(217,178,90,.6);
+}
+.poster-wrap .top-ten b{font-size:1.9rem;font-weight:400}
+.poster-wrap .top-ten small{font-size:.5rem;letter-spacing:.18em;font-family:var(--sans);font-weight:600}
+
+/* ============================================================
+   SECTIONS (shared)
+   ============================================================ */
+section{padding:100px clamp(18px,4vw,48px);position:relative}
+.wrap{max-width:1160px;margin:0 auto}
+.sec-head{margin-bottom:44px}
+.sec-head .kicker{font-size:.66rem;letter-spacing:.5em;text-indent:.06em;text-transform:uppercase;color:var(--rosa)}
+.sec-head h2{
+  font-family:var(--display);font-size:clamp(2rem,5.5vw,3.1rem);letter-spacing:.04em;
+  color:var(--white);margin-top:8px;
+}
+.sec-head .sub{color:var(--grey);font-weight:300;font-size:.92rem;max-width:60ch}
+
+.reveal{opacity:0;transform:translateY(34px);transition:opacity 1s ease,transform 1s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ============================================================
+   EPISODES — the night's agenda as an episode list
+   ============================================================ */
+#episodes{background:var(--black-2)}
+.episode{
+  display:grid;grid-template-columns:44px 190px 1fr auto;gap:22px;align-items:center;
+  padding:20px 16px;border-radius:8px;transition:background .3s ease;
+  border-bottom:1px solid #232330;
+}
+.episode:hover{background:var(--black-3)}
+@media(max-width:760px){
+  .episode{grid-template-columns:34px 120px 1fr;row-gap:8px}
+  .episode .ep-time{grid-column:3;justify-self:start}
+}
+.episode .ep-num{font-family:var(--display);font-size:2rem;color:var(--grey-dim);text-align:center}
+.ep-thumb{
+  aspect-ratio:16/9;border-radius:6px;border:1px dashed var(--grey-dim);
+  background:linear-gradient(150deg,var(--black-3),var(--card));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  color:var(--grey-dim);overflow:hidden;
+}
+/* picture here: swap each thumbnail for a photo of that moment */
+.ep-thumb svg{width:26px;height:26px;opacity:.7}
+.ep-thumb span{font-size:.56rem;letter-spacing:.28em;text-indent:.28em;text-transform:uppercase}
+.episode h3{font-size:1.06rem;font-weight:500;color:var(--white)}
+.episode h3 em{font-family:var(--serif);color:var(--gold-soft);font-size:1.05em}
+.episode p{color:var(--grey);font-weight:300;font-size:.88rem;margin-top:4px}
+.episode .ep-time{
+  font-family:var(--display);font-size:1.1rem;letter-spacing:.08em;color:var(--rosa);white-space:nowrap;
+}
+
+/* ============================================================
+   CAST — padres, madrina y padrinos, la corte
+   ============================================================ */
+.cast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:22px}
+.cast-card{background:var(--black-2);border-radius:8px;overflow:hidden;transition:transform .4s ease,box-shadow .4s ease}
+.cast-card:hover{transform:translateY(-7px);box-shadow:0 24px 50px -25px rgba(229,57,127,.35)}
+.cast-ph{
+  aspect-ratio:1/1;border-bottom:1px dashed var(--grey-dim);
+  background:linear-gradient(150deg,var(--black-3),var(--card));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--grey-dim);
+}
+/* picture here: replace each placeholder with a photo of that person */
+.cast-ph svg{width:30px;height:30px;opacity:.7}
+.cast-ph span{font-size:.56rem;letter-spacing:.28em;text-indent:.28em;text-transform:uppercase}
+.cast-card .cast-info{padding:14px 14px 18px;text-align:center}
+.cast-card .cast-name{font-weight:500;font-size:.95rem;color:var(--white)}
+.cast-card .cast-role{font-family:var(--serif);font-style:italic;color:var(--gold-soft);font-size:.92rem;margin-top:2px}
+
+/* ============================================================
+   GALLERY — "More Like This" poster grid
+   ============================================================ */
+#gallery{background:var(--black-2)}
+.more-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.more-card{
+  aspect-ratio:16/10;border-radius:8px;border:1px dashed var(--rosa);
+  background:linear-gradient(150deg,var(--black-3),var(--card));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  color:var(--rosa);transition:transform .35s ease;
+}
+/* picture here: swap each card for <img src="photos/your-photo.jpg" alt=""
+   style="width:100%;height:100%;object-fit:cover;border-radius:8px"> */
+.more-card:hover{transform:scale(1.045)}
+.more-card svg{width:32px;height:32px;opacity:.75}
+.more-card span{font-size:.62rem;letter-spacing:.32em;text-indent:.32em;text-transform:uppercase;color:var(--grey)}
+.gallery-note{color:var(--grey-dim);font-weight:300;font-size:.85rem;margin-top:26px;font-style:italic;font-family:var(--serif)}
+
+/* ============================================================
+   VENUE — filming location
+   ============================================================ */
+.venue-inner{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+@media(max-width:820px){.venue-inner{grid-template-columns:1fr}}
+.venue-map-ph{
+  aspect-ratio:4/3;border-radius:8px;border:1px dashed var(--gold);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  color:var(--gold);background:linear-gradient(150deg,var(--black-3),var(--black-2));
+}
+/* picture here: replace this placeholder with a venue photo or an embedded map iframe */
+.venue-map-ph svg{width:46px;height:46px;opacity:.85}
+.venue-map-ph span{font-size:.68rem;letter-spacing:.35em;text-indent:.35em;text-transform:uppercase;color:var(--grey)}
+.venue-copy h3{font-family:var(--display);font-size:2rem;letter-spacing:.05em}
+.venue-copy .addr{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--gold-soft);margin:12px 0 8px;line-height:1.6}
+.venue-copy p{font-weight:300;color:var(--grey);font-size:.92rem}
+.venue-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+
+/* ============================================================
+   RSVP — "the trailer": hidden behind the Play button,
+   revealed with a player-style chrome. Same seat system.
+   ============================================================ */
+#rsvp{background:linear-gradient(180deg,var(--black) 0%,#16090f 100%)}
+#rsvp .locked-note{
+  max-width:560px;margin:0 auto;text-align:center;color:var(--grey);
+  border:1px dashed var(--grey-dim);border-radius:8px;padding:44px 26px;
+  font-weight:300;font-size:.95rem;
+}
+#rsvp .locked-note .lock{font-family:var(--display);font-size:1.6rem;color:var(--rosa);letter-spacing:.1em;margin-bottom:8px}
+#rsvp.playing .locked-note{display:none}
+.player{display:none;max-width:600px;margin:0 auto}
+#rsvp.playing .player{display:block;animation:playerIn .9s ease}
+@keyframes playerIn{from{opacity:0;transform:translateY(26px) scale(.98)}to{opacity:1;transform:none}}
+.player-chrome{
+  background:var(--black-2);border:1px solid #2c2c36;border-radius:10px;overflow:hidden;
+  box-shadow:0 50px 100px -50px var(--rosa-glow);
+}
+.player-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;background:var(--black-3);border-bottom:1px solid #2c2c36;
+}
+.player-bar .dot{width:10px;height:10px;border-radius:50%;background:var(--grey-dim)}
+.player-bar .dot.r{background:var(--rosa)}
+.player-bar .dot.g{background:var(--gold)}
+.player-bar .now{margin-left:8px;font-size:.66rem;letter-spacing:.3em;text-indent:.06em;text-transform:uppercase;color:var(--grey)}
+.player-body{padding:44px clamp(22px,5vw,52px) 40px}
+.progress{height:3px;background:#2c2c36;position:relative;margin-bottom:36px;border-radius:2px;overflow:hidden}
+.progress i{position:absolute;inset:0;transform-origin:left;background:linear-gradient(90deg,var(--rosa),var(--gold));transition:transform 1s cubic-bezier(.77,0,.18,1)}
+
+.seat-meter{text-align:center;margin-bottom:34px}
+.seat-meter .big{font-family:var(--display);font-size:2.5rem;color:var(--white);line-height:1;letter-spacing:.04em}
+.seat-meter .big em{font-style:normal;color:var(--rosa)}
+.seat-meter .cap{font-size:.64rem;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;color:var(--grey-dim);margin-top:8px}
+
+.field{margin-bottom:24px}
+.field label{display:block;font-size:.64rem;letter-spacing:.32em;text-indent:.06em;text-transform:uppercase;color:var(--grey);margin-bottom:9px}
+.field input{
+  width:100%;border:1px solid #2c2c36;border-radius:4px;background:var(--black-3);
+  padding:13px 14px;font-family:var(--sans);font-weight:300;font-size:1rem;color:var(--white);outline:none;
+  transition:border-color .3s;
+}
+.field input:focus{border-color:var(--rosa)}
+.field input::placeholder{color:var(--grey-dim)}
+.stepper{display:flex;align-items:center;gap:20px}
+.stepper button{
+  width:44px;height:44px;border:1px solid #2c2c36;border-radius:4px;background:var(--black-3);color:var(--white);
+  font-size:1.4rem;cursor:pointer;transition:.3s;line-height:1;
+}
+.stepper button:hover{background:var(--rosa);border-color:var(--rosa)}
+.stepper .count{font-family:var(--display);font-size:2.1rem;min-width:52px;text-align:center;color:var(--white)}
+.avail-msg{margin-top:14px;font-family:var(--serif);font-style:italic;font-size:1.02rem;color:var(--gold-soft);min-height:1.6em;transition:color .3s}
+.avail-msg.warn{color:#e0655a}
+#rsvpForm .btn{width:100%;margin-top:8px}
+.rsvp-done{display:none;text-align:center}
+.rsvp-done.show{display:block;animation:doneIn .9s ease}
+@keyframes doneIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.rsvp-done .ring{width:74px;height:74px;margin:0 auto 24px;color:var(--rosa)}
+.rsvp-done .ring svg{width:100%;height:100%}
+.rsvp-done h3{font-family:var(--display);font-size:1.9rem;letter-spacing:.05em;color:var(--white)}
+.rsvp-done p{color:var(--grey);font-weight:300;margin-top:10px;font-size:.95rem}
+.rsvp-done .mail-note{
+  margin-top:22px;display:inline-flex;align-items:center;gap:10px;
+  padding:12px 22px;border:1px solid #2c2c36;border-radius:4px;color:var(--gold);
+  font-size:.68rem;letter-spacing:.26em;text-indent:.05em;text-transform:uppercase;
+}
+.rsvp-done .mail-note svg{width:16px;height:16px}
+.demo-note{text-align:center;font-size:.66rem;letter-spacing:.14em;color:var(--grey-dim);margin-top:24px}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq{max-width:680px}
+.faq details{background:var(--black-2);border-radius:6px;margin-bottom:10px;padding:20px 24px}
+.faq summary{
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  font-size:1rem;font-weight:500;color:var(--white);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--rosa);font-size:1.5rem;font-weight:300;transition:transform .3s;flex:none}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding-top:12px;color:var(--grey);font-weight:300;font-size:.9rem}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  text-align:center;padding:80px 24px 60px;
+  background:var(--black-2);color:var(--grey-dim);
+}
+footer .fbrand{font-family:var(--display);font-size:2.4rem;letter-spacing:.1em;color:var(--rosa);text-shadow:0 0 20px var(--rosa-glow)}
+footer .fdate{font-size:.7rem;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;margin-top:12px;color:var(--grey)}
+footer .fnote{font-family:var(--serif);font-style:italic;margin-top:28px;font-size:1.05rem;color:var(--grey)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SVG library ══════════════ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="photoIcon">
+      <rect x="3" y="3" width="18" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M3 16l5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="9" cy="8" r="1.6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </g>
+    <g id="playIcon"><path d="M8 5v14l11-7z" fill="currentColor"/></g>
+    <g id="personIcon">
+      <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- ══════════════ INTRO — title sting ══════════════ -->
+<div id="intro" role="button" aria-label="Enter site">
+  <div class="sting">XV</div>
+  <div class="sting-sub">A Quincea&ntilde;era Original</div>
+  <div class="skip-hint">Tap to skip</div>
+</div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav id="nav">
+  <a class="brand" href="#top">QUINCEFLIX</a>
+  <div class="links">
+    <a class="lnk" href="#episodes">Episodes</a>
+    <a class="lnk" href="#cast">Cast</a>
+    <a class="lnk" href="#gallery">Gallery</a>
+    <a class="lnk" href="#venue">Location</a>
+    <a class="lnk" href="#rsvp">RSVP</a>
+    <a class="lnk" href="#faq">FAQ</a>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO — streaming title card ══════════════ -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div>
+      <p class="origin"><b>Q</b> A Quincea&ntilde;era Original</p>
+      <h1>Isabella<br><span class="xv">Turns XV</span></h1>
+      <p class="tagline">Fifteen years in the making. One unforgettable premiere.</p>
+
+      <div class="meta-row">
+        <span class="match">98% Match</span>
+        <span>2026</span>
+        <span class="badge gold">XV</span>
+        <span>1 Night</span>
+        <span class="badge">HD</span>
+        <span>Fiesta &middot; Familia &middot; Baile</span>
+      </div>
+
+      <p class="synopsis">
+        After fifteen years of plot twists, blooper reels, and heart, one leading
+        lady steps into the spotlight. Join the whole cast for a night of misa,
+        vals, and dancing until the credits roll. Critics are calling it
+        &ldquo;the event of the season.&rdquo;
+      </p>
+
+      <div class="hero-btns">
+        <button class="btn play" id="playBtn" type="button">
+          <svg viewBox="0 0 24 24"><use href="#playIcon"/></svg>
+          Play &mdash; RSVP
+        </button>
+        <button class="btn ghost" id="calBtnHero" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+          My List &mdash; Save the Date
+        </button>
+      </div>
+
+      <div class="credits">
+        <div class="row"><span class="lbl">Starring:</span><b>Isabella Marie Rodr&iacute;guez</b> <span class="as">as La Quincea&ntilde;era</span></div>
+        <div class="row"><span class="lbl">Also starring:</span><b>Miguel &amp; Carolina Rodr&iacute;guez</b> <span class="as">as Los Padres</span></div>
+        <div class="row"><span class="lbl">With:</span><b>T&iacute;a Luc&iacute;a Herrera</b> <span class="as">as La Madrina</span></div>
+        <div class="row"><span class="lbl">And:</span><b>Los Padrinos de Honor</b> <span class="as">as The Executive Producers</span></div>
+        <div class="row"><span class="lbl">Featuring:</span><b>La Corte de Honor</b> <span class="as">as The Ensemble</span></div>
+      </div>
+
+      <div class="premiere">
+        <p class="plbl">Premieres In</p>
+        <div class="countdown" id="countdown" aria-label="Countdown to the quinceañera">
+          <div class="count-cell"><div class="num" id="cd-d">&mdash;</div><div class="lbl">Days</div></div>
+          <div class="count-cell"><div class="num" id="cd-h">&mdash;</div><div class="lbl">Hours</div></div>
+          <div class="count-cell"><div class="num" id="cd-m">&mdash;</div><div class="lbl">Min</div></div>
+          <div class="count-cell"><div class="num" id="cd-s">&mdash;</div><div class="lbl">Sec</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poster-wrap">
+      <div class="poster">
+        <!-- picture here: the quinceañera's portrait / poster shot -->
+        <svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg>
+        <span>Picture here</span>
+        <div class="poster-title">ISABELLA XV</div>
+      </div>
+      <div class="top-ten"><b>#1</b><small>IN FIESTAS</small></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════ EPISODES — the night's agenda ══════════════ -->
+<section id="episodes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Season 15 &middot; The Big Night</p>
+      <h2>Episodes</h2>
+      <p class="sub">One night, five episodes, zero filler. Binge the whole thing live &mdash; Saturday, November 14, 2026.</p>
+    </div>
+
+    <div class="episode reveal">
+      <div class="ep-num">1</div>
+      <div class="ep-thumb"><svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg><span>Picture here</span></div>
+      <div>
+        <h3>The Blessing <em>&middot; La Misa</em></h3>
+        <p>The season premiere. A mass of thanksgiving at St. Mary's Church &mdash; the whole story starts here. Please arrive by 1:45.</p>
+      </div>
+      <div class="ep-time">2:00 PM</div>
+    </div>
+    <div class="episode reveal">
+      <div class="ep-num">2</div>
+      <div class="ep-thumb"><svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg><span>Picture here</span></div>
+      <div>
+        <h3>The Grand Entrance <em>&middot; La Recepci&oacute;n</em></h3>
+        <p>The venue doors open, the cast assembles, and our star makes her entrance. Cocktails and appetizers while the cameras roll.</p>
+      </div>
+      <div class="ep-time">5:00 PM</div>
+    </div>
+    <div class="episode reveal">
+      <div class="ep-num">3</div>
+      <div class="ep-thumb"><svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg><span>Picture here</span></div>
+      <div>
+        <h3>The Waltz <em>&middot; El Vals &amp; Las Ceremonias</em></h3>
+        <p>The changing of the shoes, the last doll, the crown, and a father-daughter vals that will absolutely require tissues.</p>
+      </div>
+      <div class="ep-time">6:30 PM</div>
+    </div>
+    <div class="episode reveal">
+      <div class="ep-num">4</div>
+      <div class="ep-thumb"><svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg><span>Picture here</span></div>
+      <div>
+        <h3>The Feast <em>&middot; La Cena &amp; Los Brindis</em></h3>
+        <p>Dinner is served, toasts are raised, and someone's t&iacute;o tells the story everyone has heard fifteen times. It's tradition.</p>
+      </div>
+      <div class="ep-time">7:30 PM</div>
+    </div>
+    <div class="episode reveal">
+      <div class="ep-num">5</div>
+      <div class="ep-thumb"><svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg><span>Picture here</span></div>
+      <div>
+        <h3>The Season Finale <em>&middot; El Baile</em></h3>
+        <p>The surprise dance, then everyone on the floor until the credits roll at midnight. No spoilers &mdash; you have to be there.</p>
+      </div>
+      <div class="ep-time">9:00 PM</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CAST ══════════════ -->
+<section id="cast">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Meet the ensemble</p>
+      <h2>Cast &amp; Crew</h2>
+      <p class="sub">Fifteen years of supporting roles, now sharing one stage.</p>
+    </div>
+    <div class="cast-grid">
+      <!-- picture here: replace each placeholder with a photo of that person -->
+      <div class="cast-card reveal">
+        <div class="cast-ph"><svg viewBox="0 0 24 24"><use href="#personIcon"/></svg><span>Picture here</span></div>
+        <div class="cast-info"><div class="cast-name">Isabella Rodr&iacute;guez</div><div class="cast-role">La Quincea&ntilde;era</div></div>
+      </div>
+      <div class="cast-card reveal">
+        <div class="cast-ph"><svg viewBox="0 0 24 24"><use href="#personIcon"/></svg><span>Picture here</span></div>
+        <div class="cast-info"><div class="cast-name">Miguel Rodr&iacute;guez</div><div class="cast-role">Pap&aacute; &middot; Director</div></div>
+      </div>
+      <div class="cast-card reveal">
+        <div class="cast-ph"><svg viewBox="0 0 24 24"><use href="#personIcon"/></svg><span>Picture here</span></div>
+        <div class="cast-info"><div class="cast-name">Carolina Rodr&iacute;guez</div><div class="cast-role">Mam&aacute; &middot; Showrunner</div></div>
+      </div>
+      <div class="cast-card reveal">
+        <div class="cast-ph"><svg viewBox="0 0 24 24"><use href="#personIcon"/></svg><span>Picture here</span></div>
+        <div class="cast-info"><div class="cast-name">Luc&iacute;a Herrera</div><div class="cast-role">La Madrina</div></div>
+      </div>
+      <div class="cast-card reveal">
+        <div class="cast-ph"><svg viewBox="0 0 24 24"><use href="#personIcon"/></svg><span>Picture here</span></div>
+        <div class="cast-info"><div class="cast-name">Los Padrinos</div><div class="cast-role">Executive Producers</div></div>
+      </div>
+      <div class="cast-card reveal">
+        <div class="cast-ph"><svg viewBox="0 0 24 24"><use href="#personIcon"/></svg><span>Picture here</span></div>
+        <div class="cast-info"><div class="cast-name">La Corte de Honor</div><div class="cast-role">The Ensemble</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ GALLERY — "More Like This" ══════════════ -->
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Behind the scenes</p>
+      <h2>More Like This</h2>
+      <p class="sub">Fifteen seasons of highlights &mdash; the photo reel drops soon.</p>
+    </div>
+    <!-- picture here: replace each card below with <img src="photos/your-photo.jpg" alt="..."> -->
+    <div class="more-grid" id="moreGrid"></div>
+    <p class="gallery-note">Photos coming soon &mdash; check back after the premiere.</p>
+  </div>
+</section>
+
+<!-- ══════════════ VENUE ══════════════ -->
+<section id="venue">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Filming location</p>
+      <h2>Where It All Happens</h2>
+    </div>
+    <div class="venue-inner">
+      <div class="venue-map-ph reveal">
+        <!-- picture here: venue photo or embedded map -->
+        <svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg>
+        <span>Picture here</span>
+      </div>
+      <div class="venue-copy reveal">
+        <h3>The Grand Salon Ballroom</h3>
+        <p class="addr">4500 Fiesta Boulevard<br>San Antonio, Texas 78205</p>
+        <p>Misa begins at St. Mary's Church at 2:00 PM, with the reception following
+           at the Grand Salon. On-site parking is free, and the dance floor has
+           been professionally reinforced. We checked.</p>
+        <div class="venue-btns">
+          <a class="btn ghost" id="mapsBtn"
+             href="https://www.google.com/maps/search/?api=1&query=The+Grand+Salon+Ballroom%2C+4500+Fiesta+Boulevard%2C+San+Antonio%2C+TX+78205"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21c-4-3.5-7-6.5-7-10a7 7 0 0 1 14 0c0 3.5-3 6.5-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+            Open in Maps
+          </a>
+          <button class="btn ghost" id="calBtnVenue" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+            Save to Calendar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ RSVP — the trailer ══════════════ -->
+<section id="rsvp">
+  <div class="wrap">
+    <div class="sec-head reveal" style="text-align:center;max-width:640px;margin-left:auto;margin-right:auto">
+      <p class="kicker">Kindly respond by October 14, 2026</p>
+      <h2>Reserve Your Seats</h2>
+    </div>
+
+    <div class="locked-note reveal">
+      <div class="lock">&#9654; Press Play</div>
+      Hit the <b>Play</b> button on the title card above to roll the trailer
+      and unlock your reservation.
+      <div style="margin-top:22px">
+        <button class="btn rosa" id="playBtn2" type="button">
+          <svg viewBox="0 0 24 24"><use href="#playIcon"/></svg>
+          Play Trailer
+        </button>
+      </div>
+    </div>
+
+    <div class="player">
+      <div class="player-chrome">
+        <div class="player-bar">
+          <span class="dot r"></span><span class="dot g"></span><span class="dot"></span>
+          <span class="now">Now Playing &middot; Isabella Turns XV &mdash; Official RSVP</span>
+        </div>
+        <div class="player-body">
+          <div class="progress"><i id="seatBarFill"></i></div>
+
+          <div class="seat-meter">
+            <div class="big"><em id="seatsLeft">150</em> seats remain</div>
+            <div class="cap">of 150 in the ballroom</div>
+          </div>
+
+          <form id="rsvpForm" novalidate>
+            <div class="field">
+              <label for="rName">Full name</label>
+              <input id="rName" type="text" placeholder="Your name" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="rEmail">Email</label>
+              <input id="rEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label>Seats in your party</label>
+              <div class="stepper">
+                <button type="button" id="stepDown" aria-label="Fewer seats">&minus;</button>
+                <div class="count" id="partyCount">1</div>
+                <button type="button" id="stepUp" aria-label="More seats">+</button>
+              </div>
+              <p class="avail-msg" id="availMsg"></p>
+            </div>
+            <button class="btn rosa" type="submit">Reserve our seats</button>
+          </form>
+
+          <div class="rsvp-done" id="rsvpDone">
+            <div class="ring">
+              <svg viewBox="0 0 74 74" fill="none" stroke="currentColor" stroke-width="1.4">
+                <circle cx="37" cy="37" r="33" stroke="#d9b25a"/>
+                <path d="M22 38l10 10 20-22" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3 id="doneTitle">You're on the list!</h3>
+            <p id="doneMsg">Your seats are saved for the premiere.</p>
+            <div class="mail-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+              Confirmation email sent
+            </div>
+          </div>
+
+          <p class="demo-note">Demo only &mdash; seat counts are stored in your browser, no data is sent anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="kicker">Frequently asked questions</p>
+      <h2>Help Center</h2>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>What should I wear?</summary>
+        <p>Formal attire &mdash; suits, cocktail dresses, or formal gowns. The theme colors are rosa and gold, so feel free to coordinate. Please leave white and blush pink for the star of the show.</p>
+      </details>
+      <details>
+        <summary>Can I bring a plus one?</summary>
+        <p>If your invitation says "and guest," absolutely! Just include them in your seat count when you RSVP.</p>
+      </details>
+      <details>
+        <summary>Are children welcome?</summary>
+        <p>&iexcl;Claro que s&iacute;! This is a family celebration &mdash; kids are welcome at both the misa and the reception. Just count every seat, big or small, in your RSVP.</p>
+      </details>
+      <details>
+        <summary>Do I need to attend the misa?</summary>
+        <p>We would love to have you at both, but if you can only make the reception, the doors of the Grand Salon open at 5:00 PM. The vals starts at 6:30 sharp &mdash; you won't want to miss it.</p>
+      </details>
+      <details>
+        <summary>What about gifts?</summary>
+        <p>Your presence at the premiere is the best gift. If you'd like to give something more, there will be a money-dance and a gift table at the reception.</p>
+      </details>
+      <details>
+        <summary>Will there be a surprise dance?</summary>
+        <p>That would be a spoiler. (Yes. Episode 5. Be on the dance floor by 9:00 PM.)</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="fbrand">ISABELLA XV</div>
+  <div class="fdate">11 &middot; 14 &middot; 2026</div>
+  <p class="fnote">"Fifteen years of magic. One night to celebrate it all."</p>
+</footer>
+
+<script>
+/* ── Quince facts (edit these!) ────────────────────────── */
+const QUINCE = {
+  title: "Isabella Turns XV — Quinceañera",
+  start: new Date("2026-11-14T14:00:00"),
+  end:   new Date("2026-11-15T00:00:00"),
+  location: "The Grand Salon Ballroom, 4500 Fiesta Boulevard, San Antonio, TX 78205",
+  details: "Misa at 2:00 pm at St. Mary's Church, reception at 5:00 pm at the Grand Salon. Formal attire — rosa & gold.",
+  totalSeats: 150
+};
+
+/* ── Intro: title sting ────────────────────────────────── */
+const intro = document.getElementById("intro");
+const nav = document.getElementById("nav");
+let opened = false;
+function endIntro(){
+  if(opened) return; opened = true;
+  intro.classList.add("fade");
+  nav.classList.add("on");
+  document.body.style.overflow = "";
+  setTimeout(()=>intro.classList.add("gone"), 800);
+}
+intro.addEventListener("click", endIntro);
+setTimeout(endIntro, 3800);            // auto-cut to the show page
+document.body.style.overflow = "hidden";
+
+/* nav darkens once you scroll off the hero */
+addEventListener("scroll", ()=>nav.classList.toggle("scrolled", scrollY > 60), {passive:true});
+
+/* ── Countdown — "Premieres in" ────────────────────────── */
+const pad = n => String(Math.max(0,n)).padStart(2,"0");
+const cdD=document.getElementById("cd-d"), cdH=document.getElementById("cd-h"),
+      cdM=document.getElementById("cd-m"), cdS=document.getElementById("cd-s");
+function tick(){
+  const diff = QUINCE.start - new Date();
+  const d = Math.floor(diff/864e5), h = Math.floor(diff/36e5)%24,
+        m = Math.floor(diff/6e4)%60, s = Math.floor(diff/1e3)%60;
+  cdD.textContent = Math.max(0,d); cdH.textContent = pad(h);
+  cdM.textContent = pad(m); cdS.textContent = pad(s);
+}
+tick(); setInterval(tick,1000);
+
+/* ── Save to Calendar (.ics download) ──────────────────── */
+function icsDate(d){ return d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,""); }
+function saveToCalendar(){
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Isabella XV//EN","BEGIN:VEVENT",
+    "UID:isabella-xv-2026@example.com",
+    "DTSTAMP:" + icsDate(new Date()),
+    "DTSTART:" + icsDate(QUINCE.start),
+    "DTEND:"   + icsDate(QUINCE.end),
+    "SUMMARY:" + QUINCE.title,
+    "LOCATION:" + QUINCE.location.replace(/,/g,"\\,"),
+    "DESCRIPTION:" + QUINCE.details.replace(/,/g,"\\,"),
+    "END:VEVENT","END:VCALENDAR"
+  ].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));
+  a.download = "isabella-xv-quinceanera.ics";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+document.getElementById("calBtnHero").addEventListener("click", saveToCalendar);
+document.getElementById("calBtnVenue").addEventListener("click", saveToCalendar);
+
+/* ── Play button: roll the trailer → reveal the RSVP ───── */
+const rsvpSection = document.getElementById("rsvp");
+function playTrailer(){
+  rsvpSection.classList.add("playing");
+  rsvpSection.scrollIntoView({behavior:"smooth"});
+}
+document.getElementById("playBtn").addEventListener("click", playTrailer);
+document.getElementById("playBtn2").addEventListener("click", playTrailer);
+/* deep links (#rsvp in the nav) unlock it too, so nobody gets stuck */
+document.querySelectorAll('a[href="#rsvp"]').forEach(a=>
+  a.addEventListener("click", ()=>rsvpSection.classList.add("playing")));
+
+/* ── Gallery — "More Like This" placeholder grid ───────── */
+/* picture here: swap each placeholder for
+   <img src="photos/your-photo.jpg" alt="Isabella" style="width:100%;height:100%;object-fit:cover"> */
+function buildMoreGrid(el, count){
+  let cards = "";
+  for(let i=0;i<count;i++){
+    cards += `<div class="more-card reveal">
+      <svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg>
+      <span>Picture here</span>
+    </div>`;
+  }
+  el.innerHTML = cards;
+}
+buildMoreGrid(document.getElementById("moreGrid"), 8);
+
+/* ── RSVP with live seat availability (demo, localStorage) ── */
+const seatKey = "isabella-xv-seats-taken";
+let taken = parseInt(localStorage.getItem(seatKey) || "0", 10);
+if(isNaN(taken) || taken < 0 || taken > QUINCE.totalSeats) taken = 0;
+let party = 1;
+
+const seatsLeftEl = document.getElementById("seatsLeft"),
+      seatBarFill = document.getElementById("seatBarFill"),
+      partyEl = document.getElementById("partyCount"),
+      availMsg = document.getElementById("availMsg"),
+      form = document.getElementById("rsvpForm"),
+      done = document.getElementById("rsvpDone");
+
+function seatsLeft(){ return QUINCE.totalSeats - taken; }
+function renderSeats(){
+  seatsLeftEl.textContent = seatsLeft();
+  seatBarFill.style.transform = `scaleX(${taken / QUINCE.totalSeats})`;
+  partyEl.textContent = party;
+  const left = seatsLeft();
+  if(left === 0){
+    availMsg.textContent = "The ballroom is sold out — please reach out to the familia directly.";
+    availMsg.classList.add("warn");
+  } else if(party > left){
+    availMsg.textContent = `Only ${left} seat${left===1?"":"s"} remain — not quite enough for a party of ${party}.`;
+    availMsg.classList.add("warn");
+  } else {
+    availMsg.textContent = `Perfecto — ${party} seat${party===1?"":"s"} for your party, ${left - party} will remain after you.`;
+    availMsg.classList.remove("warn");
+  }
+}
+document.getElementById("stepUp").addEventListener("click", ()=>{ if(party<12) party++; renderSeats(); });
+document.getElementById("stepDown").addEventListener("click", ()=>{ if(party>1) party--; renderSeats(); });
+renderSeats();
+
+form.addEventListener("submit", e=>{
+  e.preventDefault();
+  const name = document.getElementById("rName").value.trim();
+  const email = document.getElementById("rEmail").value.trim();
+  if(!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    availMsg.textContent = "Please add your name and a valid email so we can confirm.";
+    availMsg.classList.add("warn");
+    return;
+  }
+  if(party > seatsLeft()){ renderSeats(); return; }
+  taken += party;
+  localStorage.setItem(seatKey, String(taken));
+  form.style.display = "none";
+  document.getElementById("doneTitle").textContent = `You're on the list, ${name.split(" ")[0]}!`;
+  document.getElementById("doneMsg").textContent =
+    `${party} seat${party===1?"":"s"} reserved · a confirmation has been sent to ${email}.`;
+  done.classList.add("show");
+  renderSeats();
+});
+
+/* ── Scroll reveal ─────────────────────────────────────── */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+},{threshold:.15});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
