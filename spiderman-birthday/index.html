@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Invited! 🕷️ A Spider-Man Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#e62429;
+    --dark-red:#a3161b;
+    --blue:#2a52be;
+    --dark-blue:#16255c;
+    --navy:#0a0e1f;
+    --yellow:#ffd400;
+    --ink:#0d0d0d;
+    --paper:#f6f1e5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:'Comic Neue','Comic Sans MS','Chalkboard SE',cursive;
+    background:#05060f;
+    color:var(--ink);
+  }
+  h1,h2,h3,.bangers{font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;font-weight:400}
+
+  /* ============================================================ */
+  /* INTRO — Spidey lowers on his web, then THWIP! at the screen  */
+  /* ============================================================ */
+  #intro{
+    position:fixed;inset:0;z-index:1000;
+    background:#000;
+    overflow:hidden;
+    transition:opacity .9s ease;
+  }
+  #intro.fade{opacity:0;pointer-events:none}
+  #intro .stars span{
+    position:absolute;width:2px;height:2px;border-radius:50%;
+    background:#fff;opacity:.5;
+    animation:twinkle 2.4s ease-in-out infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.12}50%{opacity:.7}}
+  .drop{
+    position:absolute;left:50%;top:0;width:0;height:0;
+    animation:lower 2.5s cubic-bezier(.34,1.3,.42,1) forwards;
+  }
+  @keyframes lower{0%{height:0}100%{height:34vh}}
+  .sway{
+    position:absolute;left:0;top:0;width:0;height:100%;
+    transform-origin:top center;
+    animation:sway 3.2s ease-in-out infinite;
+  }
+  @keyframes sway{0%,100%{transform:rotate(2.4deg)}50%{transform:rotate(-2.4deg)}}
+  .thread{
+    position:absolute;left:-1px;top:0;width:2px;height:100%;
+    background:linear-gradient(to bottom,rgba(255,255,255,.9),rgba(255,255,255,.55));
+    box-shadow:0 0 6px rgba(255,255,255,.35);
+  }
+  .spidey-sprite{
+    position:absolute;top:100%;left:0;
+    width:min(180px,38vw);
+    margin-top:-4px;
+    transform:translateX(-46.4%);
+    filter:drop-shadow(0 0 22px rgba(230,36,41,.35));
+  }
+  .thwip-burst{
+    position:absolute;left:50%;top:calc(34vh + 40px);
+    transform:translate(30%,-50%) scale(0) rotate(-8deg);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    font-size:clamp(2rem,8vw,4rem);
+    color:var(--yellow);
+    -webkit-text-stroke:2px #000;
+    text-shadow:4px 4px 0 var(--red);
+    z-index:5;white-space:nowrap;
+  }
+  .thwip-burst.go{animation:burst-pop .45s cubic-bezier(.3,1.6,.5,1) forwards}
+  @keyframes burst-pop{
+    0%{transform:translate(30%,-50%) scale(0) rotate(-8deg)}
+    100%{transform:translate(30%,-50%) scale(1) rotate(-8deg)}
+  }
+  #web-splat{
+    position:absolute;left:50%;top:calc(34vh + 180px);
+    width:220px;height:220px;
+    transform:translate(-50%,-50%) scale(0);
+    z-index:4;opacity:0;
+  }
+  #web-splat.shoot{animation:splat-out .65s cubic-bezier(.5,0,.9,.6) forwards}
+  @keyframes splat-out{
+    0%{transform:translate(-50%,-50%) scale(.05) rotate(0deg);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(16) rotate(18deg);opacity:1}
+  }
+  #flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:6;pointer-events:none}
+  #flash.go{animation:flash-fade .8s ease forwards}
+  @keyframes flash-fade{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+  #skip-intro{
+    position:absolute;right:16px;bottom:16px;z-index:10;
+    background:transparent;border:2px solid rgba(255,255,255,.4);
+    color:rgba(255,255,255,.7);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;
+    font-size:1rem;padding:8px 18px;border-radius:999px;cursor:pointer;
+    transition:.2s;
+  }
+  #skip-intro:hover{border-color:#fff;color:#fff}
+
+  /* ============================================================ */
+  /* THE COMIC BOOK                                                */
+  /* ============================================================ */
+  #book{
+    position:fixed;inset:0;
+    background:
+      radial-gradient(ellipse at 50% 110%,rgba(230,36,41,.25),transparent 60%),
+      #05060f;
+  }
+  .page{
+    position:absolute;inset:0;
+    transform-style:preserve-3d;
+    transform-origin:left center;
+    transform:perspective(2400px) rotateY(0deg);
+    transition:transform 1s cubic-bezier(.45,.05,.25,1);
+  }
+  .page.flipped{transform:perspective(2400px) rotateY(-180deg)}
+  .page.turning{z-index:120!important}
+  .face{
+    position:absolute;inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    overflow:hidden;
+  }
+  .face.back{
+    transform:rotateY(180deg);
+    background:var(--paper);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+  }
+  .face.back .backweb{width:200px;opacity:.18}
+  .face.back .keep{
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:3px;color:#8b8577;font-size:1.3rem;text-align:center;padding:0 20px;
+  }
+
+  /* generic comic page interior */
+  .page-inner{
+    position:absolute;inset:0;
+    padding:14px 14px 78px;
+    display:flex;
+  }
+  .comic-frame{
+    flex:1;
+    background:var(--paper);
+    border:5px solid var(--ink);
+    border-radius:6px;
+    box-shadow:inset 0 0 0 3px var(--paper), inset 0 0 0 5px rgba(0,0,0,.15);
+    padding:clamp(14px,3vw,30px);
+    display:flex;flex-direction:column;
+    overflow-y:auto;
+    background-image:radial-gradient(circle,rgba(0,0,0,.06) 1.4px,transparent 1.6px);
+    background-size:15px 15px;
+  }
+  .caption-box{
+    align-self:flex-start;
+    background:var(--yellow);
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 rgba(0,0,0,.4);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:1.5px;
+    font-size:clamp(.95rem,3vw,1.25rem);
+    padding:6px 14px;
+    transform:rotate(-1.5deg);
+    margin-bottom:16px;
+  }
+  .page-title{
+    text-align:center;
+    font-size:clamp(2rem,8vw,3.4rem);
+    color:var(--red);
+    -webkit-text-stroke:1.5px #000;
+    text-shadow:3px 3px 0 rgba(0,0,0,.3);
+    margin-bottom:16px;
+  }
+  .sticker{
+    position:absolute;
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    color:var(--yellow);
+    -webkit-text-stroke:1.5px #000;
+    text-shadow:3px 3px 0 var(--red);
+    transform:rotate(-10deg);
+    z-index:3;pointer-events:none;
+  }
+
+  /* per-page entrance animations (re-triggered on every page turn) */
+  [data-anim]{opacity:0;transition:transform .7s cubic-bezier(.2,1.2,.4,1),opacity .7s ease}
+  [data-anim="pop"]{transform:scale(.5)}
+  [data-anim="rise"]{transform:translateY(60px)}
+  [data-anim="slide-left"]{transform:translateX(-80px) rotate(-3deg)}
+  [data-anim="slide-right"]{transform:translateX(80px) rotate(3deg)}
+  [data-anim="spin"]{transform:rotate(-15deg) scale(.4)}
+  [data-anim].in{opacity:1;transform:none}
+
+  /* ---------------- COVER ---------------- */
+  #cover .page-inner{padding:14px 14px 78px}
+  .cover-frame{
+    flex:1;
+    border:5px solid var(--ink);
+    border-radius:6px;
+    overflow:hidden;
+    position:relative;
+    background:
+      radial-gradient(ellipse at 50% 120%,rgba(230,36,41,.5),transparent 60%),
+      linear-gradient(180deg,#0a1030 0%,var(--dark-blue) 55%,var(--blue) 120%);
+    display:flex;flex-direction:column;align-items:center;
+    text-align:center;
+  }
+  .issue-ribbon{
+    width:100%;
+    background:var(--red);
+    border-bottom:3px solid var(--ink);
+    color:#fff;
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:3px;
+    font-size:clamp(.9rem,3vw,1.2rem);
+    padding:7px 4px;
+    text-shadow:2px 2px 0 rgba(0,0,0,.5);
+  }
+  .cover-masthead{
+    margin-top:58px;
+    color:var(--yellow);
+    font-size:clamp(1.1rem,4vw,1.6rem);
+    letter-spacing:4px;
+    text-shadow:2px 2px 0 #000;
+  }
+  .cover-name{
+    font-size:clamp(3rem,13vw,6.5rem);
+    color:#fff;
+    -webkit-text-stroke:2px #000;
+    text-shadow:5px 5px 0 var(--red),9px 9px 0 rgba(0,0,0,.4);
+    line-height:1;
+    margin:2px 12px 0;
+  }
+  .cover-name .ltr{display:inline-block;opacity:0;transform:translateY(-60px) rotate(-12deg);animation:ltr-in .55s cubic-bezier(.3,1.5,.5,1) forwards;animation-play-state:paused}
+  .letters-go .ltr{animation-play-state:running}
+  @keyframes ltr-in{to{opacity:1;transform:none}}
+  .issue-box{
+    position:absolute;top:64px;left:12px;
+    background:#fff;border:3px solid var(--ink);
+    box-shadow:3px 3px 0 rgba(0,0,0,.4);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    padding:5px 10px;line-height:1.2;
+    transform:rotate(-4deg);
+    font-size:clamp(.8rem,2.6vw,1rem);
+  }
+  .issue-box b{color:var(--red);display:block;font-size:1.3em}
+  .cover-stage{
+    position:relative;flex:1;width:100%;
+    display:flex;align-items:center;justify-content:center;
+    min-height:180px;
+  }
+  .cover-stage .web-line{
+    position:absolute;top:0;left:50%;width:2px;height:26%;
+    background:linear-gradient(to bottom,rgba(255,255,255,.9),rgba(255,255,255,.5));
+  }
+  .cover-spidey{
+    width:min(150px,30vw);
+    margin-top:-4%;
+    transform-origin:top center;
+    animation:sway 3.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 22px rgba(230,36,41,.45));
+  }
+  .starburst{
+    position:absolute;right:4%;top:8%;
+    width:clamp(110px,26vw,170px);
+    animation:burst-wiggle 2.4s ease-in-out infinite;
+  }
+  @keyframes burst-wiggle{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(4deg) scale(1.07)}}
+  .starburst text{
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    fill:var(--ink);
+  }
+  .cover-banner{
+    width:100%;
+    background:var(--yellow);
+    border-top:3px solid var(--ink);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:2px;
+    font-size:clamp(.95rem,3.4vw,1.3rem);
+    padding:9px 10px;
+    color:var(--ink);
+  }
+  .cover-webs{position:absolute;width:130px;height:130px;opacity:.45;pointer-events:none}
+  .cover-webs.tl{top:34px;left:0}
+  .cover-webs.tr{top:34px;right:0;transform:scaleX(-1)}
+
+  /* ---------------- BRIEFING PAGE ---------------- */
+  .panel-grid{display:grid;gap:16px;grid-template-columns:1fr 1fr;flex:1;align-content:start}
+  .panel{
+    background:#fff;
+    border:4px solid var(--ink);
+    box-shadow:5px 5px 0 rgba(0,0,0,.35);
+    padding:16px 12px;
+    text-align:center;
+    position:relative;
+  }
+  .panel.wide{grid-column:1 / -1}
+  .panel:nth-child(1){transform:rotate(-1deg)}
+  .panel:nth-child(2){transform:rotate(1.2deg)}
+  .panel:nth-child(3){transform:rotate(-.8deg)}
+  .panel .emoji{font-size:clamp(2rem,7vw,2.8rem);display:block;margin-bottom:4px}
+  .panel h3{font-size:clamp(1.4rem,5vw,1.9rem);color:var(--red);letter-spacing:2px;margin-bottom:4px}
+  .panel p{font-weight:700;font-size:clamp(.95rem,3.2vw,1.1rem);line-height:1.4}
+  .panel small{display:block;margin-top:4px;color:#555;font-weight:700;font-size:clamp(.8rem,2.8vw,.9rem)}
+
+  /* ---------------- AGENDA PAGE ---------------- */
+  .agenda-list{list-style:none;display:grid;gap:14px;align-content:start;flex:1}
+  .agenda-list li{
+    display:flex;align-items:center;gap:14px;
+    background:#fff;
+    border:3px solid var(--ink);
+    border-radius:60px;
+    padding:11px 20px;
+    box-shadow:4px 4px 0 rgba(0,0,0,.3);
+    font-weight:700;font-size:clamp(.95rem,3.4vw,1.15rem);
+  }
+  .agenda-list li .em{font-size:1.7rem}
+  .agenda-list li:nth-child(odd){transform:rotate(-.8deg)}
+  .agenda-list li:nth-child(even){transform:rotate(.8deg)}
+
+  /* ---------------- COUNTDOWN PAGE ---------------- */
+  .count-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:26px}
+  .count-grid{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+  .count-box{
+    background:#fff;
+    border:4px solid var(--ink);
+    border-radius:12px;
+    box-shadow:5px 5px 0 rgba(0,0,0,.35);
+    min-width:78px;padding:12px 8px;text-align:center;
+    transform:rotate(-1deg);
+  }
+  .count-box:nth-child(even){transform:rotate(1.5deg)}
+  .count-box b{font-family:'Bangers',Impact,'Arial Black',sans-serif;font-size:2.4rem;color:var(--red);display:block;line-height:1}
+  .count-box span{font-weight:700;letter-spacing:1px;font-size:.8rem;color:var(--dark-blue);text-transform:uppercase}
+  .count-note{font-weight:700;font-size:clamp(1rem,3.5vw,1.2rem);text-align:center}
+  .count-spidey{
+    width:min(110px,24vw);
+    transform-origin:top center;
+    animation:sway 3.4s ease-in-out infinite;
+  }
+
+  /* ---------------- RSVP / BACK COVER ---------------- */
+  #rsvp-page .comic-frame{
+    background:
+      radial-gradient(ellipse at 50% -20%,rgba(42,82,190,.5),transparent 60%),
+      linear-gradient(180deg,#0a0a14,var(--dark-red));
+    background-size:auto;
+    align-items:center;text-align:center;justify-content:center;gap:10px;
+  }
+  #rsvp-page .caption-box{align-self:center}
+  #rsvp-page .page-title{color:#fff;text-shadow:4px 4px 0 rgba(0,0,0,.55);margin-bottom:4px}
+  #rsvp-page p{color:#fff;font-weight:700;font-size:clamp(.95rem,3.4vw,1.15rem);max-width:460px}
+  #rsvp-spidey{
+    width:min(110px,24vw);
+    transform-origin:top center;
+    animation:sway 3.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px rgba(230,36,41,.4));
+  }
+  .rsvp-btn{
+    display:inline-block;
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    font-size:clamp(1.4rem,4.5vw,2rem);
+    letter-spacing:3px;
+    color:#fff;
+    background:var(--red);
+    border:4px solid var(--ink);
+    border-radius:16px;
+    padding:14px 36px;
+    text-decoration:none;
+    box-shadow:6px 6px 0 rgba(0,0,0,.6);
+    transition:.15s;
+    animation:btn-pulse 1.8s ease-in-out infinite;
+    margin-top:6px;
+  }
+  @keyframes btn-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  .rsvp-btn:hover{background:var(--yellow);color:var(--ink);animation-play-state:paused;transform:scale(1.07)}
+  .rsvp-by{margin-top:10px;color:var(--yellow);font-family:'Bangers',Impact,'Arial Black',sans-serif;letter-spacing:2px;font-size:clamp(1rem,3.4vw,1.2rem);text-shadow:2px 2px 0 #000}
+  .the-end{
+    margin-top:14px;
+    color:rgba(255,255,255,.85);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:3px;
+    font-size:clamp(1.1rem,4vw,1.5rem);
+  }
+  .the-end small{display:block;font-family:'Comic Neue','Comic Sans MS',cursive;font-size:.8rem;letter-spacing:0;color:rgba(255,255,255,.5);margin-top:4px}
+
+  /* ---------------- PAGE NAVIGATION ---------------- */
+  #pagenav{
+    position:fixed;left:50%;bottom:14px;transform:translateX(-50%);
+    z-index:200;
+    display:flex;align-items:center;gap:12px;
+  }
+  .nav-btn{
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:2px;
+    font-size:1.05rem;
+    background:var(--red);
+    color:#fff;
+    border:3px solid var(--ink);
+    border-radius:12px;
+    box-shadow:4px 4px 0 rgba(0,0,0,.55);
+    padding:9px 18px;
+    cursor:pointer;
+    transition:.15s;
+    -webkit-text-stroke:.5px #000;
+  }
+  .nav-btn:hover:not(:disabled){background:var(--yellow);color:var(--ink);transform:translateY(-2px)}
+  .nav-btn:active:not(:disabled){transform:translateY(2px);box-shadow:2px 2px 0 rgba(0,0,0,.55)}
+  .nav-btn:disabled{opacity:.35;cursor:default}
+  #page-counter{
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:2px;
+    color:#fff;
+    text-shadow:2px 2px 0 #000;
+    font-size:1rem;
+    min-width:92px;text-align:center;white-space:nowrap;
+  }
+  #next-btn.attention{animation:btn-nudge 1.6s ease-in-out infinite}
+  @keyframes btn-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+  /* ---------------- MUSIC TOGGLE ---------------- */
+  #music-btn{
+    position:fixed;top:14px;right:14px;z-index:1100;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--red);
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 rgba(0,0,0,.55);
+    color:#fff;font-size:1.5rem;line-height:1;
+    cursor:pointer;transition:.15s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #music-btn:hover{background:var(--yellow)}
+  #music-btn.playing{animation:music-bop 1s ease-in-out infinite}
+  @keyframes music-bop{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(6deg) scale(1.1)}}
+  #music-btn.off{opacity:.75;filter:grayscale(.6)}
+  #music-hint{
+    position:fixed;top:74px;right:10px;z-index:1100;
+    background:var(--yellow);border:2px solid var(--ink);
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+    font-family:'Bangers',Impact,'Arial Black',sans-serif;
+    letter-spacing:1px;font-size:.85rem;
+    padding:5px 10px;transform:rotate(-2deg);
+    pointer-events:none;
+    opacity:0;transition:opacity .4s;
+  }
+  #music-hint.show{opacity:1}
+
+  .tap-zone{
+    position:fixed;top:0;bottom:80px;width:13%;z-index:150;
+    background:transparent;border:0;cursor:pointer;
+  }
+  #tap-prev{left:0}
+  #tap-next{right:0}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     👇👇👇  EDIT YOUR PARTY DETAILS HERE  👇👇👇
+     Change these values and everything on the page updates.
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+  const PARTY = {
+    name:      "ALEX",                          // birthday hero's name
+    age:       "6",                             // the big number!
+    date:      "Saturday, August 15",           // party date (display)
+    time:      "2:00 PM – 5:00 PM",             // party time
+    venue:     "Webster Park Pavilion",         // where
+    address:   "123 Web Lane, Queens, NY",      // address line
+    rsvpName:  "Paulo",                         // who to RSVP to
+    rsvpPhone: "555-123-4567",                  // RSVP phone number
+    rsvpBy:    "August 8",                      // RSVP deadline
+    countdownTo: "2026-08-15T14:00:00"          // ISO date+time for countdown
+  };
+</script>
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- ================= INTRO ANIMATION ================= -->
+<div id="intro">
+  <div class="stars" id="stars"></div>
+  <div class="drop">
+    <div class="sway">
+      <div class="thread"></div>
+      <img class="spidey-sprite" src="assets/spidey.png" alt="Spider-Man lowering on a web">
+    </div>
+  </div>
+  <div class="thwip-burst" id="thwip">THWIP!</div>
+  <svg id="web-splat" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
+  <div id="flash"></div>
+  <button id="skip-intro">Skip intro ➜</button>
+</div>
+
+<!-- ================= THE COMIC BOOK ================= -->
+<div id="book">
+
+  <!-- PAGE 0 : COVER -->
+  <div class="page" id="cover">
+    <div class="face front">
+      <div class="page-inner">
+        <div class="cover-frame">
+          <div class="issue-ribbon">★ SPECIAL BIRTHDAY ISSUE! ★</div>
+          <svg class="cover-webs tl" viewBox="0 0 100 100" aria-hidden="true"></svg>
+          <svg class="cover-webs tr" viewBox="0 0 100 100" aria-hidden="true"></svg>
+          <div class="cover-masthead bangers">THE AMAZING</div>
+          <h1 class="cover-name" id="cover-name">ALEX</h1>
+          <div class="issue-box">No. <b id="issue-no">6</b> FREE!</div>
+          <div class="cover-stage">
+            <div class="web-line"></div>
+            <img class="cover-spidey" src="assets/spidey.png" alt="Spider-Man hanging upside down">
+            <svg class="starburst" id="starburst" viewBox="-100 -100 200 200" aria-hidden="false" role="img">
+              <text id="burst-line1" x="0" y="-8" text-anchor="middle" font-size="34">TURNING</text>
+              <text id="burst-line2" x="0" y="30" text-anchor="middle" font-size="46">6!</text>
+            </svg>
+          </div>
+          <div class="cover-banner">A SUPER BIRTHDAY INVITATION AWAITS INSIDE...</div>
+        </div>
+      </div>
+    </div>
+    <div class="face back"><svg class="backweb" viewBox="-100 -100 200 200"></svg><div class="keep">KEEP GOING, TRUE BELIEVER! ➜</div></div>
+  </div>
+
+  <!-- PAGE 1 : MISSION BRIEFING -->
+  <div class="page" id="briefing">
+    <div class="face front">
+      <div class="page-inner">
+        <div class="comic-frame">
+          <div class="caption-box" data-anim="slide-left">MEANWHILE, AT PARTY HEADQUARTERS...</div>
+          <h2 class="page-title" data-anim="pop">THE MISSION BRIEFING</h2>
+          <div class="sticker" style="top:14px;right:16px;font-size:1.9rem" data-anim="spin">POW!</div>
+          <div class="panel-grid">
+            <div class="panel" data-anim="slide-left">
+              <span class="emoji">📅</span>
+              <h3>WHEN</h3>
+              <p id="d-date">Saturday, August 15</p>
+              <small id="d-time">2:00 PM – 5:00 PM</small>
+            </div>
+            <div class="panel" data-anim="slide-right" style="transition-delay:.15s">
+              <span class="emoji">📍</span>
+              <h3>WHERE</h3>
+              <p id="d-venue">Webster Park Pavilion</p>
+              <small id="d-address">123 Web Lane, Queens, NY</small>
+            </div>
+            <div class="panel wide" data-anim="rise" style="transition-delay:.3s">
+              <span class="emoji">🦸</span>
+              <h3>WHO</h3>
+              <p>You + every hero in the neighborhood!</p>
+              <small>Capes &amp; costumes highly encouraged 🕷️</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="face back"><svg class="backweb" viewBox="-100 -100 200 200"></svg><div class="keep">KEEP GOING, TRUE BELIEVER! ➜</div></div>
+  </div>
+
+  <!-- PAGE 2 : THE PLAN -->
+  <div class="page" id="plan">
+    <div class="face front">
+      <div class="page-inner">
+        <div class="comic-frame">
+          <div class="caption-box" data-anim="slide-left">EVERY HERO NEEDS A PLAN...</div>
+          <h2 class="page-title" data-anim="pop">ON THE AGENDA</h2>
+          <div class="sticker" style="top:14px;right:16px;font-size:1.9rem;transform:rotate(10deg)" data-anim="spin">ZAP!</div>
+          <ul class="agenda-list">
+            <li data-anim="slide-left"><span class="em">🕸️</span> Web-slinging games &amp; obstacle course</li>
+            <li data-anim="slide-right" style="transition-delay:.1s"><span class="em">🍕</span> Pizza worthy of a super-appetite</li>
+            <li data-anim="slide-left" style="transition-delay:.2s"><span class="em">🎂</span> Spidey cake (with great frosting comes great responsibility)</li>
+            <li data-anim="slide-right" style="transition-delay:.3s"><span class="em">🎁</span> Goody bags for every hero</li>
+            <li data-anim="slide-left" style="transition-delay:.4s"><span class="em">📸</span> Photo ops with the birthday web-slinger</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="face back"><svg class="backweb" viewBox="-100 -100 200 200"></svg><div class="keep">KEEP GOING, TRUE BELIEVER! ➜</div></div>
+  </div>
+
+  <!-- PAGE 3 : COUNTDOWN -->
+  <div class="page" id="countdown-page">
+    <div class="face front">
+      <div class="page-inner">
+        <div class="comic-frame">
+          <div class="caption-box" data-anim="slide-left">SUDDENLY, PETER'S SPIDEY-SENSE TINGLED...</div>
+          <h2 class="page-title" data-anim="pop">SPIDEY-SENSE SAYS...</h2>
+          <div class="count-wrap">
+            <img class="count-spidey" src="assets/spidey-solid.png" alt="" data-anim="rise">
+            <div class="count-grid" data-anim="rise" style="transition-delay:.15s">
+              <div class="count-box"><b id="c-days">0</b><span>days</span></div>
+              <div class="count-box"><b id="c-hours">0</b><span>hours</span></div>
+              <div class="count-box"><b id="c-mins">0</b><span>mins</span></div>
+              <div class="count-box"><b id="c-secs">0</b><span>secs</span></div>
+            </div>
+            <div class="count-note" data-anim="rise" style="transition-delay:.3s">...until the party swings into action! 🕸️</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="face back"><svg class="backweb" viewBox="-100 -100 200 200"></svg><div class="keep">ONE LAST PAGE... ➜</div></div>
+  </div>
+
+  <!-- PAGE 4 : RSVP / BACK COVER -->
+  <div class="page" id="rsvp-page">
+    <div class="face front">
+      <div class="page-inner">
+        <div class="comic-frame">
+          <div class="caption-box" data-anim="pop">YOUR MISSION, SHOULD YOU ACCEPT IT:</div>
+          <img id="rsvp-spidey" src="assets/spidey.png" alt="" data-anim="rise">
+          <h2 class="page-title" data-anim="pop" style="transition-delay:.1s">THWIP US YOUR RSVP!</h2>
+          <p data-anim="rise" style="transition-delay:.2s">Every hero counts! Let <span id="r-name">Paulo</span> know if your super-kid can make it.</p>
+          <a class="rsvp-btn" id="r-btn" href="sms:5551234567" data-anim="pop" style="transition-delay:.3s">📱 TEXT YOUR RSVP</a>
+          <div class="rsvp-by" id="r-by" data-anim="rise" style="transition-delay:.4s">☎ Please RSVP by August 8 ☎</div>
+          <div class="the-end" data-anim="rise" style="transition-delay:.5s">
+            "WITH GREAT BIRTHDAYS COMES GREAT FUN!"
+            <small>THE END... until the party! 🕷️🎈</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="face back"><svg class="backweb" viewBox="-100 -100 200 200"></svg><div class="keep">🕷️</div></div>
+  </div>
+
+</div>
+
+<!-- theme song -->
+<audio id="theme" src="assets/theme-song.mp3" loop preload="auto"></audio>
+<button id="music-btn" class="off" aria-label="Toggle music" title="Toggle music">🎵</button>
+<div id="music-hint">TAP 🎵 FOR MUSIC!</div>
+
+<!-- page navigation -->
+<button class="tap-zone" id="tap-prev" aria-label="Previous page"></button>
+<button class="tap-zone" id="tap-next" aria-label="Next page"></button>
+<div id="pagenav">
+  <button class="nav-btn" id="prev-btn" aria-label="Previous page">⬅ BACK</button>
+  <div id="page-counter" aria-live="polite">COVER</div>
+  <button class="nav-btn attention" id="next-btn" aria-label="Next page">OPEN ➜</button>
+</div>
+
+<script>
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+
+  /* ---------- fill in party details from PARTY config ---------- */
+  $('cover-name').innerHTML = [...PARTY.name].map((ch,i)=>
+    ch===' ' ? ' ' : `<span class="ltr" style="animation-delay:${i*0.08}s">${ch}</span>`).join('');
+  $('issue-no').textContent = PARTY.age;
+  $('burst-line2').textContent = PARTY.age + '!';
+  $('d-date').textContent = PARTY.date;
+  $('d-time').textContent = PARTY.time;
+  $('d-venue').textContent = PARTY.venue;
+  $('d-address').textContent = PARTY.address;
+  $('r-name').textContent = PARTY.rsvpName;
+  $('r-by').textContent = '☎ Please RSVP by ' + PARTY.rsvpBy + ' ☎';
+  $('r-btn').href = 'sms:' + PARTY.rsvpPhone.replace(/[^0-9+]/g,'');
+  document.title = "You're Invited! 🕷️ " + PARTY.name + "'s Spider-Man Birthday";
+
+  /* ---------- SVG builders: webs + cover starburst ---------- */
+  const NS='http://www.w3.org/2000/svg';
+  function buildWeb(svg, spokes, rings, radius, stroke, width, full){
+    const angles=[];
+    if(full){ for(let i=0;i<spokes;i++) angles.push(i/spokes*Math.PI*2); }
+    else{ const n=Math.ceil(spokes/4)+1; for(let i=0;i<n;i++) angles.push(Math.PI/2*i/(n-1)); }
+    angles.forEach(a=>{
+      const l=document.createElementNS(NS,'line');
+      l.setAttribute('x1',0);l.setAttribute('y1',0);
+      l.setAttribute('x2',Math.cos(a)*radius);l.setAttribute('y2',Math.sin(a)*radius);
+      l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',width);
+      svg.appendChild(l);
+    });
+    for(let r=1;r<=rings;r++){
+      const rad=radius*r/rings;
+      for(let i=0;i<angles.length-(full?0:1);i++){
+        const a1=angles[i], a2=angles[(i+1)%angles.length];
+        const x1=Math.cos(a1)*rad, y1=Math.sin(a1)*rad;
+        const x2=Math.cos(a2)*rad, y2=Math.sin(a2)*rad;
+        const am=a1+((a2-a1+Math.PI*2)%(Math.PI*2))/2;
+        const sag=rad*0.82;
+        const p=document.createElementNS(NS,'path');
+        p.setAttribute('d',`M${x1},${y1} Q${Math.cos(am)*sag},${Math.sin(am)*sag} ${x2},${y2}`);
+        p.setAttribute('fill','none');p.setAttribute('stroke',stroke);p.setAttribute('stroke-width',width);
+        svg.appendChild(p);
+      }
+    }
+  }
+  const splat=$('web-splat');
+  buildWeb(splat,14,6,98,'#ffffff',2.2,true);
+  document.querySelectorAll('.cover-webs').forEach(svg=>{
+    const g=document.createElementNS(NS,'g'); svg.appendChild(g);
+    buildWeb(g,16,5,96,'rgba(255,255,255,.55)',1.4,false);
+  });
+  document.querySelectorAll('.backweb').forEach(svg=>buildWeb(svg,12,5,96,'rgba(0,0,0,.55)',1.6,true));
+
+  // starburst badge behind "TURNING X!" on the cover
+  (function(){
+    const sb=$('starburst');
+    const pts=[];
+    for(let i=0;i<32;i++){
+      const a=i/32*Math.PI*2, r=(i%2? 72:100);
+      pts.push((Math.cos(a)*r).toFixed(1)+','+(Math.sin(a)*r).toFixed(1));
+    }
+    const poly=document.createElementNS(NS,'polygon');
+    poly.setAttribute('points',pts.join(' '));
+    poly.setAttribute('fill','#ffd400');
+    poly.setAttribute('stroke','#0d0d0d');
+    poly.setAttribute('stroke-width','4');
+    sb.insertBefore(poly, sb.firstChild);
+  })();
+
+  /* ---------- intro stars ---------- */
+  const stars=$('stars');
+  for(let i=0;i<40;i++){
+    const s=document.createElement('span');
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*2.4)+'s';
+    stars.appendChild(s);
+  }
+
+  /* ---------- comic book paging ---------- */
+  const pages=[...document.querySelectorAll('#book .page')];
+  const TOTAL=pages.length;
+  let current=0, turning=false;
+
+  function applyZ(){
+    pages.forEach((p,i)=>{
+      if(!p.classList.contains('turning'))
+        p.style.zIndex = p.classList.contains('flipped') ? 10+i : 60-i;
+    });
+  }
+  function playAnims(i){
+    const els=pages[i].querySelectorAll('[data-anim]');
+    els.forEach(e=>e.classList.remove('in'));
+    void pages[i].offsetWidth;
+    setTimeout(()=>els.forEach(e=>e.classList.add('in')), reduced?0:350);
+  }
+  function updateNav(){
+    $('prev-btn').disabled = current===0;
+    $('next-btn').disabled = current===TOTAL-1;
+    $('next-btn').textContent = current===0 ? 'OPEN ➜' : 'NEXT ➜';
+    $('next-btn').classList.toggle('attention', current===0);
+    $('page-counter').textContent = current===0 ? 'COVER' : `PAGE ${current} OF ${TOTAL-1}`;
+  }
+  function settle(p){
+    p.classList.remove('turning');
+    applyZ();
+    turning=false;
+  }
+  function go(dir){
+    if(turning) return;
+    if(dir>0 && current<TOTAL-1){
+      turning=true;
+      const p=pages[current];
+      p.classList.add('turning','flipped');
+      current++;
+      playAnims(current);
+      const done=()=>settle(p);
+      p.addEventListener('transitionend',done,{once:true});
+      setTimeout(done,1200);
+    } else if(dir<0 && current>0){
+      turning=true;
+      current--;
+      const p=pages[current];
+      p.style.zIndex=120;
+      p.classList.add('turning');
+      p.classList.remove('flipped');
+      playAnims(current);
+      const done=()=>settle(p);
+      p.addEventListener('transitionend',done,{once:true});
+      setTimeout(done,1200);
+    }
+    updateNav();
+  }
+  applyZ(); updateNav();
+
+  $('next-btn').addEventListener('click',()=>go(1));
+  $('prev-btn').addEventListener('click',()=>go(-1));
+  $('tap-next').addEventListener('click',()=>go(1));
+  $('tap-prev').addEventListener('click',()=>go(-1));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ') go(1);
+    if(e.key==='ArrowLeft'||e.key==='PageUp') go(-1);
+  });
+  // swipe to turn pages
+  let tx=null,ty=null;
+  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(tx===null) return;
+    const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)) go(dx<0?1:-1);
+    tx=ty=null;
+  },{passive:true});
+  // mouse wheel turns pages too
+  let wheelLock=0;
+  document.addEventListener('wheel',e=>{
+    const now=Date.now();
+    if(now-wheelLock<1100 || Math.abs(e.deltaY)<25) return;
+    wheelLock=now;
+    go(e.deltaY>0?1:-1);
+  },{passive:true});
+
+  /* ---------- intro timeline ---------- */
+  const intro=$('intro');
+  let ended=false;
+  const timers=[];
+  function endIntro(){
+    if(ended) return; ended=true;
+    timers.forEach(clearTimeout);
+    intro.classList.add('fade');
+    document.body.classList.add('letters-go');
+    playAnims(0);
+    setTimeout(()=>intro.remove(),1000);
+  }
+  if(reduced){
+    endIntro();
+  }else{
+    timers.push(setTimeout(()=>{ $('thwip').classList.add('go'); },2650));
+    timers.push(setTimeout(()=>{ splat.classList.add('shoot'); },2850));
+    timers.push(setTimeout(()=>{ $('flash').classList.add('go'); },3350));
+    timers.push(setTimeout(endIntro,3650));
+  }
+  $('skip-intro').addEventListener('click',endIntro);
+
+  /* ---------- theme song ---------- */
+  const music=$('theme'), musicBtn=$('music-btn'), musicHint=$('music-hint');
+  music.volume=0.55;
+  let musicWanted=true;
+  function musicUI(){
+    const on=!music.paused;
+    musicBtn.textContent=on?'🎵':'🔇';
+    musicBtn.classList.toggle('playing',on);
+    musicBtn.classList.toggle('off',!on);
+  }
+  function tryMusic(){
+    if(!musicWanted||!music.paused) return;
+    music.play().then(()=>{musicUI();musicHint.classList.remove('show');}).catch(()=>{});
+  }
+  musicBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(music.paused){ musicWanted=true; tryMusic(); }
+    else{ musicWanted=false; music.pause(); musicUI(); }
+    musicHint.classList.remove('show');
+  });
+  // browsers block autoplay with sound — start on the first tap/click/key instead
+  tryMusic();
+  ['pointerdown','keydown','touchstart'].forEach(ev=>
+    document.addEventListener(ev,tryMusic,{passive:true}));
+  // if autoplay was blocked, point at the music button after the intro
+  setTimeout(()=>{ if(music.paused&&musicWanted) musicHint.classList.add('show'); },reduced?500:4200);
+  setTimeout(()=>musicHint.classList.remove('show'),12000);
+
+  /* ---------- countdown ---------- */
+  const target=new Date(PARTY.countdownTo).getTime();
+  function tick(){
+    let d=Math.max(0,target-Date.now());
+    const days=Math.floor(d/864e5); d-=days*864e5;
+    const hrs=Math.floor(d/36e5); d-=hrs*36e5;
+    const mins=Math.floor(d/6e4); d-=mins*6e4;
+    $('c-days').textContent=days;
+    $('c-hours').textContent=hrs;
+    $('c-mins').textContent=mins;
+    $('c-secs').textContent=Math.floor(d/1e3);
+  }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
