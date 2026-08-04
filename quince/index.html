@@ -283,22 +283,28 @@ section{padding:100px clamp(18px,4vw,48px);position:relative}
 .cast-card .cast-role{font-family:var(--serif);font-style:italic;color:var(--gold-soft);font-size:.92rem;margin-top:2px}
 
 /* ============================================================
-   GALLERY — "More Like This" poster grid
+   GALLERY — "More Like This" auto-scrolling reels
    ============================================================ */
-#gallery{background:var(--black-2)}
-.more-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+#gallery{background:var(--black-2);padding-left:0;padding-right:0;overflow:hidden}
+#gallery .sec-head,#gallery .gallery-note{padding-left:clamp(18px,4vw,48px);padding-right:clamp(18px,4vw,48px)}
+#gallery .sec-head{max-width:1160px;margin-left:auto;margin-right:auto}
+.marquee{display:flex;gap:18px;width:max-content;animation:slide 42s linear infinite;padding:6px 0}
+.marquee:hover{animation-play-state:paused}
+.marquee.rev{animation-direction:reverse;animation-duration:52s;margin-top:18px}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .more-card{
-  aspect-ratio:16/10;border-radius:8px;border:1px dashed var(--rosa);
+  width:clamp(220px,26vw,320px);aspect-ratio:16/10;flex:none;
+  border-radius:8px;border:1px dashed var(--rosa);
   background:linear-gradient(150deg,var(--black-3),var(--card));
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-  color:var(--rosa);transition:transform .35s ease;
+  color:var(--rosa);
 }
 /* picture here: swap each card for <img src="photos/your-photo.jpg" alt=""
    style="width:100%;height:100%;object-fit:cover;border-radius:8px"> */
-.more-card:hover{transform:scale(1.045)}
+.marquee.rev .more-card{aspect-ratio:2/3;width:clamp(150px,17vw,210px);border-color:var(--gold);color:var(--gold)}
 .more-card svg{width:32px;height:32px;opacity:.75}
 .more-card span{font-size:.62rem;letter-spacing:.32em;text-indent:.32em;text-transform:uppercase;color:var(--grey)}
-.gallery-note{color:var(--grey-dim);font-weight:300;font-size:.85rem;margin-top:26px;font-style:italic;font-family:var(--serif)}
+.gallery-note{color:var(--grey-dim);font-weight:300;font-size:.85rem;margin-top:26px;font-style:italic;font-family:var(--serif);text-align:center}
 
 /* ============================================================
    VENUE — filming location
@@ -615,16 +621,15 @@ footer .fnote{font-family:var(--serif);font-style:italic;margin-top:28px;font-si
 
 <!-- ══════════════ GALLERY — "More Like This" ══════════════ -->
 <section id="gallery">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="kicker">Behind the scenes</p>
-      <h2>More Like This</h2>
-      <p class="sub">Fifteen seasons of highlights &mdash; the photo reel drops soon.</p>
-    </div>
-    <!-- picture here: replace each card below with <img src="photos/your-photo.jpg" alt="..."> -->
-    <div class="more-grid" id="moreGrid"></div>
-    <p class="gallery-note">Photos coming soon &mdash; check back after the premiere.</p>
+  <div class="sec-head reveal">
+    <p class="kicker">Behind the scenes</p>
+    <h2>More Like This</h2>
+    <p class="sub">Fifteen seasons of highlights &mdash; the photo reel drops soon.</p>
   </div>
+  <!-- picture here: replace each card below with <img src="photos/your-photo.jpg" alt="..."> -->
+  <div class="marquee" id="marqueeA"></div>
+  <div class="marquee rev" id="marqueeB"></div>
+  <p class="gallery-note">Photos coming soon &mdash; hover to pause the reel.</p>
 </section>
 
 <!-- ══════════════ VENUE ══════════════ -->
@@ -860,20 +865,21 @@ document.getElementById("playBtn2").addEventListener("click", playTrailer);
 document.querySelectorAll('a[href="#rsvp"]').forEach(a=>
   a.addEventListener("click", ()=>rsvpSection.classList.add("playing")));
 
-/* ── Gallery — "More Like This" placeholder grid ───────── */
+/* ── Gallery — "More Like This" sliding reels ──────────── */
 /* picture here: swap each placeholder for
    <img src="photos/your-photo.jpg" alt="Isabella" style="width:100%;height:100%;object-fit:cover"> */
-function buildMoreGrid(el, count){
+function buildMarquee(el, count){
   let cards = "";
   for(let i=0;i<count;i++){
-    cards += `<div class="more-card reveal">
+    cards += `<div class="more-card">
       <svg viewBox="0 0 24 24"><use href="#photoIcon"/></svg>
       <span>Picture here</span>
     </div>`;
   }
-  el.innerHTML = cards;
+  el.innerHTML = cards + cards;   // duplicated so the loop is seamless
 }
-buildMoreGrid(document.getElementById("moreGrid"), 8);
+buildMarquee(document.getElementById("marqueeA"), 6);
+buildMarquee(document.getElementById("marqueeB"), 8);
 
 /* ── RSVP with live seat availability (demo, localStorage) ── */
 const seatKey = "isabella-xv-seats-taken";
