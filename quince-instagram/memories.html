@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Party Cam 📸 | isabella.turns.xv</title>
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+<style>
+:root{
+  --bg:#000; --card:#1a1a1c; --line:#2a2a2d; --white:#f5f5f5; --grey:#a8a8a8;
+  --grey-dim:#737373; --rosa:#e5397f; --gold:#d9b25a; --blue:#4150f7;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  min-height:100dvh;font-family:var(--sans);background:var(--bg);color:var(--white);
+  display:flex;justify-content:center;
+}
+button{font-family:var(--sans);border:none;background:none;color:inherit;cursor:pointer}
+.wrap{width:100%;max-width:430px;display:flex;flex-direction:column;min-height:100dvh}
+.topbar{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(10px);z-index:5;border-bottom:1px solid var(--line);
+}
+.topbar a{display:flex;color:var(--white)}
+.topbar svg{width:24px;height:24px;stroke:var(--white)}
+.topbar b{font-size:1.02rem}
+.topbar span{font-size:.74rem;color:var(--grey);display:block}
+.hero{
+  text-align:center;padding:30px 26px 8px;
+}
+.hero .big{font-size:2.6rem}
+.hero h1{font-size:1.4rem;font-weight:800;margin-top:8px}
+.hero p{font-size:.88rem;color:var(--grey);line-height:1.6;margin-top:8px}
+.upload-zone{
+  margin:20px 16px 8px;border:2px dashed rgba(229,57,127,.55);border-radius:18px;
+  padding:28px 20px;text-align:center;cursor:pointer;transition:background .2s;
+  background:rgba(229,57,127,.05);
+}
+.upload-zone:active{background:rgba(229,57,127,.15)}
+.upload-zone .ic{font-size:2rem}
+.upload-zone .t1{font-weight:700;font-size:.95rem;margin-top:8px}
+.upload-zone .t2{font-size:.78rem;color:var(--grey);margin-top:4px}
+#fileInput{display:none}
+.count-line{text-align:center;font-size:.8rem;color:var(--grey);padding:10px 16px 4px}
+.count-line b{color:var(--gold)}
+.gallery{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:10px 0 30px;
+}
+.gitem{aspect-ratio:1;position:relative;overflow:hidden;background:var(--card)}
+.gitem img,.gitem video{width:100%;height:100%;object-fit:cover;display:block}
+.gitem .who{
+  position:absolute;left:0;right:0;bottom:0;padding:14px 8px 6px;font-size:.66rem;font-weight:600;color:#fff;
+  background:linear-gradient(transparent,rgba(0,0,0,.75));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.gitem .vid-badge{position:absolute;top:6px;right:6px;font-size:.8rem;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.empty{
+  grid-column:1/-1;text-align:center;padding:40px 30px;color:var(--grey-dim);font-size:.85rem;line-height:1.7;
+}
+.note{
+  margin:auto 16px 20px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;
+  font-size:.75rem;color:var(--grey);line-height:1.65;background:var(--card);
+}
+.note b{color:var(--gold)}
+#toast{
+  position:fixed;left:50%;bottom:40px;transform:translateX(-50%) translateY(20px);
+  background:#fff;color:#000;font-size:.82rem;font-weight:600;padding:10px 18px;border-radius:10px;
+  opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:90%;text-align:center;
+}
+#toast.on{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="links.html" title="back">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div><b>Party Cam 📸</b><span>isabella.turns.xv · Nov 14</span></div>
+  </div>
+
+  <div class="hero">
+    <div class="big">🤳</div>
+    <h1>you're the paparazzi tonight</h1>
+    <p>every pic and video you take at the party — drop it here.
+       Isabella wants to relive the whole night from everyone's eyes 🥹💕</p>
+  </div>
+
+  <div class="upload-zone" id="uploadZone">
+    <div class="ic">📤</div>
+    <div class="t1">tap to add your pics &amp; vids</div>
+    <div class="t2">photos and videos, straight from your camera roll</div>
+  </div>
+  <input id="fileInput" type="file" accept="image/*,video/*" multiple>
+
+  <div class="count-line" id="countLine"></div>
+  <div class="gallery" id="gallery"></div>
+
+  <div class="note">
+    <b>heads up bestie:</b> right now your uploads save on <i>your</i> phone (this page has no
+    server yet). keep them till after the party — Isabella will collect everyone's favorites 💕
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* Uploads persist per-device: images are compressed into localStorage;
+   videos preview for the current visit only (too big for localStorage). */
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem("igq_"+k); return v===null?d:JSON.parse(v);}catch(e){return d} },
+  set(k,v){ try{ localStorage.setItem("igq_"+k, JSON.stringify(v)); return true; }catch(e){ return false; } },
+};
+const profile = store.get("profile", null);
+const who = profile ? profile.name.trim().split(/\s+/)[0] : "guest";
+const gallery = document.getElementById("gallery");
+const countLine = document.getElementById("countLine");
+let saved = store.get("media", []);      // [{d:dataURL, n:name, at}]
+let sessionVids = [];                     // [{url, n}]
+
+const zone = document.getElementById("uploadZone");
+const fileInput = document.getElementById("fileInput");
+zone.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", async e => {
+  const files = [...e.target.files];
+  fileInput.value = "";
+  let added = 0;
+  for (const f of files) {
+    if (f.type.startsWith("video/")) {
+      sessionVids.push({ url: URL.createObjectURL(f), n: who });
+      added++;
+    } else if (f.type.startsWith("image/")) {
+      try {
+        const d = await compress(f);
+        saved.push({ d, n: who, at: Date.now() });
+        if (!store.set("media", saved)) {
+          saved.pop();
+          toast("storage is full on this phone 😭 that pic will show for now only");
+          sessionVids.push({ url: URL.createObjectURL(f), n: who, img:true });
+        }
+        added++;
+      } catch(err){ /* skip unreadable file */ }
+    }
+  }
+  render();
+  if (added) toast(added + (added===1?" memory":" memories") + " added 🥹💕");
+});
+
+function compress(file){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 900;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      res(c.toDataURL("image/jpeg", .8));
+    };
+    img.onerror = rej;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function render(){
+  gallery.innerHTML = "";
+  const total = saved.length + sessionVids.length;
+  countLine.innerHTML = total
+    ? `<b>${total}</b> ${total===1?"memory":"memories"} from this phone so far ✨`
+    : "";
+  if (!total) {
+    gallery.innerHTML = `<div class="empty">nothing here yet…<br>be the first paparazzi of the night 📸✨</div>`;
+    return;
+  }
+  for (const v of sessionVids) {
+    const d = document.createElement("div");
+    d.className = "gitem";
+    d.innerHTML = v.img
+      ? `<img src="${v.url}" alt=""><div class="who">${esc(v.n)}</div>`
+      : `<video src="${v.url}" muted playsinline loop></video><div class="vid-badge">▶</div><div class="who">${esc(v.n)}</div>`;
+    if (!v.img) d.addEventListener("click", () => { const vid = d.querySelector("video"); vid.paused ? vid.play() : vid.pause(); });
+    gallery.appendChild(d);
+  }
+  for (const m of [...saved].reverse()) {
+    const d = document.createElement("div");
+    d.className = "gitem";
+    d.innerHTML = `<img src="${m.d}" alt=""><div class="who">${esc(m.n)}</div>`;
+    gallery.appendChild(d);
+  }
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("on"), 2600);
+}
+render();
+</script>
+</body>
+</html>

@@ -28,7 +28,7 @@
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 body{
   font-family:var(--sans);
   background:#050505;
@@ -37,11 +37,11 @@ body{
 }
 button{font-family:var(--sans);border:none;background:none;color:inherit;cursor:pointer}
 input{font-family:var(--sans)}
-img{display:block;max-width:100%}
+img,video{display:block;max-width:100%}
 
-/* phone shell */
+/* phone shell — FIXED height, views scroll internally */
 #app{
-  width:100%;max-width:430px;min-height:100dvh;background:var(--bg);
+  width:100%;max-width:430px;height:100dvh;background:var(--bg);
   position:relative;overflow:hidden;
   box-shadow:0 0 60px rgba(0,0,0,.8);
 }
@@ -52,7 +52,15 @@ img{display:block;max-width:100%}
   visibility:hidden;
 }
 .view.on{transform:translateX(0);visibility:visible}
-#profileView{transform:none;visibility:visible;position:relative;min-height:100dvh}
+
+/* profile is the base view: always visible, scrolls internally */
+#profileView{
+  position:absolute;inset:0;display:flex;flex-direction:column;visibility:visible;
+}
+.pscroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
+  padding-bottom:70px;
+}
 
 /* ============================================================
    TOP BAR
@@ -65,8 +73,6 @@ img{display:block;max-width:100%}
 .topbar .uname{font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:6px}
 .topbar svg{width:24px;height:24px;stroke:var(--white)}
 .icon-btn{display:flex;align-items:center;justify-content:center;padding:4px}
-
-/* verified badge */
 .vbadge{width:15px;height:15px;flex:0 0 auto}
 
 /* ============================================================
@@ -87,12 +93,12 @@ img{display:block;max-width:100%}
 .stats{flex:1;display:flex;justify-content:space-around;text-align:center}
 .stats b{display:block;font-size:1.12rem}
 .stats span{font-size:.8rem;color:var(--white)}
-.stats .stat{cursor:default}
 
 .bio{padding:10px 16px 0;font-size:.88rem;line-height:1.45}
 .bio .rname{font-weight:600;display:flex;align-items:center;gap:5px}
 .bio .cat{color:var(--grey);font-size:.82rem;margin-bottom:2px}
 .bio .blink{color:#e0f1ff}
+.bio a.linktree{color:#a8c7ff;text-decoration:none;font-weight:600}
 
 /* ---- music pill in bio ---- */
 .music-pill{
@@ -156,11 +162,11 @@ img{display:block;max-width:100%}
 /* ============================================================
    GRID TABS + GRID
    ============================================================ */
-.gtabs{display:flex;border-bottom:1px solid var(--line);margin-top:10px}
+.gtabs{display:flex;border-bottom:1px solid var(--line);margin-top:10px;position:sticky;top:52px;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);z-index:4}
 .gtabs .gt{flex:1;display:flex;justify-content:center;padding:11px 0;opacity:.4}
 .gtabs .gt.on{opacity:1;border-bottom:1.5px solid var(--white)}
 .gtabs svg{width:23px;height:23px;stroke:var(--white)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding-bottom:76px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 .tile{
   aspect-ratio:3/4;position:relative;cursor:pointer;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
@@ -168,17 +174,53 @@ img{display:block;max-width:100%}
 .tile .tile-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
 .tile .cam{font-size:1.5rem;opacity:.85}
 .tile .ph-label{font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.75)}
-.tile .pin{position:absolute;top:7px;right:7px;width:16px;height:16px;fill:#fff;opacity:.9}
+.tile .views{
+  position:absolute;left:8px;bottom:8px;display:flex;align-items:center;gap:5px;
+  font-size:.78rem;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);
+}
+.tile .views svg{width:14px;height:14px;fill:#fff}
+.tile .tagname{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:.68rem;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
 
 /* bottom nav */
 .bnav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;display:flex;justify-content:space-around;align-items:center;
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;justify-content:space-around;align-items:center;
   padding:12px 0 max(14px,env(safe-area-inset-bottom));
   background:rgba(0,0,0,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:6;
 }
 .bnav svg{width:25px;height:25px;stroke:var(--white)}
 .bnav .mini-av{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--white);background:radial-gradient(circle at 30% 25%,#3c2a3f,#17111c 70%);display:flex;align-items:center;justify-content:center;font-size:.8rem}
+
+/* ============================================================
+   LOGIN VIEW
+   ============================================================ */
+#loginView{
+  position:absolute;inset:0;z-index:80;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px 34px;gap:0;transition:opacity .4s, visibility .4s;
+}
+#loginView.off{opacity:0;visibility:hidden;pointer-events:none}
+.ig-logo{
+  font-family:'Snell Roundhand','Brush Script MT','Segoe Script',cursive;
+  font-size:3.2rem;font-weight:600;margin-bottom:4px;
+}
+.login-sub{font-size:.8rem;color:var(--grey);margin-bottom:34px;letter-spacing:.04em}
+.login-card{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px}
+.login-card input{
+  background:#121214;border:1px solid var(--line);border-radius:10px;
+  padding:13px 14px;color:var(--white);font-size:.95rem;outline:none;width:100%;
+}
+.login-card input:focus{border-color:#555}
+.login-card input::placeholder{color:var(--grey-dim)}
+.login-card .login-btn{
+  background:var(--blue);border-radius:10px;padding:13px 0;font-weight:700;font-size:.95rem;
+  margin-top:6px;transition:transform .1s;
+}
+.login-card .login-btn:active{transform:scale(.98)}
+.login-err{font-size:.78rem;color:#ff6b7a;text-align:center;min-height:18px}
+.login-note{margin-top:26px;font-size:.72rem;color:var(--grey-dim);text-align:center;line-height:1.6;max-width:280px}
+.login-div{display:flex;align-items:center;gap:14px;width:100%;max-width:320px;margin:20px 0 2px;color:var(--grey-dim);font-size:.72rem;font-weight:600}
+.login-div::before,.login-div::after{content:"";flex:1;height:1px;background:var(--line)}
 
 /* ============================================================
    STORY VIEWER
@@ -192,19 +234,28 @@ img{display:block;max-width:100%}
 .sprog i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:0;background:#fff}
 .sprog i.done::after{width:100%}
 .sprog i.run::after{width:100%;transition:width linear}
-.story-head{display:flex;align-items:center;gap:10px;padding:12px 14px;position:relative;z-index:3}
+.story-head{display:flex;align-items:center;gap:10px;padding:12px 14px;position:relative;z-index:6}
 .story-head .sav{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#3c2a3f,#17111c 70%);display:flex;align-items:center;justify-content:center;font-size:1rem}
 .story-head b{font-size:.85rem}
 .story-head span{font-size:.8rem;color:rgba(255,255,255,.7)}
 .story-head .sclose{margin-left:auto;font-size:1.5rem;line-height:1;padding:4px 6px;color:#fff}
 .story-body{
   flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  text-align:center;padding:30px 34px 80px;position:relative;z-index:2;gap:14px;
+  text-align:center;padding:30px 34px 80px;position:relative;z-index:5;gap:14px;
+  pointer-events:none;
 }
 .story-body .s-emoji{font-size:3rem}
 .story-body h2{font-size:1.6rem;font-weight:800;letter-spacing:.02em}
 .story-body p{font-size:1.02rem;line-height:1.65;color:rgba(255,255,255,.94);white-space:pre-line}
 .story-body .s-big{font-size:2rem;font-weight:800;color:#fff}
+.s-btns{display:flex;flex-direction:column;gap:10px;margin-top:10px;pointer-events:auto;width:100%;max-width:260px}
+.s-btns button,.s-btns a{
+  display:block;width:100%;text-align:center;text-decoration:none;color:#000;background:#fff;
+  border-radius:999px;padding:12px 18px;font-size:.9rem;font-weight:700;
+  box-shadow:0 4px 18px rgba(0,0,0,.35);transition:transform .1s;
+}
+.s-btns button:active,.s-btns a:active{transform:scale(.97)}
+.s-btns .ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.4)}
 .tapzone{position:absolute;top:90px;bottom:0;width:38%;z-index:4}
 .tapzone.l{left:0}
 .tapzone.r{right:0;width:62%}
@@ -213,7 +264,7 @@ img{display:block;max-width:100%}
    POST VIEWER
    ============================================================ */
 #postView{z-index:30}
-.post-scroll{flex:1;overflow-y:auto;padding-bottom:20px}
+.post-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
 .post-head{display:flex;align-items:center;gap:10px;padding:10px 14px}
 .post-head .pav{width:34px;height:34px;border-radius:50%;padding:2px;background:var(--ring)}
 .post-head .pav i{display:flex;width:100%;height:100%;border-radius:50%;border:2px solid #000;background:radial-gradient(circle at 30% 25%,#3c2a3f,#17111c 70%);align-items:center;justify-content:center;font-style:normal;font-size:.85rem}
@@ -225,9 +276,7 @@ img{display:block;max-width:100%}
 }
 .post-img .cam{font-size:2.6rem}
 .post-img .ph-label{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.8)}
-.big-heart{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
-}
+.big-heart{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .big-heart svg{width:110px;height:110px;fill:#fff;filter:drop-shadow(0 4px 18px rgba(0,0,0,.4));opacity:0;transform:scale(.4)}
 .big-heart.pop svg{animation:heartpop .8s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes heartpop{15%{opacity:1;transform:scale(1.15)}45%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1)}}
@@ -242,7 +291,7 @@ img{display:block;max-width:100%}
 .comments{border-top:1px solid var(--line);padding:12px 14px 8px}
 .comments h4{font-size:.8rem;color:var(--grey);font-weight:600;margin-bottom:12px}
 .cmt{display:flex;gap:10px;margin-bottom:14px}
-.cmt .cav{width:30px;height:30px;border-radius:50%;background:#2c2337;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex:0 0 auto}
+.cmt .cav{width:30px;height:30px;border-radius:50%;background:#2c2337;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex:0 0 auto;font-weight:700}
 .cmt .cbody{font-size:.84rem;line-height:1.4}
 .cmt .cbody b{margin-right:6px}
 .cmt .cmeta{font-size:.7rem;color:var(--grey-dim);margin-top:3px}
@@ -250,10 +299,8 @@ img{display:block;max-width:100%}
   display:flex;align-items:center;gap:10px;padding:10px 14px max(12px,env(safe-area-inset-bottom));
   border-top:1px solid var(--line);background:var(--bg);
 }
-.cmt-box .cav{width:32px;height:32px;border-radius:50%;background:#213047;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex:0 0 auto}
-.cmt-box input{
-  flex:1;background:none;border:none;outline:none;color:var(--white);font-size:.9rem;
-}
+.cmt-box .cav{width:32px;height:32px;border-radius:50%;background:#213047;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex:0 0 auto;font-weight:700}
+.cmt-box input{flex:1;background:none;border:none;outline:none;color:var(--white);font-size:.9rem}
 .cmt-box input::placeholder{color:var(--grey-dim)}
 .cmt-box .post-btn{color:var(--blue-2);font-weight:700;font-size:.88rem;opacity:.4;pointer-events:none}
 .cmt-box .post-btn.ready{opacity:1;pointer-events:auto}
@@ -271,7 +318,7 @@ img{display:block;max-width:100%}
 .dm-head .dname span{font-size:.74rem;color:var(--grey)}
 .dm-head .dm-ics{margin-left:auto;display:flex;gap:20px}
 .dm-head .dm-ics svg{width:23px;height:23px;stroke:var(--white)}
-.dm-thread{flex:1;overflow-y:auto;padding:16px 12px;display:flex;flex-direction:column;gap:3px}
+.dm-thread{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 12px;display:flex;flex-direction:column;gap:3px}
 .dm-day{text-align:center;font-size:.68rem;color:var(--grey-dim);letter-spacing:.05em;margin:10px 0 14px;text-transform:uppercase}
 .msg{display:flex;align-items:flex-end;gap:8px;max-width:78%;animation:msgin .25s ease}
 @keyframes msgin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -281,7 +328,6 @@ img{display:block;max-width:100%}
   border-bottom-left-radius:6px;
 }
 .msg.them{align-self:flex-start}
-.msg.them + .msg.them{margin-top:1px}
 .msg.them + .msg.them .mav{visibility:hidden}
 .msg.me{align-self:flex-end;flex-direction:row-reverse}
 .msg.me .bubble{
@@ -316,13 +362,14 @@ img{display:block;max-width:100%}
 
 /* toast */
 #toast{
-  position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);
+  position:absolute;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);
   background:#fff;color:#000;font-size:.82rem;font-weight:600;padding:10px 18px;border-radius:10px;
-  opacity:0;pointer-events:none;transition:.3s;z-index:60;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:.3s;z-index:90;white-space:nowrap;max-width:92%;
+  overflow:hidden;text-overflow:ellipsis;
 }
 #toast.on{opacity:1;transform:translateX(-50%)}
 
-/* gradient placeholder palettes for tiles/posts */
+/* gradient placeholder palettes */
 .g0{background:linear-gradient(135deg,#3b1d3f,#7b2d5e)}
 .g1{background:linear-gradient(135deg,#20223f,#4a3a78)}
 .g2{background:linear-gradient(135deg,#402313,#8a5a2b)}
@@ -332,82 +379,105 @@ img{display:block;max-width:100%}
 .g6{background:linear-gradient(135deg,#33241a,#7a5a20)}
 .g7{background:linear-gradient(135deg,#1c2e4a,#3a5a8a)}
 .g8{background:linear-gradient(135deg,#3f1a1a,#8a2b45)}
+.g9{background:linear-gradient(135deg,#182a1e,#2f6b4a)}
+.g10{background:linear-gradient(135deg,#2e1b3f,#7b2d8a)}
+.g11{background:linear-gradient(135deg,#3a2508,#a06a1a)}
 </style>
 </head>
 <body>
 <div id="app">
 
+  <!-- ============ FAKE LOG IN ============ -->
+  <section id="loginView">
+    <div class="ig-logo">Instagram</div>
+    <div class="login-sub">isabella's quince edition 👑</div>
+    <div class="login-card">
+      <input id="loginName" type="text" placeholder="Your name" maxlength="40" autocomplete="name">
+      <input id="loginPhone" type="tel" placeholder="Phone number" maxlength="20" autocomplete="tel">
+      <div class="login-err" id="loginErr"></div>
+      <button class="login-btn" id="loginBtn">Log in</button>
+    </div>
+    <div class="login-div">OR</div>
+    <div class="login-note">
+      don't worry — this isn't the real instagram 😌<br>
+      logging in just makes the invite yours:<br>Isabella will know it's you 💕
+    </div>
+  </section>
+
   <!-- ============ PROFILE ============ -->
   <section id="profileView">
-    <div class="topbar">
-      <button class="icon-btn" title="back">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
-      </button>
-      <div class="uname">isabella.turns.xv
-        <svg class="vbadge" viewBox="0 0 24 24"><path fill="#4150f7" d="M12 1l2.8 2.1 3.5-.4 1.2 3.3 3.1 1.7-.8 3.4L24 12l-2.2 2.7.8 3.4-3.1 1.7-1.2 3.3-3.5-.4L12 24l-2.8-2.1-3.5.4-1.2-3.3-3.1-1.7.8-3.4L0 12l2.2-2.7-.8-3.4 3.1-1.7 1.2-3.3 3.5.4L12 1z"/><path fill="#fff" d="M10.6 15.9l-3.1-3.1 1.3-1.3 1.8 1.8 4.6-4.6 1.3 1.3-5.9 5.9z"/></svg>
+    <div class="pscroll" id="pscroll">
+      <div class="topbar">
+        <button class="icon-btn" title="back">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="uname">isabella.turns.xv
+          <svg class="vbadge" viewBox="0 0 24 24"><path fill="#4150f7" d="M12 1l2.8 2.1 3.5-.4 1.2 3.3 3.1 1.7-.8 3.4L24 12l-2.2 2.7.8 3.4-3.1 1.7-1.2 3.3-3.5-.4L12 24l-2.8-2.1-3.5.4-1.2-3.3-3.1-1.7.8-3.4L0 12l2.2-2.7-.8-3.4 3.1-1.7 1.2-3.3 3.5.4L12 1z"/><path fill="#fff" d="M10.6 15.9l-3.1-3.1 1.3-1.3 1.8 1.8 4.6-4.6 1.3 1.3-5.9 5.9z"/></svg>
+        </div>
+        <button class="icon-btn" title="menu" onclick="toast('nothing sus in here 😌 just RSVP already')">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+        </button>
       </div>
-      <button class="icon-btn" title="menu">
-        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
-      </button>
-    </div>
 
-    <div class="phead">
-      <div class="avatar-ring" onclick="openHighlight(0)">
-        <div class="avatar">👑<div class="ph-note">pic here</div></div>
+      <div class="phead">
+        <div class="avatar-ring" onclick="openHighlight(0)">
+          <div class="avatar">👑<div class="ph-note">pic here</div></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>12</b><span>posts</span></div>
+          <div class="stat"><b id="followerCount">147</b><span>followers</span></div>
+          <div class="stat"><b>XV</b><span>following</span></div>
+        </div>
       </div>
-      <div class="stats">
-        <div class="stat"><b>9</b><span>posts</span></div>
-        <div class="stat"><b id="followerCount">147</b><span>followers</span></div>
-        <div class="stat"><b>XV</b><span>following</span></div>
+
+      <div class="bio">
+        <div class="rname">Isabella Marie Rodríguez 👑</div>
+        <div class="cat">Birthday Girl · Nov 14</div>
+        <div>✨ officially XV — mis quince años ✨</div>
+        <div>una noche que nunca olvidaré 💃🌹</div>
+        <div>📍 Grand Salon Ballroom · San Antonio, TX</div>
+        <div class="blink">💌 RSVP in my DMs → hit “Message”</div>
+        <div>🔗 <a class="linktree" href="links.html">linktr.ee/isabella.turns.xv</a></div>
+        <button class="music-pill" id="musicPill">
+          <span class="prog" id="musicProg"></span>
+          <span class="mp-ic">
+            <svg id="mpPlay" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5z"/></svg>
+            <svg id="mpPause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </span>
+          <span class="mp-txt"><b>Paint The Town Red</b> <span>Doja Cat</span></span>
+          <span class="eq"><i></i><i></i><i></i><i></i></span>
+        </button>
       </div>
+
+      <div class="followed-by">
+        <div class="fb-avs"><i>🌹</i><i>💃</i><i>🕺</i></div>
+        <div>Followed by <b>tia.carmen</b>, <b>las.damas.xv</b> and <b id="fbOthers">28 others</b></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="followBtn">Follow</button>
+        <button class="btn" id="msgBtn">Message</button>
+        <button class="btn sq" onclick="toast('she already follows everyone she loves 💕')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 15.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M4 21c.8-3.2 4-5 8-5"/><path d="M19 15v6M16 18h6"/></svg>
+        </button>
+      </div>
+
+      <div class="highlights" id="hlRow"></div>
+
+      <div class="gtabs">
+        <button class="gt on" data-tab="posts"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9.5h18M3 14.5h18M9.5 3v18M14.5 3v18"/></svg></button>
+        <button class="gt" data-tab="reels"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8.7l5.5 3.3-5.5 3.3z"/></svg></button>
+        <button class="gt" data-tab="tagged"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="9" r="2.6"/><path d="M7 18c.7-2.4 2.6-3.6 5-3.6s4.3 1.2 5 3.6"/></svg></button>
+      </div>
+
+      <div class="grid" id="grid"></div>
     </div>
-
-    <div class="bio">
-      <div class="rname">Isabella Marie Rodríguez 👑</div>
-      <div class="cat">Birthday Girl · Nov 14</div>
-      <div>✨ officially XV — mis quince años ✨</div>
-      <div>una noche que nunca olvidaré 💃🌹</div>
-      <div>📍 Grand Salon Ballroom · San Antonio, TX</div>
-      <div class="blink">💌 RSVP in my DMs → hit “Message”</div>
-      <button class="music-pill" id="musicPill">
-        <span class="prog" id="musicProg"></span>
-        <span class="mp-ic">
-          <svg id="mpPlay" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5z"/></svg>
-          <svg id="mpPause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
-        </span>
-        <span class="mp-txt"><b>Paint The Town Red</b> <span>Doja Cat</span></span>
-        <span class="eq"><i></i><i></i><i></i><i></i></span>
-      </button>
-    </div>
-
-    <div class="followed-by">
-      <div class="fb-avs"><i>🌹</i><i>💃</i><i>🕺</i></div>
-      <div>Followed by <b>tia.carmen</b>, <b>las.damas.xv</b> and <b id="fbOthers">28 others</b></div>
-    </div>
-
-    <div class="actions">
-      <button class="btn primary" id="followBtn">Follow</button>
-      <button class="btn" id="msgBtn">Message</button>
-      <button class="btn sq" title="suggest">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 15.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M4 21c.8-3.2 4-5 8-5"/><path d="M19 15v6M16 18h6"/></svg>
-      </button>
-    </div>
-
-    <div class="highlights" id="hlRow"></div>
-
-    <div class="gtabs">
-      <button class="gt on"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9.5h18M3 14.5h18M9.5 3v18M14.5 3v18"/></svg></button>
-      <button class="gt"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8.7l5.5 3.3-5.5 3.3z"/></svg></button>
-      <button class="gt"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="9" r="2.6"/><path d="M7 18c.7-2.4 2.6-3.6 5-3.6s4.3 1.2 5 3.6"/></svg></button>
-    </div>
-
-    <div class="grid" id="grid"></div>
 
     <nav class="bnav">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 10.5L12 3l8 7.5V21h-5.5v-6h-5v6H4z"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16 16"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8.7 3.3l3 5.2M14.3 3.3l3 5.2M10 12.5l5 2.8-5 2.8z"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M6 3h12l3 5-9 13L3 8z"/><path d="M3 8h18M9.5 8L12 20.5M14.5 8L12 20.5M8 3l1.5 5M16 3l-1.5 5"/></svg>
+      <button class="icon-btn" onclick="document.getElementById('pscroll').scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 10.5L12 3l8 7.5V21h-5.5v-6h-5v6H4z"/></svg></button>
+      <button class="icon-btn" onclick="toast('everyone is searching for their outfit rn 👗👀')"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16 16"/></svg></button>
+      <button class="icon-btn" onclick="switchTab('reels')"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8.7 3.3l3 5.2M14.3 3.3l3 5.2M10 12.5l5 2.8-5 2.8z"/></svg></button>
+      <button class="icon-btn" onclick="window.location.href='links.html'"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M6 3h12l3 5-9 13L3 8z"/><path d="M3 8h18M9.5 8L12 20.5M14.5 8L12 20.5M8 3l1.5 5M16 3l-1.5 5"/></svg></button>
       <div class="mini-av">👑</div>
     </nav>
   </section>
@@ -434,12 +504,12 @@ img{display:block;max-width:100%}
       <button class="icon-btn" onclick="closePost()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
       </button>
-      <div class="uname" style="font-size:.95rem">Posts</div>
+      <div class="uname" style="font-size:.95rem" id="postViewTitle">Posts</div>
       <span style="width:32px"></span>
     </div>
     <div class="post-scroll" id="postScroll"></div>
     <div class="cmt-box">
-      <div class="cav">🫵</div>
+      <div class="cav" id="cmtAvatar">🫵</div>
       <input id="cmtInput" type="text" placeholder="Add a comment…" maxlength="240">
       <button class="post-btn" id="cmtPost">Post</button>
     </div>
@@ -464,7 +534,7 @@ img{display:block;max-width:100%}
     <div class="dm-thread" id="dmThread"></div>
     <div class="dm-input" id="dmInputWrap">
       <div class="camb"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 8l2-3h4l2 3h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><circle cx="10" cy="14" r="3.2"/></svg></div>
-      <input id="dmInput" type="text" placeholder="Message…" maxlength="120" autocomplete="off">
+      <input id="dmInput" type="text" placeholder="Message…" maxlength="200" autocomplete="off">
       <button class="sendb" id="dmSend">Send</button>
     </div>
   </section>
@@ -475,22 +545,49 @@ img{display:block;max-width:100%}
 
 <script>
 /* ============================================================
-   DATA
+   GUEST LIST — EDIT ME!
+   phone: digits only (matching uses the LAST 7 digits, so any
+   format guests type will still match). allowed = max spots,
+   counting the guest themself. Guests not on the list get
+   DEFAULT_ALLOWED spots.
    ============================================================ */
-const BASE_FOLLOWERS = 147;
+const GUEST_LIST = [
+  { phone: "2105550101", name: "Tia Carmen",        allowed: 6 },
+  { phone: "2105550102", name: "The Garcia Family", allowed: 5 },
+  { phone: "2105550103", name: "Chambelán J",       allowed: 2 },
+];
+const DEFAULT_ALLOWED = 3;
 
+const BASE_FOLLOWERS = 147;
+const PARTY = {
+  title: "Isabella's Quinceañera 👑",
+  dateHuman: "Saturday, November 14, 2026",
+  venue: "The Grand Salon Ballroom",
+  address: "4500 Fiesta Boulevard, San Antonio, TX 78205",
+  icsStartUTC: "20261114T200000Z",  /* 2:00 PM CST misa */
+  icsEndUTC:   "20261115T050000Z",  /* 11:00 PM CST */
+};
+const MAPS_Q = encodeURIComponent(PARTY.venue + ", " + PARTY.address);
+const GMAPS = "https://maps.google.com/?q=" + MAPS_Q;
+const AMAPS = "https://maps.apple.com/?q=" + MAPS_Q;
+
+/* ============================================================
+   CONTENT DATA
+   ============================================================ */
 const HIGHLIGHTS = [
   { name:"the day", emoji:"👑", slides:[
     { g:"linear-gradient(160deg,#5c1436,#1a0a12)", emoji:"👑", title:"MIS QUINCE AÑOS",
       text:"Isabella Marie Rodríguez\nis turning fifteen —\nand you're invited to the party of the year." },
     { g:"linear-gradient(160deg,#2b1450,#0d0a1a)", emoji:"📅", big:"NOV 14, 2026",
-      title:"save the date", text:"Saturday, November 14, 2026.\nClear your calendar. Charge your phone.\nPractice your dance moves." },
+      title:"save the date", text:"Saturday, November 14, 2026.\nClear your calendar. Charge your phone.\nPractice your dance moves.",
+      btns:[{label:"📅 Add to Calendar", act:"cal"}] },
   ]},
   { name:"venue", emoji:"📍", slides:[
     { g:"linear-gradient(160deg,#10304a,#080d14)", emoji:"⛪", title:"LA MISA",
       text:"St. Mary's Church · 2:00 PM\nThe ceremony comes first —\nyes, you have to be on time. 😇" },
     { g:"linear-gradient(160deg,#3a2408,#120c04)", emoji:"🏛️", title:"LA FIESTA",
-      text:"The Grand Salon Ballroom\n4500 Fiesta Boulevard\nSan Antonio, TX 78205\n\nDoors open 5:00 PM · free parking" },
+      text:"The Grand Salon Ballroom\n4500 Fiesta Boulevard\nSan Antonio, TX 78205\n\nDoors open 5:00 PM · free parking",
+      btns:[{label:"📍 Open in Google Maps", act:"gmaps"},{label:" Open in Apple Maps", act:"amaps", ghost:true}] },
   ]},
   { name:"schedule", emoji:"⏰", slides:[
     { g:"linear-gradient(160deg,#241a4a,#0b0916)", emoji:"🕑", title:"THE RUNDOWN",
@@ -504,9 +601,15 @@ const HIGHLIGHTS = [
     { g:"linear-gradient(160deg,#3a2c08,#120e04)", emoji:"🚫", big:"ONE RULE",
       title:"", text:"Wear whatever makes you feel amazing…\nexcept my exact shade of rosa.\nThat one's taken. 💅" },
   ]},
+  { name:"party cam", emoji:"📸", slides:[
+    { g:"linear-gradient(160deg,#123a2a,#04120b)", emoji:"🤳", title:"YOU'RE THE PAPARAZZI",
+      text:"During the party, drop every pic\nand video you take in my Party Cam —\nI want to see the night from\neveryone's eyes 🥹",
+      btns:[{label:"📸 Open Party Cam", act:"cam"}] },
+  ]},
   { name:"rsvp", emoji:"💌", slides:[
     { g:"linear-gradient(160deg,#1c1c4a,#08081a)", emoji:"💌", title:"RSVP = DM ME",
-      text:"Tap “Message” on my profile\nand tell me you're coming.\nI'm literally waiting. 🥹\n\nPlease reply by October 14, 2026." },
+      text:"Tap “Message” on my profile\nand tell me you're coming.\nI'm literally waiting. 🥹\n\nPlease reply by October 14, 2026.",
+      btns:[{label:"💌 DM me now", act:"dm"}] },
   ]},
 ];
 
@@ -520,34 +623,101 @@ const POSTS = [
   { cap:"the cake tasting was research. important research. 🍰", likes:231 },
   { cap:"last photoshoot as a fourteen-year-old 🥹📸", likes:198 },
   { cap:"POV: you pressed Message and RSVP'd like a legend 💌 (this could be you)", likes:342 },
+  { cap:"GRWM season loading… hair trial ✅ makeup trial ✅ attitude: been ready 💁‍♀️", likes:276 },
+  { cap:"mood board → reality. wait till you see the centerpieces 🌹✨", likes:164 },
+  { cap:"fourteen years of practice for this one night 🥹 almost showtime", likes:387 },
 ];
 
-const SEED_COMMENTS = [
-  [ {u:"tia.carmen",e:"🌹",t:"mi reina!! 😍😍 I'm crying already"}, {u:"las.damas.xv",e:"💃",t:"QUEEN BEHAVIOR 👑"} ],
-  [ {u:"chambelan.j",e:"🕺",t:"iconic is an understatement"} ],
-  [ {u:"tia.carmen",e:"🌹",t:"that color on you!!! 🌹🌹🌹"}, {u:"abuela.rosa",e:"💐",t:"que hermosa mija ❤️"} ],
-  [ {u:"las.damas.xv",e:"💃",t:"best court ever, no notes"} ],
-  [ {u:"chambelan.j",e:"🕺",t:"twice is still two too many sir 💀"} ],
-  [ {u:"abuela.rosa",e:"💐",t:"so elegant! ❤️❤️"} ],
-  [ {u:"tia.carmen",e:"🌹",t:"save me a slice of the tres leches one 🍰"} ],
-  [ {u:"abuela.rosa",e:"💐",t:"my baby is growing up 🥹❤️"} ],
-  [ {u:"las.damas.xv",e:"💃",t:"RSVP'd in 0.2 seconds 💌"} ],
+const SEED_COMMENTS = {
+  p0:[ {u:"tia.carmen",e:"🌹",t:"mi reina!! 😍😍 I'm crying already"}, {u:"las.damas.xv",e:"💃",t:"QUEEN BEHAVIOR 👑"} ],
+  p1:[ {u:"chambelan.j",e:"🕺",t:"iconic is an understatement"} ],
+  p2:[ {u:"tia.carmen",e:"🌹",t:"that color on you!!! 🌹🌹🌹"}, {u:"abuela.rosa",e:"💐",t:"que hermosa mija ❤️"} ],
+  p3:[ {u:"las.damas.xv",e:"💃",t:"best court ever, no notes"} ],
+  p4:[ {u:"chambelan.j",e:"🕺",t:"twice is still two too many sir 💀"} ],
+  p5:[ {u:"abuela.rosa",e:"💐",t:"so elegant! ❤️❤️"} ],
+  p6:[ {u:"tia.carmen",e:"🌹",t:"save me a slice of the tres leches one 🍰"} ],
+  p7:[ {u:"abuela.rosa",e:"💐",t:"my baby is growing up 🥹❤️"} ],
+  p8:[ {u:"las.damas.xv",e:"💃",t:"RSVP'd in 0.2 seconds 💌"} ],
+  p9:[ {u:"las.damas.xv",e:"💃",t:"the attitude was NEVER not ready 😭"} ],
+  p10:[ {u:"tia.carmen",e:"🌹",t:"ok event planner era 😍"} ],
+  p11:[ {u:"abuela.rosa",e:"💐",t:"🥹🥹🥹❤️"}, {u:"chambelan.j",e:"🕺",t:"we're not ready but we're ready"} ],
+  r0:[ {u:"las.damas.xv",e:"💃",t:"WAIT for the ending 😭"} ],
+  r1:[ {u:"chambelan.j",e:"🕺",t:"my knees after this rehearsal 💀"} ],
+  r2:[ {u:"tia.carmen",e:"🌹",t:"the transition!!! 🔥"} ],
+  r3:[ {u:"abuela.rosa",e:"💐",t:"beautiful mija ❤️"} ],
+  r4:[ {u:"las.damas.xv",e:"💃",t:"POV you're about to be at the best party ever"} ],
+  r5:[ {u:"chambelan.j",e:"🕺",t:"cook 🔥🔥"} ],
+};
+
+const REELS = [
+  { cap:"vals rehearsal but make it cinematic 💃✨", views:"12.4K", likes:842 },
+  { cap:"the court learning the surprise dance 👀 shhh", views:"11K", likes:733 },
+  { cap:"GRWM: dress fitting no.3 🌹", views:"8,871", likes:512 },
+  { cap:"cake tasting POV 🍰 (science)", views:"9,204", likes:604 },
+  { cap:"fit check season is COMING — rosa & gold only", views:"15.1K", likes:1093 },
+  { cap:"countdown to Nov 14 🥹👑", views:"22.7K", likes:1544 },
+];
+
+const TAGGED = [
+  { u:"tia.carmen", e:"🌹" }, { u:"las.damas.xv", e:"💃" }, { u:"chambelan.j", e:"🕺" },
+  { u:"abuela.rosa", e:"💐" }, { u:"mami.rodriguez", e:"💗" }, { u:"papi.rodriguez", e:"🤵" },
 ];
 
 /* ============================================================
-   STORAGE
+   STORAGE + PROFILE
    ============================================================ */
 const store = {
   get(k,d){ try{ const v = localStorage.getItem("igq_"+k); return v===null?d:JSON.parse(v);}catch(e){return d} },
   set(k,v){ try{ localStorage.setItem("igq_"+k, JSON.stringify(v)); }catch(e){} },
 };
+function normPhone(p){ return (p||"").replace(/\D/g,""); }
+function lookupGuest(phone){
+  const mine = normPhone(phone).slice(-7);
+  if (mine.length >= 7) {
+    for (const g of GUEST_LIST) {
+      if (normPhone(g.phone).slice(-7) === mine) return g;
+    }
+  }
+  return null;
+}
+let profile = store.get("profile", null);
+function firstName(){ return profile ? profile.name.trim().split(/\s+/)[0] : "bestie"; }
+function allowed(){ return profile ? profile.allowed : DEFAULT_ALLOWED; }
+function initial(){ return profile ? profile.name.trim().charAt(0).toUpperCase() : "🫵"; }
 
 /* ============================================================
-   PROFILE: followers / follow button
+   LOGIN
+   ============================================================ */
+const loginView = document.getElementById("loginView");
+const loginBtn = document.getElementById("loginBtn");
+const loginErr = document.getElementById("loginErr");
+function doLogin(){
+  const name = document.getElementById("loginName").value.trim();
+  const phone = document.getElementById("loginPhone").value.trim();
+  if (name.length < 2) { loginErr.textContent = "pls tell me your name 🥺"; return; }
+  if (normPhone(phone).length < 7) { loginErr.textContent = "that phone number looks a lil short 👀"; return; }
+  const g = lookupGuest(phone);
+  profile = { name: g && g.name ? name : name, phone: normPhone(phone),
+              allowed: g ? g.allowed : DEFAULT_ALLOWED, onList: !!g };
+  store.set("profile", profile);
+  loginView.classList.add("off");
+  refreshIdentity();
+  toast("logged in — Isabella knows you're here " + firstName() + " 💕");
+  handleHash();
+}
+loginBtn.addEventListener("click", doLogin);
+document.getElementById("loginPhone").addEventListener("keydown", e => { if (e.key==="Enter") doLogin(); });
+if (profile) loginView.classList.add("off");
+
+function refreshIdentity(){
+  document.getElementById("cmtAvatar").textContent = initial();
+}
+
+/* ============================================================
+   FOLLOWERS / FOLLOW BUTTON
    ============================================================ */
 const followerEl = document.getElementById("followerCount");
 const followBtn = document.getElementById("followBtn");
-
 function followerTotal(){
   const rsvp = store.get("rsvp", null);
   let n = BASE_FOLLOWERS;
@@ -579,22 +749,41 @@ const pill = document.getElementById("musicPill");
 const mpPlay = document.getElementById("mpPlay");
 const mpPause = document.getElementById("mpPause");
 const musicProg = document.getElementById("musicProg");
-
-pill.addEventListener("click", () => {
-  if (song.paused) song.play(); else song.pause();
-});
-song.addEventListener("play", () => {
-  pill.classList.add("playing");
-  mpPlay.style.display="none"; mpPause.style.display="block";
-});
-song.addEventListener("pause", () => {
-  pill.classList.remove("playing");
-  mpPlay.style.display="block"; mpPause.style.display="none";
-});
-song.addEventListener("timeupdate", () => {
-  if (song.duration) musicProg.style.width = (song.currentTime/song.duration*100) + "%";
-});
+pill.addEventListener("click", () => { if (song.paused) song.play(); else song.pause(); });
+song.addEventListener("play", () => { pill.classList.add("playing"); mpPlay.style.display="none"; mpPause.style.display="block"; });
+song.addEventListener("pause", () => { pill.classList.remove("playing"); mpPlay.style.display="block"; mpPause.style.display="none"; });
+song.addEventListener("timeupdate", () => { if (song.duration) musicProg.style.width = (song.currentTime/song.duration*100) + "%"; });
 song.addEventListener("ended", () => { musicProg.style.width = "0%"; });
+
+/* ============================================================
+   CALENDAR + MAPS ACTIONS
+   ============================================================ */
+function downloadICS(){
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//isabella.turns.xv//EN",
+    "BEGIN:VEVENT",
+    "UID:isabella-quince-2026@turns.xv",
+    "DTSTART:" + PARTY.icsStartUTC,
+    "DTEND:" + PARTY.icsEndUTC,
+    "SUMMARY:" + PARTY.title,
+    "LOCATION:" + PARTY.venue + "\\, " + PARTY.address.replace(/,/g,"\\,"),
+    "DESCRIPTION:Misa at St. Mary's Church 2:00 PM\\, reception at the Grand Salon. Rosa & gold formal. Vals at 6:30 sharp!",
+    "END:VEVENT","END:VCALENDAR",
+  ].join("\r\n");
+  const blob = new Blob([ics], {type:"text/calendar"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "isabella-quince.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("added to your calendar 📅💕");
+}
+function storyAction(act){
+  if (act === "cal") downloadICS();
+  else if (act === "gmaps") window.open(GMAPS, "_blank");
+  else if (act === "amaps") window.open(AMAPS, "_blank");
+  else if (act === "cam") window.location.href = "memories.html";
+  else if (act === "dm") { closeStory(); openDM(); }
+}
 
 /* ============================================================
    HIGHLIGHTS + STORY VIEWER
@@ -614,7 +803,7 @@ const storyBody = document.getElementById("storyBody");
 const storyName = document.getElementById("storyName");
 const sprog = document.getElementById("sprog");
 let sHl = 0, sIdx = 0, sTimer = null;
-const STORY_MS = 6000;
+const STORY_MS = 6500;
 
 function openHighlight(i){
   sHl = i; sIdx = 0;
@@ -630,9 +819,10 @@ function renderStory(){
     `<div class="s-emoji">${s.emoji}</div>` +
     (s.big ? `<div class="s-big">${s.big}</div>` : "") +
     (s.title ? `<h2>${s.title}</h2>` : "") +
-    `<p>${s.text}</p>`;
-  sprog.innerHTML = h.slides.map((_,j) =>
-    `<i class="${j<sIdx?'done':''}"></i>`).join("");
+    `<p>${s.text}</p>` +
+    (s.btns ? `<div class="s-btns">` + s.btns.map((b,j) =>
+      `<button class="${b.ghost?'ghost':''}" onclick="event.stopPropagation();storyAction('${b.act}')">${b.label}</button>`).join("") + `</div>` : "");
+  sprog.innerHTML = h.slides.map((_,j) => `<i class="${j<sIdx?'done':''}"></i>`).join("");
   if (!document.getElementById("sprogDur")) {
     const style = document.createElement("style");
     style.id = "sprogDur";
@@ -663,34 +853,71 @@ function closeStory(){
 }
 
 /* ============================================================
-   GRID + POST VIEWER
+   GRID TABS + GRID
    ============================================================ */
 const grid = document.getElementById("grid");
-POSTS.forEach((p,i) => {
-  const t = document.createElement("div");
-  t.className = `tile g${i}`;
-  t.innerHTML = `<div class="tile-inner"><div class="cam">📸</div><div class="ph-label">picture here</div></div>`;
-  t.addEventListener("click", () => openPost(i));
-  grid.appendChild(t);
-});
+let curTab = "posts";
+function switchTab(tab){
+  curTab = tab;
+  document.querySelectorAll(".gtabs .gt").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  renderGrid();
+}
+document.querySelectorAll(".gtabs .gt").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
+function renderGrid(){
+  grid.innerHTML = "";
+  if (curTab === "posts") {
+    POSTS.forEach((p,i) => {
+      const t = document.createElement("div");
+      t.className = `tile g${i%12}`;
+      t.innerHTML = `<div class="tile-inner"><div class="cam">📸</div><div class="ph-label">picture here</div></div>`;
+      t.addEventListener("click", () => openPost("p"+i));
+      grid.appendChild(t);
+    });
+  } else if (curTab === "reels") {
+    REELS.forEach((r,i) => {
+      const t = document.createElement("div");
+      t.className = `tile g${(i+3)%12}`;
+      t.innerHTML = `<div class="tile-inner"><div class="cam">🎥</div><div class="ph-label">video here</div></div>
+        <div class="views"><svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5z"/></svg>${r.views}</div>`;
+      t.addEventListener("click", () => openPost("r"+i));
+      grid.appendChild(t);
+    });
+  } else {
+    TAGGED.forEach((tg,i) => {
+      const t = document.createElement("div");
+      t.className = `tile g${(i+7)%12}`;
+      t.innerHTML = `<div class="tile-inner"><div class="cam">${tg.e}</div><div class="ph-label">picture here</div></div>
+        <div class="tagname">@${tg.u}</div>`;
+      t.addEventListener("click", () => toast(`@${tg.u} will be there — will you? 👀💕`));
+      grid.appendChild(t);
+    });
+  }
+}
+
+/* ============================================================
+   POST VIEWER (posts + reels share it)
+   ============================================================ */
 const postView = document.getElementById("postView");
 const postScroll = document.getElementById("postScroll");
 const cmtInput = document.getElementById("cmtInput");
 const cmtPost = document.getElementById("cmtPost");
-let curPost = 0;
+let curPost = "p0";
 
-function isLiked(i){ return !!store.get("likes",{})[i]; }
-function toggleLike(i, force){
+function postData(id){
+  return id[0] === "r" ? REELS[+id.slice(1)] : POSTS[+id.slice(1)];
+}
+function isLiked(id){ return !!store.get("likes",{})[id]; }
+function toggleLike(id, force){
   const likes = store.get("likes",{});
-  likes[i] = force !== undefined ? force : !likes[i];
+  likes[id] = force !== undefined ? force : !likes[id];
   store.set("likes", likes);
   renderPost();
 }
-function myComments(i){ return (store.get("comments",{})[i]) || []; }
-function addComment(i, text){
+function myComments(id){ return (store.get("comments",{})[id]) || []; }
+function addComment(id, text){
   const all = store.get("comments",{});
-  (all[i] = all[i] || []).push({ t:text, at:Date.now() });
+  (all[id] = all[id] || []).push({ t:text, at:Date.now(), n:firstName() });
   store.set("comments", all);
 }
 function timeAgo(ts){
@@ -700,9 +927,9 @@ function timeAgo(ts){
   if (h < 24) return h + "h";
   return Math.round(h/24) + "d";
 }
-
-function openPost(i){
-  curPost = i;
+function openPost(id){
+  curPost = id;
+  document.getElementById("postViewTitle").textContent = id[0]==="r" ? "Reels" : "Posts";
   postView.classList.add("on");
   renderPost();
   postScroll.scrollTop = 0;
@@ -710,28 +937,31 @@ function openPost(i){
 function closePost(){ postView.classList.remove("on"); }
 
 function renderPost(){
-  const i = curPost, p = POSTS[i];
-  const liked = isLiked(i);
+  const id = curPost, p = postData(id);
+  const isReel = id[0] === "r";
+  const liked = isLiked(id);
   const likeCount = p.likes + (liked ? 1 : 0);
-  const seeds = SEED_COMMENTS[i] || [];
-  const mine = myComments(i);
+  const seeds = SEED_COMMENTS[id] || [];
+  const mine = myComments(id);
   const cmtCount = seeds.length + mine.length;
+  const gi = (isReel ? (+id.slice(1)+3) : +id.slice(1)) % 12;
   postScroll.innerHTML = `
     <div class="post-head">
       <div class="pav"><i>👑</i></div>
       <div><b>isabella.turns.xv <svg class="vbadge" width="13" height="13" viewBox="0 0 24 24"><path fill="#4150f7" d="M12 1l2.8 2.1 3.5-.4 1.2 3.3 3.1 1.7-.8 3.4L24 12l-2.2 2.7.8 3.4-3.1 1.7-1.2 3.3-3.5-.4L12 24l-2.8-2.1-3.5.4-1.2-3.3-3.1-1.7.8-3.4L0 12l2.2-2.7-.8-3.4 3.1-1.7 1.2-3.3 3.5.4L12 1z"/><path fill="#fff" d="M10.6 15.9l-3.1-3.1 1.3-1.3 1.8 1.8 4.6-4.6 1.3 1.3-5.9 5.9z"/></svg></b>
-      <span>Grand Salon Ballroom</span></div>
+      <span>${isReel ? "Original audio" : "Grand Salon Ballroom"}</span></div>
     </div>
-    <div class="post-img g${i}" id="postImg">
-      <div class="cam">📸</div>
-      <div class="ph-label">picture here</div>
+    <div class="post-img g${gi}" id="postImg">
+      <div class="cam">${isReel ? "🎥" : "📸"}</div>
+      <div class="ph-label">${isReel ? "video here" : "picture here"}</div>
+      ${isReel ? `<div class="ph-label" style="letter-spacing:.08em">▶ ${p.views} views</div>` : ""}
       <div class="big-heart" id="bigHeart"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.6 2 5 5.5 4.4 7.7 4 9.6 5 12 7.4 14.4 5 16.3 4 18.5 4.4 22 5 23.6 8.6 22 11.7 19.5 16.1 12 21 12 21z"/></svg></div>
     </div>
     <div class="post-acts">
       <button class="lk ${liked?'liked':''}" id="likeBtn"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.6 2 5 5.5 4.4 7.7 4 9.6 5 12 7.4 14.4 5 16.3 4 18.5 4.4 22 5 23.6 8.6 22 11.7 19.5 16.1 12 21 12 21z"/></svg></button>
       <button onclick="document.getElementById('cmtInput').focus()"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-4.2-7.6L21 3l-1.1 4A8.9 8.9 0 0 1 21 12z" transform="rotate(90 12 12)"/></svg></button>
-      <button onclick="toast('Link copied! Send it to the group chat 💌')"><svg viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg></button>
-      <button class="bm"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button>
+      <button onclick="sharePost()"><svg viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg></button>
+      <button class="bm" onclick="toast('saved 🔖 (screenshot it too, just in case)')"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button>
     </div>
     <div class="post-likes">${likeCount.toLocaleString()} likes</div>
     <div class="post-cap"><b>isabella.turns.xv</b>${p.cap}</div>
@@ -742,27 +972,29 @@ function renderPost(){
         <div class="cmt"><div class="cav">${c.e}</div>
           <div class="cbody"><b>${c.u}</b>${c.t}<div class="cmeta">1d · Reply</div></div></div>`).join("")}
       ${mine.map(c => `
-        <div class="cmt"><div class="cav">🫵</div>
-          <div class="cbody"><b>you</b>${escapeHtml(c.t)}<div class="cmeta">${timeAgo(c.at)} · Reply</div></div></div>`).join("")}
+        <div class="cmt"><div class="cav">${escapeHtml((c.n||"?").charAt(0).toUpperCase())}</div>
+          <div class="cbody"><b>${escapeHtml(c.n||"you")}</b>${escapeHtml(c.t)}<div class="cmeta">${timeAgo(c.at)} · Reply</div></div></div>`).join("")}
     </div>`;
-  document.getElementById("likeBtn").addEventListener("click", () => toggleLike(i));
+  document.getElementById("likeBtn").addEventListener("click", () => toggleLike(id));
   const img = document.getElementById("postImg");
   let lastTap = 0;
   img.addEventListener("click", () => {
     const now = Date.now();
     if (now - lastTap < 320) {
-      toggleLike(i, true);
+      toggleLike(id, true);
       const bh = document.getElementById("bigHeart");
       if (bh){ bh.classList.remove("pop"); void bh.offsetWidth; bh.classList.add("pop"); }
     }
     lastTap = now;
   });
 }
-
-function escapeHtml(s){
-  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function sharePost(){
+  if (navigator.share) navigator.share({ title:"isabella.turns.xv", url: location.href }).catch(()=>{});
+  else toast("Link copied! Send it to the group chat 💌");
 }
-
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
 cmtInput.addEventListener("input", () => {
   cmtPost.classList.toggle("ready", cmtInput.value.trim().length > 0);
 });
@@ -787,9 +1019,8 @@ const dmThread = document.getElementById("dmThread");
 const dmInput = document.getElementById("dmInput");
 const dmInputWrap = document.getElementById("dmInputWrap");
 const dmSend = document.getElementById("dmSend");
-let dmState = "idle";       // idle | awaitYesNo | awaitName | awaitCount | done
+let dmState = "idle";
 let dmStarted = false;
-let pendingRSVP = {};
 
 document.getElementById("msgBtn").addEventListener("click", openDM);
 
@@ -798,7 +1029,6 @@ function openDM(){
   if (!dmStarted) { dmStarted = true; startConvo(); }
 }
 function closeDM(){ dmView.classList.remove("on"); }
-
 function scrollDM(){ dmThread.scrollTop = dmThread.scrollHeight; }
 
 function addBubble(who, text){
@@ -827,7 +1057,7 @@ function typing(ms){
 }
 async function isaSays(lines){
   for (const line of lines) {
-    await typing(500 + Math.min(line.length*18, 1100));
+    await typing(500 + Math.min(line.length*16, 1100));
     addBubble("them", line);
   }
 }
@@ -843,10 +1073,7 @@ function chips(options, handler){
   });
   dmThread.appendChild(c); scrollDM();
 }
-function removeChips(){
-  dmThread.querySelectorAll(".chips").forEach(el => el.remove());
-}
-
+function removeChips(){ dmThread.querySelectorAll(".chips").forEach(el => el.remove()); }
 function dayLabel(){
   const d = document.createElement("div");
   d.className = "dm-day";
@@ -855,35 +1082,48 @@ function dayLabel(){
     now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
   dmThread.appendChild(d);
 }
+function countChips(){
+  const max = Math.min(allowed(), 6);
+  const opts = [];
+  for (let n = 1; n <= max; n++) opts.push({label: n===1 ? "just me 🙋" : n+" of us", value:n});
+  return opts;
+}
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 async function startConvo(){
   dayLabel();
   const rsvp = store.get("rsvp", null);
+  const name = firstName();
   if (rsvp && rsvp.status === "yes") {
     await isaSays([
-      "heyyy it's you again 🥹💕",
+      `${name}!! back again 🥹💕`,
       `you're already on my list — ${rsvp.count} ${rsvp.count>1?"people":"person"} confirmed 📝✨`,
-      "wanna change your rsvp?",
+      "wanna change your rsvp? or just here to chat 😌",
     ]);
     dmState = "awaitChange";
-    chips([{label:"change it 🔁",value:"change"},{label:"all good 💅",value:"keep"}], handleChange);
+    chips([{label:"change my rsvp 🔁",value:"change"},{label:"just saying hi 💅",value:"keep"}], handleChange);
     return;
   }
   if (rsvp && rsvp.status === "no") {
     await isaSays([
-      "hii 🥺 you said you couldn't make it…",
+      `${name} 🥺 you said you couldn't make it…`,
       "did something change?? 👀💕",
     ]);
     dmState = "awaitYesNo";
     chips([{label:"YES I can come!! 🎉",value:"yes"},{label:"still can't 😭",value:"no"}], handleYesNo);
     return;
   }
-  await isaSays([
-    "omg hiii!! 🥹💕",
-    "you found my page — ok so as you can see, I'm turning XV 👑✨",
-    "Saturday, November 14 · misa at 2, party at the Grand Salon Ballroom 💃",
-    "sooo… the big question: can you come?? (please say yes) 😭💕",
-  ]);
+  const opener = profile && profile.onList
+    ? [`OMG ${name}!!! 🥹💕`,
+       "I was literally hoping you'd open this — you're one of my favorites, don't tell anyone 🤫",
+       "ok so: Saturday November 14 · misa at 2, party at the Grand Salon Ballroom 💃",
+       `and I saved ${allowed()} spots just for you and yours 👀`,
+       "sooo… the big question: can you come?? (please say yes) 😭💕"]
+    : [`omg hiii ${name}!! 🥹💕`,
+       "you found my page — ok so as you can see, I'm turning XV 👑✨",
+       "Saturday, November 14 · misa at 2, party at the Grand Salon Ballroom 💃",
+       "sooo… the big question: can you come?? (please say yes) 😭💕"];
+  await isaSays(opener);
   dmState = "awaitYesNo";
   chips([{label:"YES 🎉",value:"yes"},{label:"can't make it 😢",value:"no"}], handleYesNo);
 }
@@ -892,19 +1132,18 @@ async function handleYesNo(v){
   addBubble("me", v === "yes" ? "YES 🎉" : "I can't make it 😢");
   addSeen();
   if (v === "yes") {
-    pendingRSVP = { status:"yes" };
     await isaSays([
       "AHHHH YAYYY!! 🎉🎉🎉",
-      "ok ok — how many people are coming? (counting you!)",
+      `ok ok — how many of you are coming? I have ${allowed()} spots with your name on them (counting you!)`,
     ]);
     dmState = "awaitCount";
-    chips([1,2,3,4,5].map(n => ({label:n===1?"just me 🙋":n+" of us", value:n})), handleCount);
+    chips(countChips(), handleCount);
   } else {
-    store.set("rsvp", { status:"no", count:0 });
+    store.set("rsvp", { status:"no", count:0, name: profile?profile.name:"", phone: profile?profile.phone:"" });
     renderFollowers();
     await isaSays([
       "noooo 😭💔",
-      "ok ok… I'll miss you SO much. if anything changes my DMs are always open 💕",
+      `ok ${firstName()}… I'll miss you SO much. if anything changes my DMs are always open 💕`,
       "you can still stalk my page for the pics after tho 📸",
     ]);
     dmState = "done";
@@ -914,14 +1153,25 @@ async function handleYesNo(v){
 async function handleCount(n){
   addBubble("me", n === 1 ? "just me 🙋" : `${n} of us!`);
   addSeen();
-  pendingRSVP.count = n;
-  store.set("rsvp", { status:"yes", count:n });
+  await confirmCount(n);
+}
+async function confirmCount(n){
+  if (n > allowed()) {
+    await isaSays([
+      `😭 ${firstName()} I WISH — but mom's master list says ${allowed()} max for your crew`,
+      `how many are coming? (up to ${allowed()} 🙏)`,
+    ]);
+    dmState = "awaitCount";
+    chips(countChips(), handleCount);
+    return;
+  }
+  store.set("rsvp", { status:"yes", count:n, name: profile?profile.name:"", phone: profile?profile.phone:"", at: Date.now() });
   renderFollowers();
   await isaSays([
     `${n === 1 ? "just you" : n + " people"} — locked in 📝✨`,
-    "you're OFFICIALLY confirmed for my quince 👑",
+    `${firstName()}, you're OFFICIALLY confirmed for my quince 👑`,
     "Nov 14 · Grand Salon Ballroom · rosa & gold. don't be late for the vals (6:30, my mom is watching) 💃",
-    "ok go back to my profile and stalk the highlights for all the details 😌💕 see you there!!",
+    "go stalk my highlights for the details — and during the party, drop your pics in the Party Cam (link in bio!) 📸💕",
   ]);
   dmState = "done";
   toast("RSVP confirmed! You're on the list 🎉");
@@ -929,18 +1179,18 @@ async function handleCount(n){
 
 async function handleChange(v){
   if (v === "keep") {
-    addBubble("me", "all good 💅"); addSeen();
-    await isaSays(["perfect 😌💕 see you Nov 14!!"]);
+    addBubble("me", "just saying hi 💅"); addSeen();
+    await isaSays([`hiii 😌💕 love that for us. ask me anything — or see you Nov 14!!`]);
     dmState = "done";
   } else {
-    addBubble("me", "change it 🔁"); addSeen();
+    addBubble("me", "change my rsvp 🔁"); addSeen();
     await isaSays(["ok! can you still come?"]);
     dmState = "awaitYesNo";
     chips([{label:"YES 🎉",value:"yes"},{label:"actually can't 😢",value:"no"}], handleYesNo);
   }
 }
 
-/* free-text input in DM */
+/* free-text input */
 dmInput.addEventListener("input", () => {
   dmInputWrap.classList.toggle("has-text", dmInput.value.trim().length > 0);
 });
@@ -956,64 +1206,147 @@ function dmSubmit(){
 dmSend.addEventListener("click", dmSubmit);
 dmInput.addEventListener("keydown", e => { if (e.key === "Enter") dmSubmit(); });
 
+/* ---- the "brain": pattern → answers (picked at random) ---- */
+function qaBrain(low){
+  const name = firstName();
+  const RULES = [
+    { p:/\b(hi|hii+|hello|hola|hey|heyy+|wsp|whats up|what's up|sup)\b/, r:[
+      `hiii ${name} 😌💕 what's up!!`,
+      `heyyy 🥹 so happy you're here — did you rsvp yet?? 👀`,
+    ]},
+    { p:/\bhow are (you|u)\b|\bhru\b|\bcomo estas\b/, r:[
+      "hoooneestly? equal parts excited and stressed 😭✨ mostly excited. ok fully excited",
+      "living my best pre-quince life 💅 how are YOU?",
+    ]},
+    { p:/\b(gift|gifts|regalo|registry|bring (a |any )?(gift|present)|what (should|do) i bring)\b/, r:[
+      "your presence is the present 🥹💕 but if you INSIST… there's a lil wishlist table at the party 😌",
+      `honestly ${name} just bring your dance moves 💃 (and ok maybe a card if you want 🥹)`,
+    ]},
+    { p:/\b(dress|wear|outfit|attire|code|vestir)\b/, r:[
+      "formal!! rosa & gold vibes 🌹✨ check the “dress code” highlight — just DON'T wear my exact shade of rosa 💅",
+      "think fancy fancy — rosa & gold, dress like you're in the photos… because you will be 📸",
+    ]},
+    { p:/\b(time|when|what time|hora|start)\b/, r:[
+      "misa at 2:00, doors at 5:00, vals at 6:30 SHARP 💃 it's all in my “schedule” highlight!",
+      "the important one: vals at 6:30, do NOT be late, my mom is watching 😭",
+    ]},
+    { p:/\b(where|address|venue|location|donde|dónde|directions|map)\b/, r:[
+      "Grand Salon Ballroom · 4500 Fiesta Blvd, San Antonio 🏛️ there's an “open in maps” button in my venue highlight!",
+      "misa at St. Mary's, party at the Grand Salon Ballroom ✨ free parking, reinforced dance floor. we checked 😌",
+    ]},
+    { p:/\b(park|parking)\b/, r:[
+      "free parking at the Grand Salon!! valet is just my tio Ruben but he's very professional 🚗😌",
+    ]},
+    { p:/\b(food|eat|dinner|comida|menu|hungry|cake|pastel)\b/, r:[
+      "dinner at 7:30 🍽️ and the cake… I did SO much tasting research. tres leches supremacy 🍰",
+      "you will NOT leave hungry, my family is catering-level dramatic about food 😭💕",
+    ]},
+    { p:/\b(drink|drinks|bar|bebidas)\b/, r:[
+      "agua frescas, cocktails for the grown ups, and a candy bar 🍭 we thought of everything 😌",
+    ]},
+    { p:/\b(music|dj|song|playlist|dance|baile|cumbia)\b/, r:[
+      "the DJ has been WARNED: cumbia, reggaetón, and one very dramatic vals 💃 dance floor opens at 9",
+      "did you press play on my profile song yet?? 🎵 that's the energy we're bringing",
+    ]},
+    { p:/\b(kids|children|niños|baby)\b/, r:[
+      "little cousins are welcome!! there's a kids table with activities so the grown ups can dance 😌",
+    ]},
+    { p:/\b(hotel|stay|out of town)\b/, r:[
+      "if you're coming from out of town, there are a few hotels right by the ballroom! text my mom for the room block 💕",
+    ]},
+    { p:/\b(plus one|plus-one|bring (someone|a date|a friend)|can i bring)\b/, r:[
+      `so the master list says you have ${allowed()} spot${allowed()>1?"s":""} total ${name} 👀 use them wisely 😌`,
+    ]},
+    { p:/\b(how many|spots|allowed)\b/, r:[
+      `you've got ${allowed()} spot${allowed()>1?"s":""} (counting you!) 📝✨`,
+    ]},
+    { p:/\b(court|damas|chambelan|chambelán|chambelanes)\b/, r:[
+      "the court is las.damas.xv + the chambelanes 🕺💃 check my tagged tab!! they've been rehearsing for MONTHS",
+    ]},
+    { p:/\b(how old|age|quince what|what is a quince)\b/, r:[
+      "I'm turning XV — fifteen!! 👑 a quinceañera is THE fifteenth birthday celebration and mine will be legendary 😌",
+    ]},
+    { p:/\b(photo|photos|pictures|video|videos|camera|party cam)\b/, r:[
+      "YES ok — during the party, drop every pic and video in my Party Cam!! link in my bio 📸 I want to see everything",
+    ]},
+    { p:/\b(love (you|u)|te quiero|te amo|miss (you|u))\b/, r:[
+      `stoppp 🥹💕 love you more ${name}!! see you Nov 14`,
+    ]},
+    { p:/\b(thank|thanks|gracias|ty)\b/, r:[
+      "of course!! 💕 anything else? I know EVERYTHING about this party, try me 😌",
+    ]},
+    { p:/\b(lol|lmao|haha|jaja|😂|💀)\b/, r:[
+      "😭😭 ok but fr — did you rsvp yet?",
+      "the way I laughed 💀 anyway, party details are in my highlights 😌",
+    ]},
+    { p:/\b(bye|adios|adiós|gtg|see (you|u)|nos vemos)\b/, r:[
+      `byeee ${name} 💕 see you November 14!! don't forget: rosa & gold ✨`,
+    ]},
+    { p:/\b(who (made|built) (this|your page)|is this real|fake)\b/, r:[
+      "it's my official unofficial instagram 😌 real enough to rsvp on!! 💌",
+    ]},
+  ];
+  for (const rule of RULES) if (rule.p.test(low)) return pick(rule.r);
+  return null;
+}
+
+let fallbackIdx = 0;
+const FALLBACKS = [
+  "hehe 💕 ask me anything about the party — dress code, food, music, the tea… I know it all 😌",
+  "hmm 🤔 try asking about the venue, the schedule, or what to wear!! or just say hi, I love attention",
+  "I'm not sure BUT what I do know is: Nov 14, Grand Salon, rosa & gold 💃 next question!",
+];
+
 async function routeFreeText(t){
   const low = t.toLowerCase();
+
   if (dmState === "awaitYesNo" || dmState === "awaitChange") {
-    if (/\b(yes|yea|yeah|yep|si|sí|claro|of course|ofc|absolutely|coming|we.?re in|i.?m in)\b/.test(low)) {
-      pendingRSVP = { status:"yes" };
-      await isaSays(["AHHHH YAYYY!! 🎉🎉🎉","ok ok — how many people are coming? (counting you!)"]);
+    if (/\b(yes|yea|yeah|yep|yess+|si|sí|claro|of course|ofc|absolutely|coming|we.?re in|i.?m in|count me)\b/.test(low)) {
+      await isaSays([
+        "AHHHH YAYYY!! 🎉🎉🎉",
+        `ok ok — how many of you are coming? I have ${allowed()} spots for you (counting you!)`,
+      ]);
       dmState = "awaitCount";
-      chips([1,2,3,4,5].map(n => ({label:n===1?"just me 🙋":n+" of us", value:n})), handleCount);
+      chips(countChips(), handleCount);
       return;
     }
     if (/\b(no|nope|can.?t|cannot|sorry|unable)\b/.test(low)) {
-      store.set("rsvp", { status:"no", count:0 });
+      store.set("rsvp", { status:"no", count:0, name: profile?profile.name:"", phone: profile?profile.phone:"" });
       renderFollowers();
-      await isaSays(["noooo 😭💔","ok… I'll miss you SO much. if anything changes my DMs are always open 💕"]);
+      await isaSays(["noooo 😭💔", `ok ${firstName()}… I'll miss you SO much. if anything changes my DMs are always open 💕`]);
       dmState = "done";
       return;
     }
-    await isaSays(["hehe I need a yes or a no 😭 can you come??"]);
+    const ans = qaBrain(low);
+    if (ans) { await isaSays([ans, "annnd back to business: can you come?? 👀"]); }
+    else await isaSays(["hehe I need a yes or a no first 😭 can you come??"]);
     chips([{label:"YES 🎉",value:"yes"},{label:"can't make it 😢",value:"no"}], handleYesNo);
     return;
   }
+
   if (dmState === "awaitCount") {
     const m = low.match(/\d+/);
-    const words = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,just_me:1};
-    let n = m ? parseInt(m[0],10) : (/(just me|solo yo|only me|myself)/.test(low) ? 1 : (words[Object.keys(words).find(w=>low.includes(w.replace('_',' ')))] || null));
-    if (n && n >= 1 && n <= 20) { handleCountFree(n); return; }
-    await isaSays(["lol just give me a number 😭 how many total?"]);
-    chips([1,2,3,4,5].map(x => ({label:x===1?"just me 🙋":x+" of us", value:x})), handleCount);
+    const words = {"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8};
+    let n = m ? parseInt(m[0],10) : null;
+    if (n === null) {
+      if (/(just me|solo yo|only me|myself)/.test(low)) n = 1;
+      else { const w = Object.keys(words).find(w => low.includes(w)); if (w) n = words[w]; }
+    }
+    if (n && n >= 1 && n <= 30) { await confirmCount(n); return; }
+    await isaSays([`lol just give me a number 😭 how many total? (you've got ${allowed()} spots)`]);
+    chips(countChips(), handleCount);
     return;
   }
-  // idle / done — small talk
-  if (/\b(gift|regalo|bring)\b/.test(low)) {
-    await isaSays(["your presence is the present 🥹💕 but if you insist… there's a lil wishlist at the party 😌"]);
-  } else if (/\b(dress|wear|outfit|code)\b/.test(low)) {
-    await isaSays(["formal!! rosa & gold vibes 🌹✨ check the “dress code” highlight on my profile!"]);
-  } else if (/\b(time|when|hora)\b/.test(low)) {
-    await isaSays(["misa at 2:00, doors at 5:00, vals at 6:30 SHARP 💃 it's all in my “schedule” highlight!"]);
-  } else if (/\b(where|address|venue|donde|dónde)\b/.test(low)) {
-    await isaSays(["Grand Salon Ballroom · 4500 Fiesta Blvd, San Antonio 🏛️ free parking, reinforced dance floor. we checked 😌"]);
-  } else {
-    await isaSays(["hehe 💕 check my highlights for all the details — and if you haven't RSVP'd yet, say “yes”!! 👀"]);
+
+  const ans = qaBrain(low);
+  await isaSays([ans || FALLBACKS[(fallbackIdx++) % FALLBACKS.length]]);
+  if (!store.get("rsvp", null) && dmState === "done") {
+    /* nudge unRSVPd chatters gently */
   }
-}
-async function handleCountFree(n){
-  pendingRSVP.count = n;
-  store.set("rsvp", { status:"yes", count:n });
-  renderFollowers();
-  await isaSays([
-    `${n === 1 ? "just you" : n + " people"} — locked in 📝✨`,
-    "you're OFFICIALLY confirmed for my quince 👑",
-    "Nov 14 · Grand Salon Ballroom · rosa & gold 💃 see you there!!",
-  ]);
-  dmState = "done";
-  toast("RSVP confirmed! You're on the list 🎉");
 }
 
 /* ============================================================
-   TOAST
+   TOAST + INIT
    ============================================================ */
 let toastTimer;
 function toast(msg){
@@ -1023,10 +1356,14 @@ function toast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("on"), 2400);
 }
-
-/* init */
+function handleHash(){
+  if (location.hash === "#dm" && profile) { openDM(); history.replaceState(null,"",location.pathname); }
+}
 renderFollowers();
 renderFollowBtn();
+renderGrid();
+refreshIdentity();
+if (profile) handleHash();
 </script>
 </body>
 </html>

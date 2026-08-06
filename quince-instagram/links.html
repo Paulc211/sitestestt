@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>@isabella.turns.xv | Linktree</title>
+<meta name="theme-color" content="#0d0a12">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👑</text></svg>">
+<style>
+:root{
+  --rosa:#e5397f; --gold:#d9b25a; --white:#f5f5f4; --grey:#a8a8b0;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  min-height:100dvh;font-family:var(--sans);color:var(--white);
+  background:linear-gradient(175deg,#2b0f22 0%,#0d0a12 45%,#0d0a12 70%,#1a1024 100%);
+  display:flex;justify-content:center;
+}
+.wrap{width:100%;max-width:430px;padding:56px 24px 40px;display:flex;flex-direction:column;align-items:center}
+.av-ring{
+  width:96px;height:96px;border-radius:50%;padding:3px;
+  background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7);
+}
+.av{
+  width:100%;height:100%;border-radius:50%;border:3px solid #0d0a12;
+  background:radial-gradient(circle at 30% 25%,#3c2a3f,#17111c 70%);
+  display:flex;align-items:center;justify-content:center;font-size:2.4rem;
+}
+h1{font-size:1.15rem;font-weight:800;margin-top:14px}
+.sub{font-size:.85rem;color:var(--grey);margin-top:4px;text-align:center;line-height:1.5}
+.links{width:100%;display:flex;flex-direction:column;gap:14px;margin-top:30px}
+a.link,button.link{
+  display:flex;align-items:center;gap:14px;width:100%;text-decoration:none;color:var(--white);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);
+  border-radius:16px;padding:16px 18px;font-size:.95rem;font-weight:600;font-family:var(--sans);
+  cursor:pointer;transition:transform .12s, background .2s;
+}
+a.link:active,button.link:active{transform:scale(.97);background:rgba(255,255,255,.12)}
+.link .ic{font-size:1.4rem;flex:0 0 auto}
+.link .lbl{flex:1;text-align:left;line-height:1.35}
+.link .lbl small{display:block;font-weight:400;font-size:.75rem;color:var(--grey)}
+.link.star{
+  background:linear-gradient(135deg,rgba(229,57,127,.28),rgba(217,178,90,.2));
+  border-color:rgba(229,57,127,.5);
+}
+.foot{margin-top:auto;padding-top:44px;font-size:.72rem;color:var(--grey);text-align:center;line-height:1.7}
+.foot b{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="av-ring"><div class="av">👑</div></div>
+  <h1>@isabella.turns.xv</h1>
+  <div class="sub">mis quince años 👑 Nov 14, 2026<br>everything you need for the big night ↓</div>
+
+  <div class="links">
+    <a class="link star" href="memories.html">
+      <span class="ic">📸</span>
+      <span class="lbl">Party Cam — drop your pics &amp; vids
+        <small>upload your photos and videos during the party!</small></span>
+    </a>
+    <button class="link" onclick="downloadICS()">
+      <span class="ic">📅</span>
+      <span class="lbl">Add my quince to your calendar
+        <small>Saturday, November 14, 2026</small></span>
+    </button>
+    <a class="link" href="https://maps.google.com/?q=The%20Grand%20Salon%20Ballroom%2C%204500%20Fiesta%20Boulevard%2C%20San%20Antonio%2C%20TX%2078205" target="_blank" rel="noopener">
+      <span class="ic">📍</span>
+      <span class="lbl">Open the venue in Maps
+        <small>Grand Salon Ballroom · San Antonio, TX</small></span>
+    </a>
+    <a class="link" href="index.html#dm">
+      <span class="ic">💌</span>
+      <span class="lbl">RSVP — slide into my DMs
+        <small>tell me you're coming!!</small></span>
+    </a>
+    <button class="link" onclick="toggleSong(this)">
+      <span class="ic" id="songIc">🎵</span>
+      <span class="lbl">Play our song
+        <small>Paint The Town Red · Doja Cat</small></span>
+    </button>
+    <a class="link" href="index.html">
+      <span class="ic">👑</span>
+      <span class="lbl">Back to my profile
+        <small>@isabella.turns.xv</small></span>
+    </a>
+  </div>
+
+  <div class="foot">made with 💕 for <b>November 14, 2026</b><br>rosa &amp; gold · Grand Salon Ballroom</div>
+</div>
+
+<audio id="song" src="paint-the-town-red.mp3" preload="none"></audio>
+<script>
+function downloadICS(){
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//isabella.turns.xv//EN",
+    "BEGIN:VEVENT",
+    "UID:isabella-quince-2026@turns.xv",
+    "DTSTART:20261114T200000Z",
+    "DTEND:20261115T050000Z",
+    "SUMMARY:Isabella's Quinceañera 👑",
+    "LOCATION:The Grand Salon Ballroom\\, 4500 Fiesta Boulevard\\, San Antonio\\, TX 78205",
+    "DESCRIPTION:Misa at St. Mary's Church 2:00 PM\\, reception at the Grand Salon. Rosa & gold formal. Vals at 6:30 sharp!",
+    "END:VEVENT","END:VCALENDAR",
+  ].join("\r\n");
+  const blob = new Blob([ics], {type:"text/calendar"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "isabella-quince.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+const song = document.getElementById("song");
+function toggleSong(btn){
+  const ic = document.getElementById("songIc");
+  if (song.paused) { song.play(); ic.textContent = "⏸️"; }
+  else { song.pause(); ic.textContent = "🎵"; }
+}
+song.addEventListener("ended", () => document.getElementById("songIc").textContent = "🎵");
+</script>
+</body>
+</html>
