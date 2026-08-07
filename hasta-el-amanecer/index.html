@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ISABELLA XV · Hasta El Amanecer</title>
 <meta name="theme-color" content="#0b0014">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🪩%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Great+Vibes&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
@@ -44,7 +45,7 @@
     transition:background 3s ease;
   }
   #lasers{position:fixed;inset:0;z-index:2;pointer-events:none;width:100%;height:100%}
-  #confetti{position:fixed;inset:0;z-index:50;pointer-events:none;width:100%;height:100%}
+  #confetti{position:fixed;inset:0;z-index:60;pointer-events:none;width:100%;height:100%}
   #grain{
     position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
@@ -401,6 +402,7 @@ function tickCountdown(){
 $('demoPill').addEventListener('click', startDrop);
 
 /* ---------- THE DROP (synced to the track) ---------- */
+let dropDeadline = 0;
 function startDrop(){
   if (state !== 'countdown') return;
   state = 'drop';
@@ -408,9 +410,12 @@ function startDrop(){
   $('countdown').classList.remove('active');
   $('drop').classList.add('active');
 
-  // quick fade, seek to the riser, fade back in
+  // quick fade, seek to the riser, fade back in.
+  // If the host can't seek (no range request support), a wall-clock
+  // deadline keeps the countdown + drop firing on schedule anyway.
   fadeTo(0, 250, () => {
-    track.currentTime = RISER_START;
+    try { track.currentTime = RISER_START; } catch(e) {}
+    dropDeadline = performance.now() + (DROP_AT - RISER_START) * 1000;
     track.play().catch(()=>{});
     fadeTo(1, 200);
     requestAnimationFrame(dropLoop);
@@ -421,7 +426,8 @@ let lastShownNum = null;
 function dropLoop(){
   if (state !== 'drop') return;
   const t = track.currentTime;
-  const remaining = DROP_AT - t;
+  const seeked = t > RISER_START - 2 && t < DROP_AT + 2;
+  const remaining = seeked ? DROP_AT - t : (dropDeadline - performance.now()) / 1000;
   if (remaining <= 0){ theDrop(); return; }
   const n = Math.ceil(remaining);
   if (n <= 4 && n !== lastShownNum){
