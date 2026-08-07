@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07060c">
+<title>Isabella Montalvo — Mis Quince Años</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     HOLOGRAPHIC TILT INVITATION · Montalvo Studio
+     ─────────────────────────────────────────────────────────────────────
+     EVERYTHING YOU NEED TO EDIT IS MARKED WITH  ★ EDIT  comments:
+       1. The honoree's photo        → search for "★ EDIT: PHOTO"
+       2. Names, date, venue, times  → search for "★ EDIT: EVENT" (one JS
+          object drives the countdown + maps button) and the hero card text.
+       3. RSVP backend (optional)    → search for "★ EDIT: RSVP" — paste a
+          Google Apps Script URL to go live; leave blank for demo mode.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── Design tokens ─────────────────────────────────────── */
+:root{
+  --bg:#07060c;
+  --bg-2:#0d0a18;
+  --ink:#f4eee6;
+  --ink-dim:#b9b0c9;
+  --ink-faint:#7d7492;
+  --gold:#d9b46a;
+  --gold-soft:#efdcae;
+  --violet:#8b6fd8;
+  --card-r:22px;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Jost","Helvetica Neue",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-weight:300;
+  overflow-x:hidden;
+  min-height:100svh;
+}
+
+/* ── Cinematic backdrop: vignette + drifting glow + stars ─ */
+.backdrop{
+  position:fixed;inset:0;z-index:-1;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #141026 0%, var(--bg) 55%),
+    var(--bg);
+}
+.backdrop::before{               /* slow aurora wash behind the card */
+  content:"";position:absolute;inset:-40%;
+  background:
+    radial-gradient(38% 30% at 30% 40%, rgba(110,60,220,.16), transparent 70%),
+    radial-gradient(32% 26% at 72% 60%, rgba(40,150,220,.12), transparent 70%),
+    radial-gradient(26% 22% at 55% 25%, rgba(220,120,200,.09), transparent 70%);
+  animation:aurora 26s ease-in-out infinite alternate;
+}
+@keyframes aurora{
+  0%{transform:translate3d(-3%,-2%,0) rotate(-2deg)}
+  100%{transform:translate3d(3%,2%,0) rotate(2deg)}
+}
+.backdrop::after{                /* fine star field */
+  content:"";position:absolute;inset:0;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, rgba(255,255,255,.5), transparent 100%),
+    radial-gradient(1px 1px at 78% 12%, rgba(255,255,255,.35), transparent 100%),
+    radial-gradient(1.5px 1.5px at 30% 74%, rgba(255,255,255,.3), transparent 100%),
+    radial-gradient(1px 1px at 64% 48%, rgba(255,255,255,.4), transparent 100%),
+    radial-gradient(1px 1px at 88% 80%, rgba(255,255,255,.3), transparent 100%),
+    radial-gradient(1.5px 1.5px at 44% 8%, rgba(255,255,255,.35), transparent 100%),
+    radial-gradient(1px 1px at 8% 56%, rgba(255,255,255,.3), transparent 100%),
+    radial-gradient(1px 1px at 55% 90%, rgba(255,255,255,.35), transparent 100%);
+  animation:twinkle 7s ease-in-out infinite alternate;
+}
+@keyframes twinkle{from{opacity:.45}to{opacity:1}}
+
+/* ── Hero stage ────────────────────────────────────────── */
+.hero{
+  min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 20px 72px;position:relative;
+}
+.hero-kicker{
+  font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:26px;text-align:center;
+  animation:fadeDown 1.4s .2s ease both;
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+
+/* Perspective frame around the card */
+.stage{
+  perspective:1200px;
+  animation:cardIn 1.6s .4s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(34px) scale(.94)}
+  to{opacity:1;transform:none}
+}
+
+/* ── The holographic card ──────────────────────────────── */
+/* Tilt is driven by CSS custom properties set from JS:
+   --rx / --ry  → 3-D rotation (deg)
+   --fx / --fy  → foil gradient position (%)
+   --gx / --gy  → glare highlight position (%)
+   --tilt       → 0-1 tilt magnitude, drives glow + shadow depth   */
+.card{
+  --rx:0deg;--ry:0deg;--fx:50%;--fy:50%;--gx:50%;--gy:38%;--tilt:0;
+  position:relative;
+  width:min(76vw,330px);
+  aspect-ratio:5/7;                     /* trading-card 2.5" × 3.5" */
+  border-radius:var(--card-r);
+  transform:rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style:preserve-3d;
+  cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+  background:
+    linear-gradient(160deg,#1b1530 0%,#0e0b1c 45%,#191231 100%);
+  box-shadow:
+    0 34px 70px -20px rgba(0,0,0,.8),
+    0 0 calc(26px + 60px*var(--tilt)) rgba(139,111,216, calc(.14 + .4*var(--tilt))),
+    0 0 calc(14px + 44px*var(--tilt)) rgba(64,190,255, calc(.08 + .32*var(--tilt)));
+  transition:box-shadow .25s ease;
+}
+/* thin metallic frame line */
+.card::before{
+  content:"";position:absolute;inset:9px;border-radius:calc(var(--card-r) - 7px);
+  border:1px solid rgba(217,180,106,.55);
+  pointer-events:none;z-index:6;
+}
+.card-inner{
+  position:absolute;inset:0;border-radius:inherit;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* ── Foil + glare layers (the holo magic) ──────────────── */
+.foil{
+  position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(115deg,
+    transparent 18%,
+    rgba(255,60,150,.55) 32%,
+    rgba(255,214,64,.5)  40%,
+    rgba(80,255,170,.5)  48%,
+    rgba(60,190,255,.55) 56%,
+    rgba(160,80,255,.5)  64%,
+    transparent 80%);
+  background-size:260% 260%;
+  background-position:var(--fx) var(--fy);
+  mix-blend-mode:color-dodge;
+  opacity:calc(.34 + .5*var(--tilt));
+  filter:saturate(1.4) blur(.5px);
+}
+.foil-grain{                     /* micro-line texture so foil reads as etched */
+  position:absolute;inset:0;z-index:4;border-radius:inherit;pointer-events:none;
+  background:repeating-linear-gradient(115deg,
+    rgba(255,255,255,.05) 0 1px, transparent 1px 4px);
+  mix-blend-mode:soft-light;opacity:.7;
+}
+.glare{
+  position:absolute;inset:0;z-index:5;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(60% 48% at var(--gx) var(--gy),
+    rgba(255,255,255,.5), rgba(255,255,255,.08) 46%, transparent 70%);
+  mix-blend-mode:overlay;
+  opacity:calc(.35 + .55*var(--tilt));
+}
+
+/* ── Card face content ─────────────────────────────────── */
+.card-top{
+  text-align:center;padding:26px 18px 0;z-index:2;
+}
+.card-crest{
+  font-family:var(--serif);font-size:.95rem;letter-spacing:.5em;
+  color:var(--gold);text-indent:.5em;
+}
+.card-rule{
+  width:42px;height:1px;margin:10px auto 0;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* ★ EDIT: PHOTO ───────────────────────────────────────────
+   The .photo block below is a styled gradient placeholder.
+   To use a real photo, add e.g.
+       background:url("isabella.jpg") center/cover no-repeat;
+   to .photo (keep the ::after veil — it helps text legibility)
+   and delete the .photo-mark monogram if you like. */
+.photo{
+  position:relative;flex:1;margin:18px 22px 0;z-index:2;
+  border-radius:12px;overflow:hidden;
+  background:
+    radial-gradient(80% 60% at 50% 28%, rgba(217,180,106,.35), transparent 60%),
+    linear-gradient(155deg,#3d2a63 0%,#241a44 38%,#12102a 72%,#2a1740 100%);
+  border:1px solid rgba(244,238,230,.1);
+}
+.photo::after{                   /* soft bottom veil for legibility */
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 55%,rgba(7,6,12,.55) 100%);
+}
+.photo-mark{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(3.4rem,17vw,5rem);color:rgba(244,238,230,.28);
+}
+.card-name{
+  z-index:2;text-align:center;padding:16px 14px 0;
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(1.6rem,7.4vw,2.05rem);line-height:1.05;
+  color:var(--gold-soft);
+  text-shadow:0 1px 14px rgba(217,180,106,.25);
+}
+.card-sub{
+  z-index:2;text-align:center;
+  font-size:.66rem;letter-spacing:.38em;text-transform:uppercase;
+  color:var(--ink-dim);margin-top:8px;text-indent:.38em;
+}
+.card-date{
+  z-index:2;text-align:center;padding:10px 0 22px;
+  font-family:var(--serif);font-style:italic;font-size:1.02rem;
+  color:var(--ink-dim);
+}
+
+/* ── "Tap to Reveal" sensor-permission veil (iOS 13+) ──── */
+.reveal-veil{
+  position:absolute;inset:0;z-index:8;border-radius:inherit;
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  background:rgba(7,6,12,.66);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  border:none;width:100%;color:var(--ink);cursor:pointer;font-family:var(--sans);
+}
+.reveal-veil.show{display:flex;animation:veilIn .6s ease}
+@keyframes veilIn{from{opacity:0}to{opacity:1}}
+.reveal-veil .spark{
+  font-size:1.5rem;color:var(--gold);
+  animation:sparkPulse 2.2s ease-in-out infinite;
+}
+@keyframes sparkPulse{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.25);opacity:1}}
+.reveal-veil .label{
+  font-size:.78rem;letter-spacing:.4em;text-transform:uppercase;text-indent:.4em;
+}
+.reveal-veil .hint{font-size:.68rem;color:var(--ink-faint);letter-spacing:.12em}
+
+.tilt-hint{
+  margin-top:30px;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:center;text-indent:.3em;
+  animation:fadeDown 1.4s 1.2s ease both;
+}
+.scroll-cue{
+  position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  color:var(--ink-faint);animation:cueBob 2.4s ease-in-out infinite;
+}
+.scroll-cue svg{width:22px;height:22px}
+@keyframes cueBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+/* ── Content sections below the hero ───────────────────── */
+main{max-width:600px;margin:0 auto;padding:0 22px 90px}
+section{padding:58px 0 6px}
+.sec-kicker{
+  font-size:.68rem;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:center;text-indent:.4em;
+}
+.sec-title{
+  font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,8vw,2.5rem);
+  text-align:center;color:var(--ink);margin-top:8px;
+}
+.sec-rule{
+  width:52px;height:1px;margin:16px auto 34px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.reveal-on-scroll{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease}
+.reveal-on-scroll.in{opacity:1;transform:none}
+
+/* Detail cards */
+.detail-card{
+  background:linear-gradient(165deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
+  border:1px solid rgba(244,238,230,.1);
+  border-radius:16px;padding:26px 24px;margin-bottom:16px;
+  text-align:center;
+}
+.detail-card h3{
+  font-family:var(--serif);font-weight:500;font-size:1.4rem;color:var(--gold-soft);
+}
+.detail-card .when{
+  font-size:.74rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-dim);margin-top:8px;
+}
+.detail-card .where{
+  font-family:var(--serif);font-style:italic;font-size:1.06rem;
+  color:var(--ink-dim);margin-top:10px;line-height:1.5;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;margin-top:18px;
+  padding:13px 26px;border-radius:999px;border:1px solid rgba(217,180,106,.5);
+  background:transparent;color:var(--gold-soft);
+  font-family:var(--sans);font-size:.74rem;letter-spacing:.24em;text-transform:uppercase;
+  text-decoration:none;cursor:pointer;transition:background .3s,color .3s,border-color .3s;
+}
+.btn:hover{background:rgba(217,180,106,.12);border-color:var(--gold)}
+.btn.solid{
+  background:linear-gradient(120deg,#c9a254,#e8cd8c 50%,#c9a254);
+  color:#1c1428;border:none;font-weight:500;
+}
+.btn.solid:hover{filter:brightness(1.08)}
+.btn svg{width:15px;height:15px}
+
+/* Dress code swatches */
+.swatches{display:flex;justify-content:center;gap:14px;margin-top:20px}
+.swatch{width:34px;height:34px;border-radius:50%;border:1px solid rgba(244,238,230,.25)}
+.dress-note{
+  color:var(--ink-dim);font-size:.95rem;line-height:1.7;max-width:420px;margin:14px auto 0;
+}
+
+/* Countdown */
+.count-grid{display:flex;justify-content:center;gap:12px}
+.count-cell{
+  min-width:74px;padding:18px 8px 14px;border-radius:14px;
+  background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid rgba(244,238,230,.1);text-align:center;
+}
+.count-cell b{
+  display:block;font-family:var(--serif);font-weight:500;
+  font-size:2rem;color:var(--gold-soft);font-variant-numeric:tabular-nums;
+}
+.count-cell span{
+  font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint);
+}
+@media(max-width:360px){.count-cell{min-width:64px}}
+
+/* ── RSVP (phone-number invitation lookup) ─────────────── */
+.rsvp-card{
+  background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid rgba(244,238,230,.12);
+  border-radius:18px;padding:34px 26px;
+}
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:9px;
+}
+.field input{
+  width:100%;padding:14px 16px;border-radius:10px;
+  border:1px solid rgba(244,238,230,.16);background:rgba(7,6,12,.5);
+  color:var(--ink);font-family:var(--sans);font-size:1rem;font-weight:300;
+  outline:none;transition:border-color .3s,box-shadow .3s;
+}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,180,106,.14)}
+.field input::placeholder{color:var(--ink-faint)}
+
+.invite-ticket{
+  display:none;margin:6px 0 20px;padding:20px 18px;border-radius:12px;text-align:center;
+  border:1px dashed rgba(217,180,106,.5);
+  background:
+    linear-gradient(115deg,rgba(255,60,150,.05),rgba(60,190,255,.05),rgba(160,80,255,.05)),
+    rgba(217,180,106,.05);
+}
+.invite-ticket.show{display:block;animation:ticketIn .6s cubic-bezier(.2,.7,.2,1)}
+@keyframes ticketIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.t-kicker{font-size:.64rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);text-indent:.34em}
+.t-line{font-family:var(--serif);font-style:italic;font-size:1.06rem;color:var(--ink-dim);margin-top:8px}
+.t-seats{font-family:var(--serif);font-size:2.2rem;color:var(--gold-soft);margin-top:4px}
+.t-seats small{font-size:1rem;font-style:italic;color:var(--ink-dim)}
+.stepper-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}
+.stepper-row button{
+  width:40px;height:40px;border-radius:50%;border:1px solid rgba(217,180,106,.5);
+  background:transparent;color:var(--gold-soft);font-size:1.25rem;cursor:pointer;
+  transition:background .25s;
+}
+.stepper-row button:hover{background:rgba(217,180,106,.12)}
+.stepper-row .count{font-family:var(--serif);font-size:1.7rem;min-width:34px;color:var(--ink)}
+.stepper-row .of{font-size:.72rem;letter-spacing:.18em;color:var(--ink-faint)}
+.avail-msg{margin-top:12px;font-size:.85rem;color:var(--ink-dim);font-style:italic;min-height:1.2em}
+.avail-msg.warn{color:#e08a9a}
+#rsvpForm .btn{width:100%;justify-content:center;margin-top:6px}
+#rsvpForm .btn[disabled]{opacity:.35;pointer-events:none}
+.rsvp-done{display:none;text-align:center;padding:10px 0}
+.rsvp-done.show{display:block;animation:ticketIn .8s ease}
+.rsvp-done .ring{width:70px;height:70px;margin:0 auto 20px;color:var(--gold)}
+.rsvp-done .ring svg{width:100%;height:100%}
+.rsvp-done h3{font-family:var(--serif);font-weight:500;font-size:1.8rem;color:var(--gold-soft)}
+.rsvp-done p{color:var(--ink-dim);margin-top:10px;font-size:.95rem;line-height:1.6}
+.demo-note{
+  margin-top:20px;text-align:center;font-size:.7rem;letter-spacing:.06em;
+  color:var(--ink-faint);
+}
+.lookup-spin{
+  display:none;margin:0 auto 16px;width:22px;height:22px;border-radius:50%;
+  border:2px solid rgba(217,180,106,.25);border-top-color:var(--gold);
+  animation:spin 1s linear infinite;
+}
+.lookup-spin.show{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{
+  text-align:center;padding:30px 20px 54px;color:var(--ink-faint);
+}
+footer .crest{font-family:var(--serif);letter-spacing:.5em;text-indent:.5em;color:var(--gold);font-size:.9rem}
+footer p{font-size:.72rem;letter-spacing:.14em;margin-top:12px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="backdrop" aria-hidden="true"></div>
+
+<!-- ══════════════ HERO · THE HOLOGRAPHIC CARD ══════════════ -->
+<header class="hero">
+  <p class="hero-kicker">You are cordially invited</p>
+
+  <div class="stage">
+    <!-- Tap the card to open the invitation details below -->
+    <div class="card" id="holoCard" role="button" tabindex="0" aria-label="Invitation card — tap to view event details">
+      <div class="card-inner">
+        <div class="card-top">
+          <!-- ★ EDIT: EVENT — crest / monogram text -->
+          <div class="card-crest">XV</div>
+          <div class="card-rule"></div>
+        </div>
+
+        <!-- ★ EDIT: PHOTO — replace this gradient block with the real photo
+             (see the .photo CSS rule above for the one-line swap) -->
+        <div class="photo">
+          <div class="photo-mark">I</div>
+        </div>
+
+        <!-- ★ EDIT: EVENT — name, occasion, date shown on the card face -->
+        <div class="card-name">Isabella Montalvo</div>
+        <div class="card-sub">Mis Quince Años</div>
+        <div class="card-date">Saturday · November 14, 2026</div>
+      </div>
+
+      <!-- holographic layers -->
+      <div class="foil" aria-hidden="true"></div>
+      <div class="foil-grain" aria-hidden="true"></div>
+      <div class="glare" aria-hidden="true"></div>
+
+      <!-- iOS 13+ motion-sensor gate: shown only when permission is needed -->
+      <button class="reveal-veil" id="revealVeil" type="button">
+        <span class="spark">✦</span>
+        <span class="label">Tap to Reveal</span>
+        <span class="hint">then tilt your phone to catch the light</span>
+      </button>
+    </div>
+  </div>
+
+  <p class="tilt-hint" id="tiltHint">Tilt your phone to catch the light</p>
+
+  <a class="scroll-cue" href="#details" aria-label="Scroll to details">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg>
+  </a>
+</header>
+
+<main>
+
+<!-- ══════════════ EVENT DETAILS ══════════════ -->
+<section id="details">
+  <div class="reveal-on-scroll">
+    <p class="sec-kicker">The Celebration</p>
+    <h2 class="sec-title">Event Details</h2>
+    <div class="sec-rule"></div>
+  </div>
+
+  <!-- ★ EDIT: EVENT — ceremony + reception times & venue text.
+       (The "Open in Maps" link is generated from EVENT.address in the JS
+       config below, so edit it there too.) -->
+  <div class="detail-card reveal-on-scroll">
+    <h3>Ceremony</h3>
+    <p class="when">5:00 in the evening</p>
+    <p class="where">Mission San José Chapel<br>701 East Pyron Avenue, San Antonio, TX</p>
+  </div>
+
+  <div class="detail-card reveal-on-scroll">
+    <h3>Reception</h3>
+    <p class="when">7:00 · Dinner &amp; Dancing</p>
+    <p class="where">The Grand Salon Ballroom<br>4500 Fiesta Boulevard, San Antonio, TX</p>
+    <a class="btn" id="mapsBtn" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      Open in Maps
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════ DRESS CODE ══════════════ -->
+<section id="dress">
+  <div class="reveal-on-scroll">
+    <p class="sec-kicker">What to wear</p>
+    <h2 class="sec-title">Dress Code</h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="detail-card reveal-on-scroll">
+    <h3>Formal · Midnight &amp; Jewel Tones</h3>
+    <div class="swatches" aria-hidden="true">
+      <span class="swatch" style="background:#141026"></span>
+      <span class="swatch" style="background:#3d2a63"></span>
+      <span class="swatch" style="background:#1d4b6e"></span>
+      <span class="swatch" style="background:#6e2440"></span>
+      <span class="swatch" style="background:linear-gradient(135deg,#c9a254,#e8cd8c)"></span>
+    </div>
+    <!-- ★ EDIT: EVENT — dress code note -->
+    <p class="dress-note">
+      Dress to shimmer — deep blues, violets, emeralds and gold.
+      We kindly ask guests to leave white and blush to the birthday girl.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ COUNTDOWN ══════════════ -->
+<section id="countdown">
+  <div class="reveal-on-scroll">
+    <p class="sec-kicker">Counting down</p>
+    <h2 class="sec-title">Until the First Dance</h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="count-grid reveal-on-scroll" id="countGrid">
+    <div class="count-cell"><b id="cdD">–</b><span>Days</span></div>
+    <div class="count-cell"><b id="cdH">–</b><span>Hours</span></div>
+    <div class="count-cell"><b id="cdM">–</b><span>Min</span></div>
+    <div class="count-cell"><b id="cdS">–</b><span>Sec</span></div>
+  </div>
+</section>
+
+<!-- ══════════════ RSVP ══════════════ -->
+<section id="rsvp">
+  <div class="reveal-on-scroll">
+    <p class="sec-kicker">Kindly respond by October 24, 2026</p>
+    <h2 class="sec-title">RSVP</h2>
+    <div class="sec-rule"></div>
+  </div>
+
+  <div class="rsvp-card reveal-on-scroll">
+    <form id="rsvpForm" novalidate>
+      <div class="field">
+        <label for="rName">Full name</label>
+        <input id="rName" type="text" placeholder="As it appears on your invitation" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="rPhone">Phone number</label>
+        <input id="rPhone" type="tel" placeholder="(555) 555-5555" autocomplete="tel" required>
+      </div>
+
+      <div class="lookup-spin" id="lookupSpin" aria-hidden="true"></div>
+
+      <div class="invite-ticket" id="inviteTicket">
+        <p class="t-kicker">Invitation found</p>
+        <p class="t-line" id="ticketLine">Welcome.</p>
+        <div class="t-seats"><span id="ticketSeats">2</span> <small id="ticketSeatsWord">seats</small></div>
+        <div class="stepper-row">
+          <button type="button" id="stepDown" aria-label="Fewer guests">&minus;</button>
+          <div class="count" id="partyCount">1</div>
+          <button type="button" id="stepUp" aria-label="More guests">+</button>
+          <span class="of" id="ofMax">of 2</span>
+        </div>
+        <p class="avail-msg" id="availMsg"></p>
+      </div>
+
+      <button class="btn solid" type="submit" id="reserveBtn" disabled>Reserve our seats</button>
+    </form>
+
+    <div class="rsvp-done" id="rsvpDone">
+      <div class="ring">
+        <svg viewBox="0 0 74 74" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="37" cy="37" r="33" stroke="#8b6fd8"/>
+          <path d="M22 38l10 10 20-22" stroke-width="2"/>
+        </svg>
+      </div>
+      <h3 id="doneTitle">Thank you!</h3>
+      <p id="doneMsg">Your seats are saved.</p>
+    </div>
+
+    <p class="demo-note" id="demoNote">
+      Demo mode — invitations are simulated in your browser, no data is sent anywhere.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="crest">XV</div>
+  <p>ISABELLA MONTALVO · 11 · 14 · 2026 · SAN ANTONIO</p>
+</footer>
+
+<script>
+/* ═════════════════════════════════════════════════════════
+   ★ EDIT: EVENT — one object drives countdown + maps button
+   ═════════════════════════════════════════════════════════ */
+const EVENT = {
+  start: new Date("2026-11-14T17:00:00"),          // ceremony start (local time)
+  address: "The Grand Salon Ballroom, 4500 Fiesta Boulevard, San Antonio, TX 78205"
+};
+
+/* ═════════════════════════════════════════════════════════
+   ★ EDIT: RSVP — demo mode
+   ─────────────────────────────────────────────────────────
+   The RSVP runs entirely in the browser: the phone-number
+   lookup "finds" a simulated invitation (2–6 seats, always
+   the same for the same guest) and nothing is sent anywhere.
+   The code below is already wired so a Google Sheets + Apps
+   Script Web-App URL can be pasted here later to go live —
+   for now, leave it "" for demo mode.
+   ═════════════════════════════════════════════════════════ */
+const RSVP_SCRIPT_URL = "";   // demo mode — leave blank
+
+/* ═════════════════════════════════════════════════════════
+   HOLOGRAPHIC TILT ENGINE (vanilla JS)
+   ─────────────────────────────────────────────────────────
+   Sources, in order of preference:
+     1. DeviceOrientationEvent (phones — iOS asks permission
+        via the themed "Tap to Reveal" veil, never a raw popup)
+     2. Mouse position over the hero (desktop fallback)
+     3. Neither → a slow idle shimmer keeps the card alive
+   All motion is lerped in one rAF loop and written to CSS
+   custom properties that drive transform, foil, glare, glow.
+   ═════════════════════════════════════════════════════════ */
+(() => {
+  const card  = document.getElementById("holoCard");
+  const veil  = document.getElementById("revealVeil");
+  const hint  = document.getElementById("tiltHint");
+  const MAX   = 16;                 // max card rotation, deg
+  const RANGE = 26;                 // phone-tilt degrees mapped onto MAX
+
+  let targetRX = 0, targetRY = 0;   // where the card wants to be
+  let rx = 0, ry = 0;               // where it is (lerped)
+  let baseBeta = null, baseGamma = null;   // neutral holding angle
+  let lastInput = 0;                // ms timestamp of last real input
+  let usingOrientation = false;
+
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* — source 1: device orientation — */
+  function onOrient(e){
+    if (e.beta == null || e.gamma == null) return;
+    if (baseBeta === null){ baseBeta = e.beta; baseGamma = e.gamma; }
+    usingOrientation = true;
+    lastInput = performance.now();
+    targetRX = -(clamp(e.beta  - baseBeta,  -RANGE, RANGE) / RANGE) * MAX;
+    targetRY =  (clamp(e.gamma - baseGamma, -RANGE, RANGE) / RANGE) * MAX;
+  }
+  function startOrientation(){
+    window.addEventListener("deviceorientation", onOrient, true);
+  }
+
+  /* iOS 13+ requires a user gesture before granting sensors —
+     the themed veil on the card is that gesture. */
+  const needsPermission =
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function";
+
+  if (needsPermission){
+    veil.classList.add("show");
+    veil.addEventListener("click", (ev) => {
+      ev.stopPropagation();                     // don't also trigger card tap
+      DeviceOrientationEvent.requestPermission()
+        .then(state => { if (state === "granted") startOrientation(); })
+        .catch(() => {})                        // denied → mouse/idle fallback
+        .finally(() => veil.classList.remove("show"));
+    });
+  } else if ("DeviceOrientationEvent" in window){
+    startOrientation();                         // Android & older iOS: no gate
+  }
+
+  /* — source 2: mouse over the page (desktop) — */
+  addEventListener("mousemove", (e) => {
+    if (usingOrientation) return;               // sensors win once they speak
+    lastInput = performance.now();
+    const r = card.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    targetRY =  clamp((e.clientX - cx) / (r.width  * 1.1), -1, 1) * MAX;
+    targetRX = -clamp((e.clientY - cy) / (r.height * 1.1), -1, 1) * MAX;
+  });
+  addEventListener("mouseleave", () => { targetRX = 0; targetRY = 0; });
+
+  /* Recalibrate neutral angle on tap-hold?  Simpler: double-tap the
+     card face resets the baseline to however the phone is held now. */
+  let lastTap = 0;
+  card.addEventListener("click", () => {
+    const now = performance.now();
+    if (now - lastTap < 350){ baseBeta = baseGamma = null; }
+    lastTap = now;
+    document.getElementById("details").scrollIntoView({ behavior: "smooth" });
+  });
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      document.getElementById("details").scrollIntoView({ behavior: "smooth" });
+    }
+  });
+
+  /* — the render loop — */
+  function frame(t){
+    // source 3: idle shimmer after 3 s of stillness (unless reduced motion)
+    if (!reduced && t - lastInput > 3000){
+      targetRX = Math.sin(t / 2400) * 4;
+      targetRY = Math.cos(t / 3100) * 6;
+    }
+    rx += (targetRX - rx) * 0.09;
+    ry += (targetRY - ry) * 0.09;
+
+    const nx = ry / MAX, ny = rx / MAX;             // normalised −1…1
+    const tilt = Math.min(1, Math.hypot(nx, ny));   // 0…1 magnitude
+
+    card.style.setProperty("--rx", rx.toFixed(2) + "deg");
+    card.style.setProperty("--ry", ry.toFixed(2) + "deg");
+    card.style.setProperty("--fx", (50 + nx * 42).toFixed(1) + "%");
+    card.style.setProperty("--fy", (50 + ny * 42).toFixed(1) + "%");
+    card.style.setProperty("--gx", (50 + nx * 46).toFixed(1) + "%");
+    card.style.setProperty("--gy", (38 - ny * 40).toFixed(1) + "%");
+    card.style.setProperty("--tilt", tilt.toFixed(3));
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* If sensors never speak on a coarse-pointer device, soften the hint */
+  setTimeout(() => {
+    if (!usingOrientation && !needsPermission && matchMedia("(pointer:coarse)").matches){
+      hint.textContent = "Tap the card to open your invitation";
+    } else if (matchMedia("(pointer:fine)").matches){
+      hint.textContent = "Move your cursor over the card";
+    }
+  }, 2500);
+})();
+
+/* ═════════════ Open in Maps ═════════════ */
+document.getElementById("mapsBtn").href =
+  "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(EVENT.address);
+
+/* ═════════════ Countdown ═════════════ */
+(() => {
+  const D = document.getElementById("cdD"), H = document.getElementById("cdH"),
+        M = document.getElementById("cdM"), S = document.getElementById("cdS");
+  const pad = n => String(n).padStart(2, "0");
+  function tick(){
+    let ms = EVENT.start - Date.now();
+    if (ms <= 0){ D.textContent = H.textContent = M.textContent = S.textContent = "0"; return; }
+    D.textContent = Math.floor(ms / 864e5);
+    H.textContent = pad(Math.floor(ms / 36e5) % 24);
+    M.textContent = pad(Math.floor(ms / 6e4) % 60);
+    S.textContent = pad(Math.floor(ms / 1e3) % 60);
+    setTimeout(tick, 1000);
+  }
+  tick();
+})();
+
+/* ═════════════ RSVP — phone-number invitation lookup ═════════════
+   With RSVP_SCRIPT_URL set, lookups and reservations go to your
+   Google Sheet via Apps Script. Without it, invitations are derived
+   deterministically from name + phone (2–6 seats) so the same guest
+   always sees the same card — a faithful demo of the real flow.      */
+(() => {
+  const nameIn  = document.getElementById("rName"),
+        phoneIn = document.getElementById("rPhone"),
+        ticket  = document.getElementById("inviteTicket"),
+        tLine   = document.getElementById("ticketLine"),
+        tSeats  = document.getElementById("ticketSeats"),
+        tWord   = document.getElementById("ticketSeatsWord"),
+        ofMax   = document.getElementById("ofMax"),
+        partyEl = document.getElementById("partyCount"),
+        availMsg= document.getElementById("availMsg"),
+        btn     = document.getElementById("reserveBtn"),
+        form    = document.getElementById("rsvpForm"),
+        done    = document.getElementById("rsvpDone"),
+        spin    = document.getElementById("lookupSpin"),
+        demoNote= document.getElementById("demoNote");
+
+  const live = RSVP_SCRIPT_URL.trim().length > 0;
+  if (live) demoNote.textContent = "Your response is recorded instantly with our guest list.";
+
+  let allotted = 0, party = 1, guestName = "", lookupTimer = null;
+
+  const digitsOf = v => v.replace(/\D/g, "");
+  const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+
+  /* demo fallback: stable pseudo-invitation from name + phone */
+  function demoLookup(name, digits){
+    let h = 0;
+    const s = name.toLowerCase().replace(/\s+/g, "") + digits;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return Promise.resolve({ found: true, name, seats: 2 + (h % 5) });
+  }
+  function liveLookup(digits){
+    return fetch(RSVP_SCRIPT_URL + "?action=lookup&phone=" + digits)
+      .then(r => r.json());
+  }
+
+  function showTicket(res){
+    spin.classList.remove("show");
+    if (!res.found){
+      ticket.classList.remove("show");
+      btn.disabled = true;
+      availMsg.textContent = "We couldn't find that number — please double-check it, or reach out to the family.";
+      availMsg.classList.add("warn");
+      return;
+    }
+    availMsg.classList.remove("warn");
+    allotted = Math.max(1, res.seats);
+    party = Math.min(party, allotted);
+    guestName = res.name || nameIn.value.trim();
+    const first = cap(guestName.split(" ")[0] || "");
+    tLine.textContent = `Welcome, ${first} — your invitation is valid for`;
+    tSeats.textContent = allotted;
+    tWord.textContent = allotted === 1 ? "seat" : "seats";
+    ofMax.textContent = `of ${allotted}`;
+    ticket.classList.add("show");
+    btn.disabled = false;
+    renderParty();
+  }
+
+  function check(){
+    const name = nameIn.value.trim();
+    const digits = digitsOf(phoneIn.value);
+    clearTimeout(lookupTimer);
+    if (name.length >= 2 && digits.length >= 7){
+      spin.classList.add("show");
+      lookupTimer = setTimeout(() => {
+        (live ? liveLookup(digits) : demoLookup(name, digits))
+          .then(showTicket)
+          .catch(() => {
+            spin.classList.remove("show");
+            availMsg.textContent = "We couldn't reach the guest list — please try again in a moment.";
+            availMsg.classList.add("warn");
+          });
+      }, live ? 500 : 350);
+    } else {
+      spin.classList.remove("show");
+      ticket.classList.remove("show");
+      btn.disabled = true;
+    }
+  }
+  function renderParty(){
+    partyEl.textContent = party;
+    availMsg.textContent = party === allotted
+      ? "Bringing the whole table — we love to see it."
+      : `Reserving ${party} of your ${allotted} seats.`;
+  }
+  nameIn.addEventListener("input", check);
+  phoneIn.addEventListener("input", check);
+  document.getElementById("stepUp").addEventListener("click", () => { if (party < allotted){ party++; renderParty(); } });
+  document.getElementById("stepDown").addEventListener("click", () => { if (party > 1){ party--; renderParty(); } });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (btn.disabled || allotted === 0) return;
+    btn.disabled = true;
+
+    const finish = () => {
+      form.style.display = "none";
+      const first = cap((guestName || nameIn.value.trim()).split(" ")[0] || "");
+      document.getElementById("doneTitle").textContent = `Thank you, ${first}!`;
+      document.getElementById("doneMsg").textContent =
+        `${party} of your ${allotted} seats are reserved. We can't wait to celebrate with you.`;
+      done.classList.add("show");
+    };
+
+    if (!live){ finish(); return; }
+    fetch(RSVP_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "rsvp",
+        phone: digitsOf(phoneIn.value),
+        name: nameIn.value.trim(),
+        party: String(party)
+      })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.ok) finish();
+      else throw new Error("not found");
+    })
+    .catch(() => {
+      btn.disabled = false;
+      availMsg.textContent = "Something went wrong saving your RSVP — please try again.";
+      availMsg.classList.add("warn");
+    });
+  });
+})();
+
+/* ═════════════ Scroll reveal ═════════════ */
+(() => {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { threshold: .15 });
+  document.querySelectorAll(".reveal-on-scroll").forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>
