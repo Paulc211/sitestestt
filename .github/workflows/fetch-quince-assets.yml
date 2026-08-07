@@ -1,6 +1,10 @@
 name: fetch-quince-assets
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - "claude/quinceañera-party-qr-site-pzk0ug"
+    paths:
+      - ".github/workflows/fetch-quince-assets.yml"
 
 permissions:
   contents: write
