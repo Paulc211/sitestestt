@@ -1,0 +1,16 @@
+# secrets — never commit
+.env
+
+# runtime state
+state/
+logs/
+*.db
+*.db-wal
+*.db-shm
+halt.flag
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/

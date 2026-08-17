@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRADEBOT // MISSION CONTROL</title>
+<style>
+  :root {
+    --bg: #05080d;
+    --panel: #0a1018;
+    --panel-edge: #12202e;
+    --cyan: #27d7ff;
+    --cyan-dim: #0e5a70;
+    --amber: #ffb347;
+    --red: #ff4d5e;
+    --green: #3dffa2;
+    --text: #b8cfe0;
+    --text-dim: #4f6b80;
+    --mono: "SFMono-Regular", "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(39,215,255,.06), transparent),
+      repeating-linear-gradient(0deg, transparent 0 2px, rgba(255,255,255,.008) 2px 4px);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+    padding: 14px;
+  }
+  header {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 10px 16px; margin-bottom: 14px;
+    border: 1px solid var(--panel-edge);
+    background: linear-gradient(180deg, rgba(39,215,255,.05), transparent);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  }
+  header h1 {
+    font-size: 16px; letter-spacing: .35em; color: var(--cyan);
+    text-shadow: 0 0 12px rgba(39,215,255,.6);
+  }
+  .chip {
+    padding: 3px 10px; border: 1px solid var(--panel-edge); border-radius: 2px;
+    font-size: 11px; letter-spacing: .1em; color: var(--text-dim);
+  }
+  .chip b { color: var(--text); }
+  .chip.paper b { color: var(--green); }
+  .chip.live b  { color: var(--red); text-shadow: 0 0 8px rgba(255,77,94,.8); }
+  .chip.halted { border-color: var(--red); color: var(--red);
+    animation: pulse 1.2s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  #kill {
+    margin-left: auto;
+    background: linear-gradient(180deg, #3a0a10, #21060a);
+    color: var(--red); border: 1px solid var(--red); cursor: pointer;
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+    letter-spacing: .25em; padding: 12px 26px;
+    text-shadow: 0 0 10px rgba(255,77,94,.9);
+    box-shadow: 0 0 18px rgba(255,77,94,.25), inset 0 0 12px rgba(255,77,94,.12);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  #kill:hover { background: #4d0d15; box-shadow: 0 0 30px rgba(255,77,94,.55); }
+  #resume {
+    background: transparent; color: var(--text-dim); border: 1px solid var(--panel-edge);
+    cursor: pointer; font-family: var(--mono); font-size: 11px; padding: 6px 12px;
+  }
+  #resume:hover { color: var(--green); border-color: var(--green); }
+
+  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+  .col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .panel {
+    border: 1px solid var(--panel-edge); background: var(--panel);
+    padding: 12px 14px; position: relative;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  }
+  .panel h2 {
+    font-size: 10px; letter-spacing: .3em; color: var(--cyan);
+    border-bottom: 1px solid var(--panel-edge); padding-bottom: 6px;
+    margin-bottom: 10px; text-shadow: 0 0 8px rgba(39,215,255,.4);
+  }
+  .panel h2 .live-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cyan); margin-right: 6px;
+    box-shadow: 0 0 6px var(--cyan); animation: pulse 2s infinite;
+  }
+  canvas { width: 100%; height: 220px; display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; color: var(--text-dim); font-weight: 400;
+    font-size: 10px; letter-spacing: .15em; padding: 3px 6px;
+    border-bottom: 1px solid var(--panel-edge); }
+  td { padding: 4px 6px; border-bottom: 1px solid rgba(18,32,46,.5); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pos { color: var(--green); } .neg { color: var(--red); }
+  .stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .stat { flex: 1; min-width: 110px; border: 1px solid var(--panel-edge);
+    padding: 8px 10px; background: rgba(39,215,255,.02); }
+  .stat .label { font-size: 9px; letter-spacing: .2em; color: var(--text-dim); }
+  .stat .value { font-size: 18px; margin-top: 2px; color: var(--text);
+    text-shadow: 0 0 10px rgba(39,215,255,.25); }
+  .hb { display: flex; align-items: center; gap: 8px; padding: 4px 0;
+    border-bottom: 1px solid rgba(18,32,46,.5); font-size: 12px; }
+  .hb .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.ok { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.dead { background: var(--red); box-shadow: 0 0 8px var(--red);
+    animation: pulse 1s infinite; }
+  .hb .agent { width: 90px; color: var(--text); text-transform: uppercase;
+    letter-spacing: .1em; }
+  .hb .meta { color: var(--text-dim); font-size: 11px; }
+  #feed { height: 320px; overflow-y: auto; font-size: 11.5px; line-height: 1.55; }
+  #feed .line { display: flex; gap: 8px; }
+  #feed .t { color: var(--text-dim); flex-shrink: 0; }
+  #feed .a { color: var(--cyan); width: 70px; flex-shrink: 0; }
+  #feed .s { color: var(--amber); flex-shrink: 0; }
+  #feed .m { color: var(--text); word-break: break-word; }
+  #feed::-webkit-scrollbar { width: 6px; }
+  #feed::-webkit-scrollbar-thumb { background: var(--panel-edge); }
+  .avoid-item { color: var(--amber); font-size: 12px; padding: 3px 0; }
+  .empty { color: var(--text-dim); font-size: 11px; font-style: italic; }
+  #conn { font-size: 10px; color: var(--text-dim); letter-spacing: .1em; }
+  #conn.err { color: var(--red); }
+</style>
+</head>
+<body>
+<header>
+  <h1>TRADEBOT</h1>
+  <span class="chip" id="mode-chip">MODE <b id="mode">—</b></span>
+  <span class="chip">REGIME <b id="regime">—</b></span>
+  <span class="chip" id="halt-chip" style="display:none">⛔ HALTED</span>
+  <span class="chip" id="dayhalt-chip" style="display:none">DAILY LOSS CAP</span>
+  <span id="conn">SYNC —</span>
+  <button id="resume" onclick="doResume()" style="display:none">CLEAR HALT</button>
+  <button id="kill" onclick="doKill()">◉ KILL SWITCH</button>
+</header>
+
+<div class="grid">
+  <div class="col">
+    <div class="panel">
+      <h2><span class="live-dot"></span>EQUITY CURVE</h2>
+      <div class="stat-row">
+        <div class="stat"><div class="label">EQUITY</div><div class="value" id="equity">—</div></div>
+        <div class="stat"><div class="label">DAY START</div><div class="value" id="daystart">—</div></div>
+        <div class="stat"><div class="label">DAY P/L</div><div class="value" id="daypl">—</div></div>
+      </div>
+      <canvas id="chart" height="220"></canvas>
+    </div>
+    <div class="panel">
+      <h2>OPEN POSITIONS</h2>
+      <table id="positions">
+        <thead><tr><th>SYM</th><th class="num">QTY</th><th class="num">ENTRY</th>
+        <th class="num">LAST</th><th class="num">VALUE</th><th class="num">UNRLZD P/L</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="pos-empty" style="display:none">no open positions</div>
+    </div>
+    <div class="panel">
+      <h2>RECENT TRADES</h2>
+      <table id="trades">
+        <thead><tr><th>TIME</th><th>SYM</th><th>SIDE</th><th class="num">QTY</th>
+        <th class="num">PRICE</th><th>REASON</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="trades-empty" style="display:none">no trades yet</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="panel">
+      <h2>AGENT STATUS</h2>
+      <div id="heartbeats"></div>
+    </div>
+    <div class="panel">
+      <h2>NEWS AVOID LIST</h2>
+      <div id="avoid"></div>
+    </div>
+    <div class="panel">
+      <h2><span class="live-dot"></span>REASONING FEED</h2>
+      <div id="feed"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+let lastLogId = 0;
+const $ = id => document.getElementById(id);
+const fmt = n => n == null ? "—" : Number(n).toLocaleString("en-US",
+  {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const ts = t => new Date(t * 1000).toLocaleTimeString("en-US", {hour12: false});
+
+async function poll() {
+  try {
+    const r = await fetch("/api/overview");
+    if (!r.ok) throw new Error(r.status);
+    render(await r.json());
+    $("conn").textContent = "SYNC " + new Date().toLocaleTimeString("en-US", {hour12:false});
+    $("conn").classList.remove("err");
+  } catch (e) {
+    $("conn").textContent = "SYNC LOST";
+    $("conn").classList.add("err");
+  }
+}
+
+async function pollLogs() {
+  try {
+    const r = await fetch(`/api/logs?after_id=${lastLogId}`);
+    if (!r.ok) return;
+    const data = await r.json();
+    const feed = $("feed");
+    const atBottom = feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 30;
+    for (const l of data.logs) {
+      lastLogId = Math.max(lastLogId, l.id);
+      const div = document.createElement("div");
+      div.className = "line";
+      div.innerHTML = `<span class="t">${ts(l.ts)}</span>` +
+        `<span class="a">${esc(l.agent)}</span>` +
+        (l.symbol ? `<span class="s">${esc(l.symbol)}</span>` : "") +
+        `<span class="m">${esc(l.message)}</span>`;
+      feed.appendChild(div);
+    }
+    while (feed.children.length > 400) feed.removeChild(feed.firstChild);
+    if (atBottom) feed.scrollTop = feed.scrollHeight;
+  } catch (e) { /* covered by SYNC indicator */ }
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g,
+    c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function render(d) {
+  $("mode").textContent = d.mode.toUpperCase();
+  $("mode-chip").className = "chip " + d.mode;
+  $("regime").textContent = `${d.regime.label} x${d.regime.multiplier}`;
+  $("halt-chip").style.display = d.halt.active ? "" : "none";
+  $("halt-chip").title = d.halt.reason || "";
+  $("resume").style.display = d.halt.active ? "" : "none";
+  $("dayhalt-chip").style.display = d.day_halt ? "" : "none";
+  $("dayhalt-chip").className = "chip halted";
+  if (d.halt.active) $("halt-chip").className = "chip halted";
+
+  const curve = d.equity_curve;
+  const eq = curve.length ? curve[curve.length - 1].equity : null;
+  const dayStart = d.day_start_equity ? parseFloat(d.day_start_equity) : null;
+  $("equity").textContent = eq == null ? "—" : "$" + fmt(eq);
+  $("daystart").textContent = dayStart == null ? "—" : "$" + fmt(dayStart);
+  if (eq != null && dayStart) {
+    const pl = eq - dayStart, pct = pl / dayStart * 100;
+    const el = $("daypl");
+    el.textContent = `${pl >= 0 ? "+" : ""}${fmt(pl)} (${pct.toFixed(2)}%)`;
+    el.className = "value " + (pl >= 0 ? "pos" : "neg");
+  }
+  drawChart(curve, dayStart);
+
+  const ptb = $("positions").querySelector("tbody");
+  ptb.innerHTML = "";
+  $("pos-empty").style.display = d.positions.length ? "none" : "";
+  for (const p of d.positions) {
+    const pl = p.unrealized_pl;
+    ptb.insertAdjacentHTML("beforeend",
+      `<tr><td>${esc(p.symbol)}</td><td class="num">${p.qty}</td>` +
+      `<td class="num">${fmt(p.entry_price)}</td><td class="num">${fmt(p.current_price)}</td>` +
+      `<td class="num">${fmt(p.market_value)}</td>` +
+      `<td class="num ${pl >= 0 ? "pos" : "neg"}">${pl == null ? "—" : fmt(pl)}</td></tr>`);
+  }
+
+  const ttb = $("trades").querySelector("tbody");
+  ttb.innerHTML = "";
+  $("trades-empty").style.display = d.trades.length ? "none" : "";
+  for (const t of d.trades) {
+    ttb.insertAdjacentHTML("beforeend",
+      `<tr><td>${ts(t.ts)}</td><td>${esc(t.symbol)}</td>` +
+      `<td class="${t.side === "buy" ? "pos" : "neg"}">${t.side.toUpperCase()}</td>` +
+      `<td class="num">${t.qty || ""}</td><td class="num">${fmt(t.price)}</td>` +
+      `<td style="color:var(--text-dim)">${esc((t.reason || "").slice(0, 60))}</td></tr>`);
+  }
+
+  const hb = $("heartbeats");
+  hb.innerHTML = "";
+  for (const h of d.heartbeats) {
+    hb.insertAdjacentHTML("beforeend",
+      `<div class="hb"><span class="dot ${h.alive ? "ok" : "dead"}"></span>` +
+      `<span class="agent">${esc(h.agent)}</span>` +
+      `<span class="meta">${h.age_sec}s ago · pid ${h.pid} · ${esc(h.status)}</span></div>`);
+  }
+  if (!d.heartbeats.length) hb.innerHTML = '<div class="empty">no agents reporting</div>';
+
+  const av = $("avoid");
+  av.innerHTML = "";
+  for (const a of d.avoid_list) {
+    const mins = Math.max(0, Math.round((a.expires_ts - d.ts) / 60));
+    av.insertAdjacentHTML("beforeend",
+      `<div class="avoid-item">⏸ ${esc(a.symbol)} — ${esc(a.reason)} (${mins}m left)</div>`);
+  }
+  if (!d.avoid_list.length) av.innerHTML = '<div class="empty">clear — no paused symbols</div>';
+}
+
+function drawChart(curve, dayStart) {
+  const cv = $("chart");
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = 220;
+  cv.width = w * dpr; cv.height = h * dpr;
+  const ctx = cv.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  if (curve.length < 2) {
+    ctx.fillStyle = "#4f6b80"; ctx.font = "11px monospace";
+    ctx.fillText("waiting for equity data…", 10, h / 2);
+    return;
+  }
+  const vals = curve.map(p => p.equity);
+  let min = Math.min(...vals), max = Math.max(...vals);
+  if (dayStart) { min = Math.min(min, dayStart); max = Math.max(max, dayStart); }
+  const pad = (max - min) * 0.1 || max * 0.001 || 1;
+  min -= pad; max += pad;
+  const x = i => i / (vals.length - 1) * (w - 8) + 4;
+  const y = v => h - 6 - (v - min) / (max - min) * (h - 12);
+
+  ctx.strokeStyle = "rgba(18,32,46,.9)"; ctx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) {
+    const gy = 6 + g * (h - 12) / 4;
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+  }
+  if (dayStart) {
+    ctx.strokeStyle = "rgba(255,179,71,.5)"; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(0, y(dayStart)); ctx.lineTo(w, y(dayStart));
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  const up = vals[vals.length - 1] >= vals[0];
+  const color = up ? "#3dffa2" : "#ff4d5e";
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, up ? "rgba(61,255,162,.25)" : "rgba(255,77,94,.25)");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.beginPath();
+  vals.forEach((v, i) => i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v)));
+  ctx.strokeStyle = color; ctx.lineWidth = 1.6;
+  ctx.shadowColor = color; ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.lineTo(x(vals.length - 1), h); ctx.lineTo(x(0), h); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  ctx.fillStyle = "#4f6b80"; ctx.font = "10px monospace";
+  ctx.fillText("$" + Math.round(max - pad).toLocaleString(), 6, 14);
+  ctx.fillText("$" + Math.round(min + pad).toLocaleString(), 6, h - 8);
+}
+
+async function doKill() {
+  if (!confirm("KILL SWITCH: write halt.flag and stop ALL new trading?")) return;
+  await fetch("/api/kill", {method: "POST"});
+  poll();
+}
+async function doResume() {
+  if (!confirm("Clear halt.flag and allow trading to resume next cycle?")) return;
+  await fetch("/api/resume", {method: "POST"});
+  poll();
+}
+
+poll(); pollLogs();
+setInterval(poll, 4000);
+setInterval(pollLogs, 3000);
+</script>
+</body>
+</html>

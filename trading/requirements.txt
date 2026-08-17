@@ -1,0 +1,10 @@
+# Python 3.12 — pinned majors, small footprint for a 1GB droplet.
+# No pandas/numpy: indicators are pure Python.
+requests>=2.32,<3
+python-dotenv>=1.0,<2
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+anthropic>=0.60
+PyJWT>=2.9,<3
+cryptography>=43
+pytest>=8

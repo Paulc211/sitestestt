@@ -1,0 +1,20 @@
+[Unit]
+Description=tradebot market-regime agent (volatility -> position sizing)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tradebot
+WorkingDirectory=/opt/tradebot
+ExecStart=/opt/tradebot/.venv/bin/python -m agents.regime_agent
+Restart=always
+RestartSec=30
+MemoryMax=120M
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/tradebot/state /opt/tradebot/logs
+
+[Install]
+WantedBy=multi-user.target
