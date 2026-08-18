@@ -60,7 +60,9 @@ def _require(name: str) -> str:
 
 
 def _optional(name: str, default: str = "") -> str:
-    return os.getenv(name, default).strip()
+    # a present-but-blank line in .env (e.g. "ANTHROPIC_MODEL=") must fall
+    # back to the default, same as a missing line
+    return (os.getenv(name) or default).strip() or default
 
 
 # --- Alpaca ----------------------------------------------------------------
