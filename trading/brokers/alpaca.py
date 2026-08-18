@@ -12,6 +12,8 @@ We only ever use CLOSED bars and never assume SIP-quality fills.
 from __future__ import annotations
 
 import logging
+import math
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -164,10 +166,17 @@ class AlpacaBroker(Broker):
             "symbol": a_sym, "qty": f"{qty:.6f}", "side": "buy",
             "type": "market", "time_in_force": "gtc",
         })
-        # broker-side stop so it fires even if this server is dead
+        # broker-side stop so it fires even if this server is dead.
+        # IMPORTANT: Alpaca takes its crypto fee out of the base asset, so the
+        # filled quantity is slightly LESS than requested — size the stop from
+        # the actual sellable balance, never the requested qty.
         try:
+            stop_qty = self._crypto_sellable_qty(symbol, qty)
+            if stop_qty <= 0:
+                raise ApiError(0, "no sellable quantity after entry fill",
+                               "alpaca:crypto-stop")
             stop = self._post("/v2/orders", {
-                "symbol": a_sym, "qty": f"{qty:.6f}", "side": "sell",
+                "symbol": a_sym, "qty": f"{stop_qty:.9f}", "side": "sell",
                 "type": "stop_limit", "time_in_force": "gtc",
                 "stop_price": f"{stop_price:.2f}",
                 # limit slightly through the stop so it actually fills
@@ -179,9 +188,28 @@ class AlpacaBroker(Broker):
             log.exception("Protective stop REJECTED for %s — closing entry", symbol)
             self.close_position(symbol)
             raise
-        log.info("Crypto buy %s x%.6f with broker-side stop %.2f",
-                 symbol, qty, stop_price)
+        log.info("Crypto buy %s x%.6f with broker-side stop %.2f on %.9f",
+                 symbol, qty, stop_price, stop_qty)
         return entry
+
+    def _crypto_sellable_qty(self, symbol: str, requested: float) -> float:
+        """Actual quantity we can attach a sell order to, post-fees. Polls the
+        position briefly because market-buy settlement isn't instantaneous."""
+        pos_sym = to_alpaca(symbol).replace("/", "")
+        avail = 0.0
+        for _ in range(6):
+            try:
+                p = self._get(self._trading, f"/v2/positions/{pos_sym}")
+                avail = float(p.get("qty_available") or p.get("qty") or 0)
+            except ApiError as e:
+                if e.status != 404:
+                    raise
+            if avail > 0:
+                break
+            time.sleep(1)
+        # round DOWN so we never ask for a hair more than we hold
+        qty = math.floor(min(avail, requested) * 1e9) / 1e9
+        return qty
 
     def close_position(self, symbol: str) -> dict[str, Any] | None:
         # cancel this symbol's working orders first (bracket children / stops)

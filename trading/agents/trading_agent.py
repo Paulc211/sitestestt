@@ -95,8 +95,13 @@ class TradingAgent:
                 db.heartbeat(AGENT, os.getpid(), "ok")
             except Exception as e:
                 log.exception("Cycle failed")
-                db.heartbeat(AGENT, os.getpid(), f"error: {type(e).__name__}")
-                db.log_reasoning(AGENT, f"Cycle failed: {type(e).__name__}: {e}")
+                # the error-reporting writes must never be able to kill the
+                # process themselves (e.g. transient sqlite lock)
+                try:
+                    db.heartbeat(AGENT, os.getpid(), f"error: {type(e).__name__}")
+                    db.log_reasoning(AGENT, f"Cycle failed: {type(e).__name__}: {e}")
+                except Exception:
+                    log.exception("Could not record cycle error in DB")
             elapsed = time.time() - started
             time.sleep(max(5.0, config.LOOP_INTERVAL_SEC - elapsed))
 
@@ -170,6 +175,15 @@ class TradingAgent:
         holding = symbol in ctx.open_symbols
 
         if signal.action == Signal.BUY and not holding:
+            # one entry attempt per signal bar: if the order fails, do NOT
+            # re-buy on the same bar every cycle (that bleeds the spread)
+            bar_key = f"entry_bar:{symbol}"
+            bar_ts = str(bars[-1]["t"])
+            if db.kv_get(bar_key) == bar_ts:
+                db.log_reasoning(AGENT, "entry already attempted on this bar — "
+                                        "waiting for next signal", symbol)
+                return
+            db.kv_set(bar_key, bar_ts)
             self._enter(symbol, last_close, ctx, broker)
         elif signal.action == Signal.SELL and holding:
             self._exit(symbol, last_close, signal.reason, broker, ctx)
