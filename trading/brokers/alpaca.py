@@ -95,8 +95,13 @@ class AlpacaBroker(Broker):
         return out
 
     def get_open_orders(self) -> list[dict[str, Any]]:
+        # nested=false ON PURPOSE: bracket child orders (the protective stop
+        # and take-profit legs) must come back as flat top-level entries.
+        # Nested format folds them inside the already-filled parent, which
+        # made them invisible to the watchdog's protection check and to
+        # close_position's cancel sweep.
         orders = self._get(self._trading, "/v2/orders",
-                           {"status": "open", "limit": 200, "nested": "true"})
+                           {"status": "open", "limit": 200, "nested": "false"})
         return [{
             "id": o["id"],
             "symbol": from_alpaca(o["symbol"]),
