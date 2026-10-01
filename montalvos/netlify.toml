@@ -1,0 +1,6 @@
+# Netlify config for the Montalvo's site.
+# In the Netlify UI set the site's Base directory to "montalvos" so this file is picked up.
+# Then add ANTHROPIC_API_KEY under Site settings → Environment variables to power the AI assistant.
+[build]
+  publish = "."
+  functions = "netlify/functions"

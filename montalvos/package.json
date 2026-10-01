@@ -1,0 +1,10 @@
+{
+  "name": "montalvos-differentials",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Montalvo's Differentials website with an AI assistant (Netlify Function)",
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  }
+}
